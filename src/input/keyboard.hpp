@@ -24,7 +24,7 @@ namespace dxna::input {
 			std::vector<Keys> pressedKeys;
 
 			for (size_t i = 0; i < size; ++i) {
-				if (IsKeyDown(i))
+				if (IsKeyDown(static_cast<int>(i)))
 					pressedKeys.push_back((Keys)i);
 			}
 
@@ -52,21 +52,35 @@ namespace dxna::input {
 			return KeyboardState(flags);
 		}
 
-		static constexpr bool IsKeyDown(Keys key) {
+		static constexpr bool IsKeyDown(Keys const& key) {
 			return flags[(int)key];
 		}
 
-		static constexpr bool IsKeyUp(Keys key) {
+		static constexpr bool IsKeyUp(Keys const& key) {
 			return !flags[(int)key];
 		}
 
-		static constexpr void WinProc(WPARAM wparam, bool value) {
-			flags[wparam] = value;
+		static constexpr void WinProc(UINT const& message, WPARAM const& wparam) {
+			switch (message)
+			{
+			case WM_KEYDOWN:
+				flags[wparam] = true;
+				return;
+			case WM_KEYUP:
+				flags[wparam] = false;
+				return;
+			default:
+				return;
+			}
 		}
 
 	private:
 		static std::vector<bool> flags;
 		static constexpr int KEYDOWN_FLAG = 0x8000;
+
+		constexpr Keyboard() = default;
+		constexpr Keyboard(Keyboard&&) = default;
+		constexpr Keyboard(const Keyboard&) = default;
 	};
 }
 

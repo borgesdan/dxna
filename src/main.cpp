@@ -4,7 +4,7 @@
 #include "main.hpp"
 #include <windows.h> 
 
-#include "input/keyboard.hpp"
+#include "input/input.hpp"
 
 using namespace std;
 using namespace dxna::input;
@@ -25,7 +25,7 @@ LRESULT CALLBACK WinProc(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
     HWND         hwnd;                // identificador da janela
     MSG          msg;                 // mensagem
-    WNDCLASS     wndclass;            // classe da janela
+    WNDCLASS     wndclass;            // classe da janela    
 
     // definindo uma classe de janela chamada "GameWindow" 
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -137,14 +137,14 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_KEYDOWN:
         vkKeys[wParam] = true;
         InvalidateRect(hwnd, NULL, TRUE);  
-        Keyboard::WinProc(wParam, true);
+        Keyboard::WinProc(message, wParam);
         return 0;
 
         // processa teclas liberadas
     case WM_KEYUP:
         vkKeys[wParam] = false;
         InvalidateRect(hwnd, NULL, TRUE);        
-        Keyboard::WinProc(wParam, false);
+        Keyboard::WinProc(message, wParam);
         return 0;
 
     case WM_PAINT:
