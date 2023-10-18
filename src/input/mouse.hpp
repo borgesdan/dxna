@@ -115,56 +115,43 @@ namespace dxna::input {
 			switch (message)
 			{
 			case WM_MOUSEMOVE:
-				PreviousX = X;
-				PreviousY = Y;
 				X = GET_X_LPARAM(lparam);
 				Y = GET_Y_LPARAM(lparam);
 				return;
 			case WM_MOUSEWHEEL:
-				PreviousWheel = Wheel;
 				Wheel += GET_WHEEL_DELTA_WPARAM(wparam);
 				return;
 			case WM_LBUTTONDOWN:
-				PreviousLeft = Left;
 				Left = ButtonState::Pressed;
 				return;
 			case WM_LBUTTONUP:
-				PreviousLeft = Left;
 				Left = ButtonState::Released;
 				return;
 			case WM_MBUTTONDOWN:
-				PreviousMiddle = Middle;
 				Middle = ButtonState::Pressed;
 				return;
 			case WM_MBUTTONUP:
-				PreviousMiddle = Middle;
 				Middle = ButtonState::Released;
 				return;
 			case WM_RBUTTONDOWN:
-				PreviousRight = Right;
 				Right = ButtonState::Pressed;
 				return;
 			case WM_RBUTTONUP:
-				PreviousRight = Right;
 				Right = ButtonState::Released;
 				return;
 			case WM_XBUTTONDOWN:
-				if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON1) {
-					PreviousX1 = X1;
+				if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON1) {					
 					X1 = ButtonState::Pressed;
 				}
-				else if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON2) {
-					PreviousX2 = X2;
+				else if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON2) {					
 					X2 = ButtonState::Pressed;
 				}
 				return;
 			case WM_XBUTTONUP:
 				if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON1) {
-					PreviousX1 = X1;
 					X1 = ButtonState::Released;
 				}
-				else if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON2) {
-					PreviousX2 = X2;
+				else if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON2) {					
 					X2 = ButtonState::Released;
 				}
 				return;		
@@ -181,15 +168,6 @@ namespace dxna::input {
 		static ButtonState Middle;
 		static ButtonState X1;
 		static ButtonState X2;
-
-		static int PreviousX;
-		static int PreviousY;
-		static int64_t PreviousWheel;
-		static ButtonState PreviousLeft;
-		static ButtonState PreviousRight;
-		static ButtonState PreviousMiddle;
-		static ButtonState PreviousX1;
-		static ButtonState PreviousX2;
 
 	private:		
 		constexpr Mouse() = default;
