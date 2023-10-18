@@ -4,11 +4,13 @@
 #include "../includes.hpp"
 
 namespace dxna::input {
+	//Representa os estados das chaves do teclado.
 	enum class KeyState {
 		Up,
 		Down
 	};
 
+	//Representa as chaves do teclado.
 	enum class Keys {
 		None = 0,
 		Back = VK_BACK,

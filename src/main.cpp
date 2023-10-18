@@ -3,6 +3,7 @@
 
 #include "main.hpp"
 #include <windows.h> 
+#include <sstream>       
 
 #include "input/input.hpp"
 
@@ -112,12 +113,17 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     return int(msg.wParam);
 }
 
+std::stringstream stream;
+
 // procedimento da janela
 LRESULT CALLBACK WinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC         hdc;       // representa o dispositivo gráfico
     PAINTSTRUCT ps;        // guarda região invalidada da janela
     RECT        rect;      // região retângular       
+
+    Keyboard::WinProc(message, wParam, lParam);
+    Mouse::WinProc(message, wParam, lParam);
 
     switch (message)
     {
@@ -136,42 +142,33 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         // processa teclas pressionadas
     case WM_KEYDOWN:
         vkKeys[wParam] = true;
-        InvalidateRect(hwnd, NULL, TRUE);  
-        Keyboard::WinProc(message, wParam);
+        InvalidateRect(hwnd, NULL, TRUE);          
         return 0;
 
         // processa teclas liberadas
     case WM_KEYUP:
         vkKeys[wParam] = false;
-        InvalidateRect(hwnd, NULL, TRUE);        
-        Keyboard::WinProc(message, wParam);
+        InvalidateRect(hwnd, NULL, TRUE);  
+        return 0;
+
+    case WM_MOUSEWHEEL:
+        InvalidateRect(hwnd, NULL, TRUE);
         return 0;
 
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
-        GetClientRect(hwnd, &rect);
+        GetClientRect(hwnd, &rect);   
 
-        if (vkKeys[VK_CONTROL])
-            DrawText(hdc, "CTRL", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        if (vkKeys[VK_LEFT])
-            DrawText(hdc, "LEFT", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        if (vkKeys[VK_RIGHT])
-            DrawText(hdc, "RIGHT", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        if (vkKeys[VK_UP])
-            DrawText(hdc, "UP", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        if (vkKeys[VK_DOWN])
-            DrawText(hdc, "DOWN", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        if (vkKeys[VK_ESCAPE])
-            DrawText(hdc, "ESC", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        if (vkKeys[VK_RETURN])
-            DrawText(hdc, "ENTER", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        if (vkKeys[VK_SPACE])
-            DrawText(hdc, "SPACE", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);   
+        stream.str("");
+        stream << Mouse::Wheel;        
+        DrawText(hdc, stream.str().c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 
-        if (Keyboard::IsKeyDown(Keys::Back))
+        /*if (Keyboard::IsKeyDown(Keys::Back))
             DrawText(hdc, "BACK IS DOWN", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
         if (Keyboard::IsKeyUp(Keys::Back))
-            DrawText(hdc, "BACK IS UP", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+            DrawText(hdc, "BACK IS UP", -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);*/
+
+
 
         rect.bottom -= 100;
         DrawText(hdc, msg, -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
