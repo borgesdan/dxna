@@ -1,5 +1,5 @@
-#ifndef DXNA_BUTTONS_HPP
-#define DXNA_BUTTONS_HPP
+#ifndef DXNA_INPUT_BUTTONS_HPP
+#define DXNA_NPUT_BUTTONS_HPP
 
 namespace dxna::input {
 	//Representa os estados dos botões.

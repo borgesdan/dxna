@@ -1,5 +1,5 @@
-#ifndef DXNA_KEYS_HPP
-#define DXNA_KEYS_HPP
+#ifndef DXNA_NPUT_KEYS_HPP
+#define DXNA_NPUT_KEYS_HPP
 
 #include "../includes.hpp"
 

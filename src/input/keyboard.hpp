@@ -1,5 +1,5 @@
-#ifndef DXNA_KEYBOARD_HPP
-#define DXNA_KEYBOARD_HPP
+#ifndef DXNA_NPUT_KEYBOARD_HPP
+#define DXNA_NPUT_KEYBOARD_HPP
 
 #include "keys.hpp"
 

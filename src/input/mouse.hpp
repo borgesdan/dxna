@@ -1,5 +1,5 @@
-#ifndef DXNA_MOUSE_HPP
-#define DXNA_MOUSE_HPP
+#ifndef DXNA_NPUT_MOUSE_HPP
+#define DXNA_NPUT_MOUSE_HPP
 
 #include "../includes.hpp"
 #include "buttons.hpp"
