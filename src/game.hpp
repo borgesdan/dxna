@@ -1,6 +1,8 @@
 #ifndef DXNA_GAME_HPP
 #define DXNA_GAME_HPP
 
+#include "gametime.hpp"
+
 namespace dxna {
 	class Game {
 	public:
@@ -13,9 +15,9 @@ namespace dxna {
 	protected:
 		virtual void BeginRun(){}
 		virtual void EndRun(){}
-		virtual void Update();
+		virtual void Update(GameTime const& gameTime);
 		virtual bool BeginDraw();
-		virtual void Draw();
+		virtual void Draw(GameTime const& gameTime);
 		virtual void Initialize();
 		void ResetElapsedTime();
 		virtual void OnActived();

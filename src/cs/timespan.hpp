@@ -1,7 +1,8 @@
 #ifndef CS_TIMESPAN_HPP
 #define CS_TIMESPAN_HPP
 
-#include "../includes.hpp"
+#include <limits>
+#include <cstdint>
 
 namespace cs {
 	struct TimeSpan {
@@ -66,11 +67,11 @@ namespace cs {
 		}
 
 		static constexpr TimeSpan MaxValue() {
-			return TimeSpan(long_max);
+			return TimeSpan(std::numeric_limits<int64_t>::max());
 		}
 
 		static constexpr TimeSpan MinValue() {
-			return TimeSpan(long_min);
+			return TimeSpan(std::numeric_limits<int64_t>::min());
 		}
 
 		static constexpr int32_t Compare(TimeSpan const& t1, TimeSpan const& t2) {
