@@ -10,11 +10,11 @@ namespace cs {
 	public:
 		using EventHandlerCallBack = void(*)(TOBJECT& sender, TEVENTARGS& e);
 
-		constexpr void operator+=(EventHandlerCallBack& del) {
+		constexpr void operator+=(EventHandlerCallBack const& del) {
 			delegates.push_back(del);
 		}
 
-		constexpr void operator-=(EventHandlerCallBack& del) {
+		constexpr void operator-=(EventHandlerCallBack const& del) {
 			std::remove(delegates.begin(), delegates.end(), del);
 		}
 
@@ -27,6 +27,10 @@ namespace cs {
 				if(del != nullptr)
 					del(obj, e);
 			}
+		}
+
+		constexpr bool IsEmpty() const {
+			return delegates.empty();
 		}
 
 	private:
