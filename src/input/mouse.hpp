@@ -8,7 +8,7 @@ namespace dxna::input {
 	struct MouseState {
 		int X{ 0 };
 		int Y{ 0 };
-		int Wheel{ 0 };
+		int64_t Wheel{ 0 };
 		ButtonState Left{ ButtonState::Released };
 		ButtonState Right{ ButtonState::Released };
 		ButtonState Middle{ ButtonState::Released };
@@ -17,7 +17,7 @@ namespace dxna::input {
 
 		constexpr MouseState() = default;
 
-		constexpr MouseState(int x, int y, int scrollWheel,
+		constexpr MouseState(int x, int y, int64_t scrollWheel,
 			ButtonState const& left, ButtonState const& right, ButtonState const& middle,
 			ButtonState const& x1, ButtonState const& x2) :
 			X(x), Y(y),	Wheel(scrollWheel),

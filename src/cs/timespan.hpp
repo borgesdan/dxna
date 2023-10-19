@@ -1,8 +1,8 @@
 #ifndef CS_TIMESPAN_HPP
 #define CS_TIMESPAN_HPP
 
-#include <limits>
-#include <cstdint>
+#define NOMINMAX
+#include "../includes.hpp"
 
 namespace cs {
 	struct TimeSpan {
@@ -226,5 +226,7 @@ namespace cs {
 		}
 	};
 }
+
+#undef NOMINMAX
 
 #endif
