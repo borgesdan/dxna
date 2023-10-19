@@ -7,6 +7,7 @@
 
 #include "input/input.hpp"
 
+
 using namespace std;
 using namespace dxna::input;
 
