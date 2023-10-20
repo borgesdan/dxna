@@ -3,6 +3,8 @@
 
 #include "cs/cs.hpp"
 #include "defincludes.hpp"
+#include "structs.hpp"
+#include "enumerations.hpp"
 
 namespace dxna {
 	class GameWindow {
@@ -10,20 +12,14 @@ namespace dxna {
 		static constexpr int DefaultClientWidth = 800;
 		static constexpr int DefaultClientheight = 600;
 
-		std::string Title() const {
+		constexpr std::string Title() const {
 			return std::string(title);
 		}
 
-		void Title(std::string const& value) {
-			if (title == value)
-				return;
-
-			title = value;
-			//SetTitle(title);
-		}
+		void Title(std::string const& value);
 		
-		std::string ScreenDeviceName() const;
-		//DisplayOrientation CurrentOrientation() const;
+		virtual std::string ScreenDeviceName() const = 0;
+		virtual DisplayOrientation CurrentOrientation() const = 0;
 
 		cs::EventHandler<GameWindow, cs::EventArgs> Activated;
 		cs::EventHandler<GameWindow, cs::EventArgs> Deactivated;
@@ -32,16 +28,16 @@ namespace dxna {
 		cs::EventHandler<GameWindow, cs::EventArgs> ClientSizeChanged;
 		cs::EventHandler<GameWindow, cs::EventArgs> OrientationChanged;
 
-		virtual void EndScreenDeviceChange(std::string screnDeviceName, int clientWidth, int clientHeight) = 0;
+		virtual void EndScreenDeviceChange(std::string const& screnDeviceName, int clientWidth, int clientHeight) = 0;
 		
 		bool AllowUserResizing{ false };
 		bool IsMouseVisible{ false };
 		bool IsMinimizes{ false };
-		//Rectangle ClientBounds
+		virtual Rectangle ClientBounds() const = 0;
 
 	protected:
-		virtual void SetTitle(std::string title) = 0;
-		//virtual void SetSupportedOrientations(DisplayOrientation orientations) = 0;
+		virtual void SetTitle(std::string const& title) = 0;
+		virtual void SetSupportedOrientations(DisplayOrientation orientations) = 0;
 
 		virtual void OnActivated() const;
 		virtual void OnDeactivated() const;

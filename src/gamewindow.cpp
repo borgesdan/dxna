@@ -1,4 +1,6 @@
 #include "gamewindow.hpp"
+#include "structs.hpp"
+#include "enumerations.hpp"
 
 namespace dxna {
 	void GameWindow::OnActivated() const {
@@ -23,5 +25,13 @@ namespace dxna {
 
 	void GameWindow::OnOrientationChanged() const {
 		OrientationChanged.Invoke(*this, cs::EventArgs::Empty());
+	}
+
+	void GameWindow::Title(std::string const& value) {
+		if (title == value)
+			return;
+
+		title = value;
+		SetTitle(title);
 	}
 }
