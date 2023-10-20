@@ -8,17 +8,20 @@ namespace cs {
 	template <typename TOBJECT, typename TEVENTARGS>
 	class Delegate {
 	public:
-		using EventHandlerCallBack = void(*)(TOBJECT& sender, TEVENTARGS& e);
+		using EventHandlerCallBack = void(*)(TOBJECT const& sender, TEVENTARGS const& e);
 
-		constexpr void operator+=(EventHandlerCallBack& del) {
+		constexpr void operator+=(EventHandlerCallBack const& del) {
 			delegates.push_back(del);
 		}
 
-		constexpr void operator-=(EventHandlerCallBack& del) {
+		constexpr void operator-=(EventHandlerCallBack const& del) {
 			std::remove(delegates.begin(), delegates.end(), del);
 		}
 
-		void Invoke(TOBJECT& obj, TEVENTARGS& e) const {
+		void Invoke(TOBJECT const& obj, TEVENTARGS const& e) const {
+			if (delegates.empty())
+				return;
+
 			const auto size = delegates.size();
 
 			for (size_t i = 0; i < size; ++i) {
@@ -27,6 +30,10 @@ namespace cs {
 				if(del != nullptr)
 					del(obj, e);
 			}
+		}
+
+		constexpr bool IsEmpty() const {
+			return delegates.empty();
 		}
 
 	private:

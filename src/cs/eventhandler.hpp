@@ -17,7 +17,7 @@ namespace cs {
 	};
 
 	template <typename TOBJECT, typename TEVENTARGS>
-	class EventHandler : Delegate<TOBJECT, TEVENTARGS> {};
+	class EventHandler : public Delegate<TOBJECT, TEVENTARGS> {};
 }
 
 #endif

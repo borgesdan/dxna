@@ -1,7 +1,4 @@
-#include <vector>
-#include <cstdint>
-#include <limits>
-#include <memory>
+#include "defincludes.hpp"
 
 //
 //Usar #define/#undef NOMINMAX para conflitos com max() e min()
