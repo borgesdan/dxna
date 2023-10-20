@@ -17,9 +17,32 @@ namespace dxna {
 		}
 
 		void Title(std::string const& value);
+
+		virtual DisplayOrientation CurrentOrientation() const = 0;		
+
+		virtual void BeginScreenDeviceChange(bool willBeFullScreen) = 0;
+
+		virtual void EndScreenDeviceChange(std::string const& screnDeviceName, int clientWidth, int clientHeight) = 0;
 		
-		virtual std::string ScreenDeviceName() const = 0;
-		virtual DisplayOrientation CurrentOrientation() const = 0;
+		virtual bool AllowUserResizing() const {
+			return false;
+		}
+
+		virtual void AlloUserResizing(bool value) {
+		}
+
+		virtual bool IsMouseVisible() const {
+			return false;
+		}
+
+		virtual void IsMouseVisible(bool value) {
+		}
+
+		virtual bool IsMinimizedState() const {
+			return false;
+		}
+
+		virtual Rectangle ClientBounds() const = 0;
 
 		cs::EventHandler<GameWindow, cs::EventArgs> Activated;
 		cs::EventHandler<GameWindow, cs::EventArgs> Deactivated;
@@ -27,13 +50,6 @@ namespace dxna {
 		cs::EventHandler<GameWindow, cs::EventArgs> ScreenDevicenameChanged;
 		cs::EventHandler<GameWindow, cs::EventArgs> ClientSizeChanged;
 		cs::EventHandler<GameWindow, cs::EventArgs> OrientationChanged;
-
-		virtual void EndScreenDeviceChange(std::string const& screnDeviceName, int clientWidth, int clientHeight) = 0;
-		
-		bool AllowUserResizing{ false };
-		bool IsMouseVisible{ false };
-		bool IsMinimizes{ false };
-		virtual Rectangle ClientBounds() const = 0;
 
 	protected:
 		virtual void SetTitle(std::string const& title) = 0;
