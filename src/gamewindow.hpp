@@ -37,7 +37,7 @@ namespace dxna {
 		}
 
 		//Define se a janela permite ser redimensionada.
-		virtual void AlloUserResizing(bool value) {
+		virtual void AllowUserResizing(bool value) {
 		}
 
 		//Obtém se o mouse deve ser visível na janela.

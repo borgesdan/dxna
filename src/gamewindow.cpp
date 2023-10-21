@@ -1,6 +1,7 @@
 #include "gamewindow.hpp"
 #include "structs.hpp"
 #include "enumerations.hpp"
+#include "gamewindow.hpp"
 
 namespace dxna {
 	void GameWindow::OnActivated() const {
