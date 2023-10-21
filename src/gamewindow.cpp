@@ -13,11 +13,7 @@ namespace dxna {
 
 	void GameWindow::OnPaint() const {
 		Paint.Invoke(*this, cs::EventArgs::Empty());
-	}
-
-	void GameWindow::OnScreenDeviceNameChanged() const {
-		ScreenDevicenameChanged.Invoke(*this, cs::EventArgs::Empty());
-	}
+	}	
 
 	void GameWindow::OnClientSizeChanged() const {
 		ClientSizeChanged.Invoke(*this, cs::EventArgs::Empty());
