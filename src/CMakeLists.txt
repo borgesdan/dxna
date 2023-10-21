@@ -6,12 +6,16 @@
 add_executable (dxna WIN32 
 "main.cpp"
 "cs/cs.cpp"
+"game.cpp"
+"platforms/windows/wgamewindow.cpp"
 "input/keyboard.cpp"
+"gamewindow.cpp"
 "input/mouse.cpp"
 "input/gamepad.cpp"
 "input/input.cpp"
-"game.cpp"
-"gamewindow.cpp")
+ "platforms/platforms.cpp"
+"platforms/windows/wgamewindow.cpp"
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET dxna PROPERTY CXX_STANDARD 20)

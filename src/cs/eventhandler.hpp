@@ -13,7 +13,7 @@ namespace cs {
 
 		static EventArgs Empty() {
 			return EventArgs();
-		}
+		}		
 	};
 
 	template <typename TOBJECT, typename TEVENTARGS>
