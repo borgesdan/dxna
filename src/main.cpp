@@ -121,10 +121,7 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC         hdc;       // representa o dispositivo gráfico
     PAINTSTRUCT ps;        // guarda região invalidada da janela
-    RECT        rect;      // região retângular       
-
-    Keyboard::WinProc(message, wParam, lParam);
-    Mouse::WinProc(message, wParam, lParam);
+    RECT        rect;      // região retângular           
 
     switch (message)
     {

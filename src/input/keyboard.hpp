@@ -2,6 +2,7 @@
 #define DXNA_NPUT_KEYBOARD_HPP
 
 #include "keys.hpp"
+#include <vector>
 
 namespace dxna::input {
 	struct KeyboardState {	
@@ -16,8 +17,24 @@ namespace dxna::input {
 			return flags[(int)key];
 		}
 
+		//Obtém TRUE caso a tecla informada esteja pressionada.
+		bool constexpr IsKeyDown(size_t key) const {
+			if (key > 255)
+				return false;
+
+			return flags[key];
+		}
+
 		//Obtém TRUE caso a tecla informada esteja liberada.
-		constexpr bool IsKeyUp(Keys const& key) const {
+		constexpr bool IsKeyUp(Keys const& key) const {			
+			return !flags[(int)key];
+		}
+
+		//Obtém TRUE caso a tecla informada esteja liberada.
+		constexpr bool IsKeyUp(size_t key) const {
+			if (key > 255)
+				return false;
+
 			return !flags[(int)key];
 		}
 
@@ -40,10 +57,6 @@ namespace dxna::input {
 
 	private:
 		std::vector<bool> flags;
-		
-		bool constexpr IsKeyDown(int const& key) const {
-			return flags[key];
-		}
 	};
 
 	struct Keyboard {
@@ -57,8 +70,24 @@ namespace dxna::input {
 			return flags[(int)key];
 		}
 
+		//Obtém TRUE caso a tecla informada esteja pressionada.
+		bool constexpr IsKeyDown(size_t key) const {
+			if (key > 255)
+				return false;
+
+			return flags[key];
+		}
+
 		//Obtém TRUE caso a tecla informada esteja liberada.
 		static constexpr bool IsKeyUp(Keys const& key) {
+			return !flags[(int)key];
+		}
+
+		//Obtém TRUE caso a tecla informada esteja liberada.
+		bool constexpr IsKeyUp(size_t key) const {
+			if (key > 255)
+				return false;
+
 			return !flags[(int)key];
 		}
 
@@ -73,20 +102,13 @@ namespace dxna::input {
 			}
 
 			return pressedKeys;
-		}
+		}		
 
-		static constexpr void WinProc(UINT message, WPARAM wparam, LPARAM lparam){
-			switch (message)
-			{
-			case WM_KEYDOWN:
-				flags[wparam] = true;
+		static constexpr void SetFlag(size_t index, bool value) {
+			if (index > 255)
 				return;
-			case WM_KEYUP:
-				flags[wparam] = false;
-				return;
-			default:
-				return;
-			}
+
+			flags[index] = value;
 		}
 
 	private:
@@ -95,11 +117,7 @@ namespace dxna::input {
 
 		constexpr Keyboard() = default;
 		constexpr Keyboard(Keyboard&&) = default;
-		constexpr Keyboard(const Keyboard&) = default;
-
-		bool constexpr IsKeyDown(int const& key) const {
-			return flags[key];
-		}
+		constexpr Keyboard(const Keyboard&) = default;		
 	};
 }
 

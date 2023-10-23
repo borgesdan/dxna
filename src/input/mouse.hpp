@@ -111,55 +111,6 @@ namespace dxna::input {
 		//Define a posição do cursor do mouse.
 		static void SetPosition(int x, int y);
 
-		static constexpr void WinProc(UINT message, WPARAM wparam, LPARAM lparam) {
-			switch (message)
-			{
-			case WM_MOUSEMOVE:
-				X = GET_X_LPARAM(lparam);
-				Y = GET_Y_LPARAM(lparam);
-				return;
-			case WM_MOUSEWHEEL:
-				Wheel += GET_WHEEL_DELTA_WPARAM(wparam);
-				return;
-			case WM_LBUTTONDOWN:
-				Left = ButtonState::Pressed;
-				return;
-			case WM_LBUTTONUP:
-				Left = ButtonState::Released;
-				return;
-			case WM_MBUTTONDOWN:
-				Middle = ButtonState::Pressed;
-				return;
-			case WM_MBUTTONUP:
-				Middle = ButtonState::Released;
-				return;
-			case WM_RBUTTONDOWN:
-				Right = ButtonState::Pressed;
-				return;
-			case WM_RBUTTONUP:
-				Right = ButtonState::Released;
-				return;
-			case WM_XBUTTONDOWN:
-				if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON1) {					
-					X1 = ButtonState::Pressed;
-				}
-				else if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON2) {					
-					X2 = ButtonState::Pressed;
-				}
-				return;
-			case WM_XBUTTONUP:
-				if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON1) {
-					X1 = ButtonState::Released;
-				}
-				else if (GET_XBUTTON_WPARAM(wparam) == MK_XBUTTON2) {					
-					X2 = ButtonState::Released;
-				}
-				return;		
-			default:
-				break;
-			}
-		}	
-
 		static int X;
 		static int Y;
 		static int64_t Wheel;
