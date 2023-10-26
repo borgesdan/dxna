@@ -38,25 +38,12 @@ namespace dxna::input {
 			return !flags[(int)key];
 		}
 
-		//Obtém uma lista de todas as teclas pressionadas
-		constexpr std::vector<Keys> GetPressedKeys() {			
-			auto const size = flags.size();
-			std::vector<Keys> pressedKeys;
-
-			for (size_t i = 0; i < size; ++i) {
-				if (IsKeyDown(static_cast<int>(i)))
-					pressedKeys.push_back((Keys)i);
-			}
-
-			return pressedKeys;
-		}
-
 		constexpr KeyState operator[](Keys const& key) const {
 			return IsKeyDown(key) ? KeyState::Down : KeyState::Up;
 		}
 
 	private:
-		std::vector<bool> flags;
+		std::vector<bool> flags = std::vector<bool>(255);
 	};
 
 	struct Keyboard {
@@ -91,19 +78,6 @@ namespace dxna::input {
 			return !flags[(int)key];
 		}
 
-		//Obtém uma lista de todas as teclas pressionadas
-		constexpr std::vector<Keys> GetPressedKeys() {
-			auto const size = flags.size();
-			std::vector<Keys> pressedKeys;
-
-			for (size_t i = 0; i < size; ++i) {
-				if (IsKeyDown(static_cast<int>(i)))
-					pressedKeys.push_back((Keys)i);
-			}
-
-			return pressedKeys;
-		}		
-
 		static constexpr void SetFlag(size_t index, bool value) {
 			if (index > 255)
 				return;
@@ -113,7 +87,6 @@ namespace dxna::input {
 
 	private:
 		static std::vector<bool> flags;
-		static constexpr int KEYDOWN_FLAG = 0x8000;
 
 		constexpr Keyboard() = default;
 		constexpr Keyboard(Keyboard&&) = default;
