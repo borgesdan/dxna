@@ -2,7 +2,7 @@
 #define DXNA_GAMETIME_HPP
 
 #include "cs/cs.hpp"
-#include "includes.hpp"
+#include "defincludes.hpp"
 
 namespace dxna {
 	class GameTime {

@@ -1,5 +1,5 @@
-#ifndef DXNA_PLATFORMS_WINDOWS_WINPUT_HPP
-#define DXNA_PLATFORMS_WINDOWS_WINPUT_HPP
+#ifndef DXNA_PLT_WIN_WINPUT_HPP
+#define DXNA_PLT_WIN_WINPUT_HPP
 
 #include "win32includes.hpp"
 #include "../../input/input.hpp"
@@ -66,6 +66,12 @@ namespace dxna::input{
 		default:
 			break;
 		}
+	}
+
+	inline void Mouse::SetPosition(int x, int y) {
+		X = x;
+		Y = y;
+		SetCursorPos(x, y);
 	}
 }
 
