@@ -25,34 +25,22 @@ namespace dxna {
 		void Title(std::string const& value);
 
 		//Obtém a orientação da janela.
-		virtual DisplayOrientation CurrentOrientation() const = 0;		
-
-		virtual void BeginScreenDeviceChange(bool willBeFullScreen) = 0;
-
-		virtual void EndScreenDeviceChange(std::string const& screnDeviceName, int clientWidth, int clientHeight) = 0;
+		virtual DisplayOrientation CurrentOrientation() const = 0;
 		
 		//Obtém se a janela permite ser redimensionada.
-		virtual bool AllowUserResizing() const {
-			return false;
-		}
+		virtual bool AllowUserResizing() const { return false; }
 
 		//Define se a janela permite ser redimensionada.
-		virtual void AllowUserResizing(bool value) {
-		}
+		virtual void AllowUserResizing(bool value) {}
 
 		//Obtém se o mouse deve ser visível na janela.
-		virtual bool IsMouseVisible() const {
-			return false;
-		}
+		virtual bool IsMouseVisible() const { return false; }
 
 		//Define se o mouse deve ser visível na janela.
-		virtual void IsMouseVisible(bool value) {
-		}
+		virtual void IsMouseVisible(bool value) {}
 
 		//Obtém se a janela está minimizada.
-		virtual bool IsMinimizedState() const {
-			return false;
-		}
+		virtual bool IsMinimizedState() const {	return false; }
 
 		//Obtém os limites da janela.
 		virtual Rectangle ClientBounds() const = 0;
@@ -61,8 +49,6 @@ namespace dxna {
 		cs::EventHandler<GameWindow, cs::EventArgs> Activated;
 		//Eventos ativados quando a janela for desativada.
 		cs::EventHandler<GameWindow, cs::EventArgs> Deactivated;
-		//Eventos ativados quando a janela for desenhada.
-		cs::EventHandler<GameWindow, cs::EventArgs> Paint;
 		//Eventos ativados quando a janela tiver seu tamanho cliente mudado.
 		cs::EventHandler<GameWindow, cs::EventArgs> ClientSizeChanged;
 		//Eventos ativados quando a janela tiver sua orientação mudada.
@@ -72,11 +58,21 @@ namespace dxna {
 		virtual void SetTitle(std::string const& title) = 0;
 		virtual void SetSupportedOrientations(DisplayOrientation orientations) = 0;
 
-		virtual void OnActivated() const;
-		virtual void OnDeactivated() const;
-		virtual void OnPaint() const;
-		virtual void OnClientSizeChanged() const;
-		virtual void OnOrientationChanged() const;
+		inline void OnActivated() const {
+			Activated.Invoke(*this, cs::EventArgs::Empty());
+		}
+
+		inline void OnDeactivated() const {
+			Deactivated.Invoke(*this, cs::EventArgs::Empty());
+		}
+
+		inline void OnClientSizeChanged() const {
+			ClientSizeChanged.Invoke(*this, cs::EventArgs::Empty());
+		}
+
+		inline void OnOrientationChanged() const {
+			OrientationChanged.Invoke(*this, cs::EventArgs::Empty());
+		}
 
 	private:
 		std::string title;

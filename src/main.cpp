@@ -3,6 +3,7 @@
 
 #include "main.hpp"
 #include <windows.h> 
+#include <windowsx.h> 
 #include <sstream>       
 
 #include "input/input.hpp"

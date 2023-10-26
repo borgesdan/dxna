@@ -1,5 +1,5 @@
-#ifndef DXNA_PLATFORMS_WINDOWS_GAMEWINDOW_HPP
-#define DXNA_PLATFORMS_WINDOWS_GAMEWINDOW_HPP
+#ifndef DXNA_PLT_WIN_WGAMEWINDOW_HPP
+#define DXNA_PLT_WIN_WGAMEWINDOW_HPP
 
 #include "win32includes.hpp"
 #include "../../gamewindow.hpp"
@@ -12,15 +12,33 @@ namespace dxna {
 
 		bool Create();
 		void Show();
-		virtual bool AllowUserResizing() const override;
-		virtual void AllowUserResizing(bool value) override;
-		virtual bool IsMouseVisible() const override;
-		virtual void IsMouseVisible(bool value) override;
+		
+		inline virtual bool AllowUserResizing() const override {
+			return allowUserResizing;
+		}
+		
+		inline virtual void AllowUserResizing(bool value) override {
+			allowUserResizing = value;
+		}
+
+		inline virtual bool IsMouseVisible() const override {
+			return isMouseVisible;
+		}
+
+		inline virtual void IsMouseVisible(bool value) override {
+			isMouseVisible = value;
+			ShowCursor(value);
+		}
+
 		virtual Rectangle ClientBounds() const override;
-		virtual DisplayOrientation CurrentOrientation() const override;
-		virtual bool IsMinimizedState() const override;
-		virtual void BeginScreenDeviceChange(bool willBeFullScreen) override;
-		virtual void EndScreenDeviceChange(std::string const& screnDeviceName, int clientWidth, int clientHeight) override;
+		
+		inline virtual DisplayOrientation CurrentOrientation() const override {
+			return DisplayOrientation::Default;
+		}
+
+		virtual bool IsMinimizedState() const override {
+			return IsIconic(hwnd);
+		}
 
 		LRESULT InternalWinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		
@@ -28,11 +46,19 @@ namespace dxna {
 		cs::EventHandler<GameWindow, cs::EventArgs> Resume;
 
 	protected:
-		virtual void SetTitle(std::string const& title) override;
+		inline virtual void SetTitle(std::string const& title) override {
+			SetWindowText(hwnd, LPCSTR(title.c_str()));
+		}
+
 		virtual void SetSupportedOrientations(DisplayOrientation orientations) override {}
 
-		void OnSuspend() const;
-		void OnResume() const;
+		inline void OnSuspend() const {
+			Suspend.Invoke(*this, cs::EventArgs::Empty());
+		}
+
+		inline void OnResume() const {
+			Resume.Invoke(*this, cs::EventArgs::Empty());
+		}
 
 	private:
 		bool allowUserResizing{ false };
@@ -40,8 +66,7 @@ namespace dxna {
 		bool inDeviceTransition{ false };
 		bool hasCreated{ false };
 		int currentClientWidth{ DefaultClientWidth };
-		int currentClientHeight{ DefaultClientHeight };
-		
+		int currentClientHeight{ DefaultClientHeight };		
 
 		HWND hwnd = nullptr;
 		WNDCLASS wndclass{};

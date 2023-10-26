@@ -8,9 +8,5 @@ namespace dxna::input {
 	ButtonState Mouse::Right{ ButtonState::Released };
 	ButtonState Mouse::Middle{ ButtonState::Released };
 	ButtonState Mouse::X1{ ButtonState::Released };
-	ButtonState Mouse::X2{ ButtonState::Released };
-
-	void Mouse::SetPosition(int x, int y) {
-		SetCursorPos(x, y);
-	}
+	ButtonState Mouse::X2{ ButtonState::Released };	
 }

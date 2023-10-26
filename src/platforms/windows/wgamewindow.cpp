@@ -80,25 +80,8 @@ namespace dxna {
 
 		ShowWindow(hwnd, 0);
 		UpdateWindow(hwnd);
-	}
-
-	void WindowsGameWindow::AllowUserResizing(bool value) {
-		allowUserResizing = value;
-	}
-
-	bool WindowsGameWindow::AllowUserResizing() const {
-		return allowUserResizing;
-	}
-
-	bool WindowsGameWindow::IsMouseVisible() const {
-		return isMouseVisible;
-	}
-
-	void WindowsGameWindow::IsMouseVisible(bool value) {
-		isMouseVisible = value;
-		ShowCursor(value);
-	}
-
+	}		
+	
 	Rectangle WindowsGameWindow::ClientBounds() const {
 		RECT rect{};
 		GetWindowRect(hwnd, &rect);
@@ -108,19 +91,7 @@ namespace dxna {
 			rect.top,
 			rect.right - rect.left,
 			rect.bottom - rect.top);
-	}
-
-	DisplayOrientation WindowsGameWindow::CurrentOrientation() const {
-		return DisplayOrientation::Default;
-	}
-
-	bool WindowsGameWindow::IsMinimizedState() const {
-		return IsIconic(hwnd);
-	}
-
-	void WindowsGameWindow::BeginScreenDeviceChange(bool willBeFullScreen) {}
-
-	void WindowsGameWindow::EndScreenDeviceChange(std::string const& screnDeviceName, int clientWidth, int clientHeight) {}
+	}		
 
 	LRESULT WindowsGameWindow::InternalWinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 		switch (message)
@@ -130,11 +101,7 @@ namespace dxna {
 				OnDeactivated();
 			else
 				OnActivated();
-			return 0;
-
-		case WM_PAINT:
-			OnPaint();
-			return 0;
+			return 0;		
 
 		case WM_KILLFOCUS:
 			OnSuspend();
@@ -147,17 +114,6 @@ namespace dxna {
 		default:
 			return 0;
 		}
-	}
-
-	void WindowsGameWindow::SetTitle(std::string const& title) {
-		SetWindowText(hwnd, LPCSTR(title.c_str()));
-	}
-
-	void WindowsGameWindow::OnSuspend() const {
-		Suspend.Invoke(*this, cs::EventArgs::Empty());
-	}
-
-	void WindowsGameWindow::OnResume() const {
-		Resume.Invoke(*this, cs::EventArgs::Empty());
-	}
+	}		
+	
 }

@@ -1,8 +1,8 @@
 #ifndef DXNA_NPUT_MOUSE_HPP
 #define DXNA_NPUT_MOUSE_HPP
 
-#include "../includes.hpp"
 #include "buttons.hpp"
+#include <cstdint>
 
 namespace dxna::input {
 	struct MouseState {
