@@ -73,11 +73,13 @@ namespace dxna::input {
 			return true;
 		}
 
+		//Operador para acesso direto para verificar se uma tecla está pressionada
 		constexpr KeyState operator[](Keys const& key) const {
 			return IsKeyDown(key) ? KeyState::Down : KeyState::Up;
 		}
 
-		constexpr KeyState operator[](size_t key) const {
+		//Operador para acesso direto para verificar se uma tecla está pressionada
+		constexpr KeyState operator[](size_t const& key) const {
 			return IsKeyDown(key) ? KeyState::Down : KeyState::Up;
 		}
 
@@ -90,7 +92,7 @@ namespace dxna::input {
 		}
 
 		//Adiciona teclas pressionadas ao estado atual, com o máximo de 20 registros.
-		constexpr void AddPressedKey(size_t key) {
+		constexpr void AddPressedKey(size_t const& key) {
 			downKeys[index++] = static_cast<int>(key);
 
 			if (index == MAX_KEYS)
