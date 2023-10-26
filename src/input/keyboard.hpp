@@ -5,8 +5,11 @@
 #include <vector>
 
 namespace dxna::input {
-	struct KeyboardState {	
+	struct Keyboard;
 
+	struct KeyboardState {	
+		//Para acesso amigo a função interna AddPressedKey
+		friend struct Keyboard;
 		constexpr KeyboardState() = default;
 
 		//Obtém TRUE caso a tecla informada esteja pressionada.
@@ -51,53 +54,15 @@ namespace dxna::input {
 		//Operador para acesso direto para verificar se uma tecla está pressionada
 		constexpr KeyState operator[](size_t const& vkkey) const {
 			return IsKeyDown(vkkey) ? KeyState::Down : KeyState::Up;
-		}
+		}					
 
-		//Internal: Adiciona teclas pressionadas ao estado atual, com o máximo de 10 registros.
-		//Retorna true caso a operação seja bem sucedida ou não exceda os 10 registros.
-		constexpr bool AddPressedKey(Keys const& key) {
-			++index;
-
-			if (index == MAX_KEYS)
-				return false;
-
-			switch (index)
-			{
-			case 0:
-				slot0 = static_cast<int>(key);
-				break;
-			case 1:
-				slot1 = static_cast<int>(key);
-				break;
-			case 2:
-				slot2 = static_cast<int>(key);
-				break;
-			case 3:
-				slot3 = static_cast<int>(key);
-				break;
-			case 4:
-				slot4 = static_cast<int>(key);
-				break;
-			case 5:
-				slot5 = static_cast<int>(key);
-				break;
-			case 6:
-				slot6 = static_cast<int>(key);
-				break;
-			case 7:
-				slot7 = static_cast<int>(key);
-				break;
-			case 8:
-				slot8 = static_cast<int>(key);
-				break;
-			case 9:
-				slot9 = static_cast<int>(key);
-				break;
-			default:
-				return false;
-			}
-
-			return true;
+	private:		
+		constexpr bool checkSlots(int const& value) const {
+			return value == slot0 || value == slot1
+				|| value == slot2 || value == slot3
+				|| value == slot4 || value == slot5
+				|| value == slot6 || value == slot7
+				|| value == slot8 || value == slot9;
 		}
 
 		//Internal: Adiciona teclas pressionadas ao estado atual, com o máximo de 10 registros.
@@ -145,15 +110,6 @@ namespace dxna::input {
 			}
 
 			return true;
-		}		
-
-	private:		
-		constexpr bool checkSlots(int const& value) const {
-			return value == slot0 || value == slot1
-				|| value == slot2 || value == slot3
-				|| value == slot4 || value == slot5
-				|| value == slot6 || value == slot7
-				|| value == slot8 || value == slot9;
 		}
 
 		static constexpr int MAX_KEYS = 10;
@@ -174,13 +130,18 @@ namespace dxna::input {
 	struct Keyboard {
 		//Obtém o estado atual do teclado.
 		static KeyboardState GetState() {	
-			KeyboardState state;
+			KeyboardState state;				
 
 			for (size_t i = 0; i < 255; ++i) {
-				if (flags[i]) {
-					state.AddPressedKey(i);
+				if (flags[i]) {					
+					const auto result = state.AddPressedKey(i);					
+
+					if (!result)
+						break;
 				}
 			}				
+
+			return state;
 		}
 
 		//Obtém TRUE caso a tecla informada esteja pressionada.
@@ -198,17 +159,18 @@ namespace dxna::input {
 
 		//Obtém TRUE caso a tecla informada esteja liberada.
 		static constexpr bool IsKeyUp(Keys const& key) {
-			return !flags[(int)key];
+			return !flags[static_cast<int>(key)];
 		}
 
 		//Obtém TRUE caso a tecla informada esteja liberada.
-		bool constexpr IsKeyUp(size_t vkkey) const {
+		static constexpr bool IsKeyUp(size_t vkkey) {
 			if (vkkey > 255)
 				return false;
 
-			return !flags[(int)vkkey];
+			return !flags[vkkey];
 		}
 
+		//Define uma flag de teclado.
 		static constexpr void SetFlag(size_t vkkey, bool value) {
 			if (vkkey > 255)
 				return;
@@ -219,6 +181,7 @@ namespace dxna::input {
 	private:
 		static std::vector<bool> flags;
 
+		//Esconde construtores para transformar a classe em estática.
 		constexpr Keyboard() = default;
 		constexpr Keyboard(Keyboard&&) = default;
 		constexpr Keyboard(const Keyboard&) = default;		
