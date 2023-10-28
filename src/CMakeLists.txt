@@ -3,7 +3,8 @@
 #
 
 # Add source to this project's executable.
-add_executable (dxna WIN32 
+# Usar dxna WIN32
+add_executable (dxna  
 "main.cpp"
 "game.cpp"
 "input/keyboard.cpp"
