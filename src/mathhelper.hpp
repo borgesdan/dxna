@@ -13,7 +13,7 @@ namespace dxna {
         }
 
         template <typename T>
-        static float Lerp(T value1, T value2, float amount) {
+        static constexpr float Lerp(T value1, T value2, float amount) {
             return value1 + (value2 - value1) * amount;
         }
 	};

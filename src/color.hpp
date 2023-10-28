@@ -25,7 +25,7 @@ namespace dxna {
 			packedValue = static_cast<uintcs>(r | g | b | a);
 		}
 
-		Color(float r, float g, float b, float a = 1.0F) {
+		constexpr Color(float r, float g, float b, float a = 1.0F) {
 			r = MathHelper::Clamp(r, 0.0F, 1.0F);
 			g = MathHelper::Clamp(r, 0.0F, 1.0F);
 			b = MathHelper::Clamp(r, 0.0F, 1.0F);
@@ -62,7 +62,7 @@ namespace dxna {
 		constexpr void B(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & -16711681 | value << 16); }
 		constexpr void A(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & 16777215 | value << 24); }
 
-		static Color Lerp(Color const& value1, Color const& value2, float amount) {
+		static constexpr Color Lerp(Color const& value1, Color const& value2, float amount) {
 			amount = MathHelper::Lerp(amount, 0.0F, 1.0F);
 
 			const auto r = MathHelper::Lerp(value1.R(), value2.R(), amount);
