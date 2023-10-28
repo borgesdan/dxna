@@ -8,22 +8,9 @@ namespace dxna {
 	struct Color {
 		constexpr Color() = default;
 
-		constexpr Color(uintcs packedValue) : packedValue(packedValue) {}
+		constexpr Color(uintcs packedValue) : packedValue(packedValue) {}		
 
-		constexpr Color(intcs r, intcs g, intcs b) {
-			if (((r | g | b) & -256) != 0) {
-				r = clamp(r);
-				g = clamp(g);
-				b = clamp(b);
-			}
-
-			g <<= 8;
-			b <<= 16;
-
-			packedValue = static_cast<uintcs>(r | g | b | -16777216);
-		}
-
-		constexpr Color(intcs r, intcs g, intcs b, intcs a) {
+		constexpr Color(intcs r, intcs g, intcs b, intcs a = 255) {
 			if (((r | g | b | a) & -256) != 0) {
 				r = clamp(r);
 				g = clamp(g);
@@ -38,21 +25,30 @@ namespace dxna {
 			packedValue = static_cast<uintcs>(r | g | b | a);
 		}
 
-		Color(float r, float g, float b) {
-			const auto maxByte = static_cast<float>(MaxByte);
-			packedValue = packUNorm(maxByte, r)
-				| packUNorm(maxByte, g) << 8
-				| packUNorm(maxByte, b) << 16
-				| packUNorm(maxByte, 1.0F) << 24;
-		}
+		Color(float r, float g, float b, float a = 1.0F) {
+			r = MathHelper::Clamp(r, 0.0F, 1.0F);
+			g = MathHelper::Clamp(r, 0.0F, 1.0F);
+			b = MathHelper::Clamp(r, 0.0F, 1.0F);
+			a = MathHelper::Clamp(a, 0.0F, 1.0F);
 
-		Color(float r, float g, float b, float a) {
-			const auto maxByte = static_cast<float>(MaxByte);
-			packedValue = packUNorm(maxByte, r)
-				| packUNorm(maxByte, g) << 8
-				| packUNorm(maxByte, b) << 16
-				| packUNorm(maxByte, a) << 24;
-		}
+			auto _r = static_cast<intcs>(r * 255);
+			auto _g = static_cast<intcs>(g * 255);
+			auto _b = static_cast<intcs>(b * 255);
+			auto _a = static_cast<intcs>(a * 255);
+
+			if (((_r | _g | _b | _a) & -256) != 0) {
+				_r = clamp(r);
+				_g = clamp(g);
+				_b = clamp(b);
+				a = clamp(a);
+			}
+
+			_g <<= 8;
+			_b <<= 16;
+			_a <<= 24;
+
+			packedValue = static_cast<uintcs>(_r | _g | _b | _a);
+		}		
 
 		constexpr uintcs PackedValue() const { return packedValue; }
 		constexpr bytecs R() const { return static_cast<bytecs>(packedValue); }
@@ -124,25 +120,7 @@ namespace dxna {
 
 			return value > MaxByte ? MaxByte : value;
 		}
-
-		static uintcs packUNorm(float bitmask, float value) {
-			value *= bitmask;
-			return (uintcs)clampAndRound(value, 0.0F, bitmask);
-		}
-
-		static float clampAndRound(float value, float min, float max) {
-			if (std::isnan(value))
-				return 0.0;
-
-			if (std::isinf(value))
-				return value == -std::numeric_limits<float>::infinity() ? min : max;
-
-			if (value < min)
-				return min;
-
-			return value > max ? max : static_cast<float>(std::round((double)value));
-		}
-
+		
 		uintcs packedValue{ 0 };			
 	};
 
