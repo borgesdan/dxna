@@ -6,5 +6,6 @@
 #include <iostream>
 #include "color.hpp"
 #include "graphics/viewport.hpp"
+#include "graphics/blendstate.hpp"
 
 // TODO: Reference additional headers your program requires here.

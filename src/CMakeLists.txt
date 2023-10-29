@@ -13,6 +13,7 @@ add_executable (dxna
 "input/mouse.cpp"
 "input/gamepad.cpp"
 "input/input.cpp"
+"graphics/graphics.cpp"
 "platforms/platforms.cpp"
 "platforms/windows/wgamewindow.cpp"
 "platforms/windows/wgamewindow.cpp"
