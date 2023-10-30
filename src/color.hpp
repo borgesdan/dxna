@@ -37,10 +37,10 @@ namespace dxna {
 			auto _a = static_cast<intcs>(a * 255);
 
 			if (((_r | _g | _b | _a) & -256) != 0) {
-				_r = clamp(r);
-				_g = clamp(g);
-				_b = clamp(b);
-				a = clamp(a);
+				_r = clamp(_r);
+				_g = clamp(_g);
+				_b = clamp(_b);
+				a = clamp(_a);
 			}
 
 			_g <<= 8;
