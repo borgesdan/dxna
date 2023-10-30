@@ -40,7 +40,7 @@ namespace dxna {
 				_r = clamp(_r);
 				_g = clamp(_g);
 				_b = clamp(_b);
-				a = clamp(_a);
+				_a = clamp(_a);
 			}
 
 			_g <<= 8;

@@ -4,7 +4,8 @@
 #include "main.hpp"
 #include <windows.h> 
 #include <windowsx.h> 
-#include <sstream>       
+#include <sstream>     
+#include "mathhelper.hpp"
 
 #include "input/input.hpp"
 
@@ -12,26 +13,11 @@ using namespace dxna;
 using namespace std;
 
 int main() {
-	/*Color color = Colors::AliceBlue;
+	Vector2 vec1(5);
+	Vector2 vec2(10);
 
-	Color color2 = Color::Multiply(color, 0.5F);
+	//auto vec3 = vec1 * vec2;
+	auto equal = vec1 != vec2;
 
-	cout << (int)color2.R()
-		<< " "
-		<< (int)color2.G()
-		<< " "
-		<< (int)color2.B()
-		<< " "
-		<< (int)color2.A() << endl;*/
-
-	Color color(1.F, 1.F, 1.F, 1.F);
-	cout << (int)color.R()
-		<< " "
-		<< (int)color.G()
-		<< " "
-		<< (int)color.B()
-		<< " "
-		<< (int)color.A() << endl;
-
-		return 0;
+	return 0;
 }
