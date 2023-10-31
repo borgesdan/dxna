@@ -4,6 +4,9 @@
 #include "cs/cstypes.hpp"
 
 namespace dxna {
+	struct Matrix;
+	struct Quaternion;
+
 	struct Point {
 		intcs X{ 0 };
 		intcs Y{ 0 };
@@ -111,10 +114,7 @@ namespace dxna {
 		constexpr bool operator==(Rectangle const& value2) const {
 			return Equals(value2);
 		}
-	};
-
-	struct Matrix;
-	struct Quaternion;
+	};	
 
 	struct Vector2 {
 		float X{ 0 };
@@ -126,13 +126,13 @@ namespace dxna {
 
 		constexpr Vector2 operator-() const { return Negate(*this); }
 		constexpr bool operator==(Vector2 const& other) const { return Equals(other); }
-		friend constexpr Vector2 operator+(Vector2 const& value1, Vector2 const& value2) { return Add(value1, value2); }
-		friend constexpr Vector2 operator-(Vector2 const& value1, Vector2 const& value2) { return Subtract(value1, value2); }
-		friend constexpr Vector2 operator*(Vector2 const& value1, Vector2 const& value2) { return Multiply(value1, value2); }
-		friend constexpr Vector2 operator*(Vector2 const& value, float scale) { return Multiply(value, scale); }
-		friend constexpr Vector2 operator*(float scale, Vector2 const& value) { return Multiply(value, scale); }
-		friend constexpr Vector2 operator/(Vector2 const& value1, Vector2 const& value2) { return Divide(value1, value2); }
-		friend constexpr Vector2 operator/(Vector2 const& value, float divider) { return Divide(value, divider); }
+		friend constexpr Vector2 operator+(Vector2 const& value1, Vector2 const& value2) { return Vector2::Add(value1, value2); }
+		friend constexpr Vector2 operator-(Vector2 const& value1, Vector2 const& value2) { return Vector2::Subtract(value1, value2); }
+		friend constexpr Vector2 operator*(Vector2 const& value1, Vector2 const& value2) { return Vector2::Multiply(value1, value2); }
+		friend constexpr Vector2 operator*(Vector2 const& value, float scale) { return Vector2::Multiply(value, scale); }
+		friend constexpr Vector2 operator*(float scale, Vector2 const& value) { return Vector2::Multiply(value, scale); }
+		friend constexpr Vector2 operator/(Vector2 const& value1, Vector2 const& value2) { return Vector2::Divide(value1, value2); }
+		friend constexpr Vector2 operator/(Vector2 const& value, float divider) { return Vector2::Divide(value, divider); }
 		
 		constexpr bool Equals(Vector2 const& other) const { return X == other.X && Y == other.Y; }
 		constexpr float LengthSquared() const { return X * X + Y * Y; }
@@ -304,6 +304,229 @@ namespace dxna {
 		static void TransformNormal(Vector2* sourceArray, Matrix const& matrix,
 			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
 			size_t destinationIndex = 0);	
+	};
+
+	struct Vector3 {
+		float X{ 0 };
+		float Y{ 0 };
+		float Z{ 0 };
+
+		constexpr Vector3() {}
+		constexpr Vector3(float x, float y, float z) : X(x), Y(y), Z(z) {}
+		constexpr Vector3(float value) : X(value), Y(value), Z(value) {}
+		constexpr Vector3(Vector2 const& value, float z) : X(value.X), Y(value.Y), Z(z) {}
+
+		constexpr Vector3 operator-() const { return Negate(*this); }
+		constexpr bool operator==(Vector3 const& other) const { return Equals(other); }
+		friend constexpr Vector3 operator+(Vector3 const& value1, Vector3 const& value2) { return Vector3::Add(value1, value2); }
+		friend constexpr Vector3 operator-(Vector3 const& value1, Vector3 const& value2) { return Vector3::Subtract(value1, value2); }
+		friend constexpr Vector3 operator*(Vector3 const& value1, Vector3 const& value2) { return Vector3::Multiply(value1, value2); }
+		friend constexpr Vector3 operator*(Vector3 const& value, float scale) { return Vector3::Multiply(value, scale); }
+		friend constexpr Vector3 operator*(float scale, Vector3 const& value) { return Vector3::Multiply(value, scale); }
+		friend constexpr Vector3 operator/(Vector3 const& value1, Vector3 const& value2) { return Vector3::Divide(value1, value2); }
+		friend constexpr Vector3 operator/(Vector3 const& value, float divider) { return Vector3::Divide(value, divider); }
+
+
+		float Length() const;
+		void Normalize();
+
+		constexpr bool Equals(const Vector3& other) const {	return X == other.X && Y == other.Y && Z == other.Z; }
+		constexpr float LengthSquared() const { return (X * X) + (Y * Y) + (Z * Z);	}
+
+		static constexpr Vector3 Zero() { return Vector3(); };
+		static constexpr Vector3 One() { return Vector3(1.F, 1.F, 1.F); }
+		static constexpr Vector3 UnitX() { return Vector3(1.0F, 0.0, 0.0); }
+		static constexpr Vector3 UnitY() { return Vector3(0.0, 1.0F, 0.0); }
+		static constexpr Vector3 UnitZ() { return Vector3(0.0, 0.0, 1.0F); }
+		static constexpr Vector3 Up() { return UnitY(); }
+		static constexpr Vector3 Down() { return -UnitY(); }
+		static constexpr Vector3 Right() { return UnitX(); }
+		static constexpr Vector3 Left(){ { return -UnitX(); } }
+		static constexpr Vector3 Forward() { return -UnitZ(); }
+		static constexpr Vector3 Backward() { return UnitZ(); }		
+
+		static float Distance(Vector3 const& value1, Vector3 const& value2);
+
+		static constexpr float DistanceSquared(Vector3 const& value1, Vector3 const& value2) {
+			const auto num1 = value1.X - value2.X;
+			const auto num2 = value1.Y - value2.Y;
+			const auto num3 = value1.Z - value2.Z;
+			return num1 * num1 + num2 * num2 + num3 * num3;
+		}
+
+		static constexpr float Dot(Vector3 const& vector1, Vector3 const& vector2) {
+			return vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z;
+		}	
+
+		static constexpr Vector3 Cross(Vector3 const& vector1, Vector3 const& vector2) {
+			Vector3 vector3;
+			vector3.X = vector1.Y * vector2.Z - vector1.Z * vector2.Y;
+			vector3.Y = vector1.Z * vector2.X - vector1.X * vector2.Z;
+			vector3.Z = vector1.X * vector2.Y - vector1.Y * vector2.X;
+			return vector3;
+		}
+
+		static constexpr Vector3 Reflect(Vector3 const& vector, Vector3 const& normal) {
+			const auto num = vector.X * normal.X + vector.Y * normal.Y + vector.Z * normal.Z;
+			Vector3 vector3;
+			vector3.X = vector.X - 2.0F * num * normal.X;
+			vector3.Y = vector.Y - 2.0F * num * normal.Y;
+			vector3.Z = vector.Z - 2.0F * num * normal.Z;
+			return vector3;
+		}
+
+		static constexpr Vector3 Min(Vector3 const& value1, Vector3 const& value2) {
+			Vector3 vector3;
+			vector3.X = value1.X < value2.X ? value1.X : value2.X;
+			vector3.Y = value1.Y < value2.Y ? value1.Y : value2.Y;
+			vector3.Z = value1.Z < value2.Z ? value1.Z : value2.Z;
+			return vector3;
+		}
+
+		static constexpr Vector3 Max(Vector3 const& value1, Vector3 const& value2) {
+			Vector3 vector3;
+			vector3.X = value1.X >  value2.X ? value1.X : value2.X;
+			vector3.Y = value1.Y >  value2.Y ? value1.Y : value2.Y;
+			vector3.Z = value1.Z >  value2.Z ? value1.Z : value2.Z;
+			return vector3;
+		}
+
+		static constexpr Vector3 Clamp(Vector3 const& value1, Vector3 const& min, Vector3 const& max) {
+			const auto x = value1.X;
+			const auto num1 = x > max.X ? max.X : x;
+			const auto num2 = num1 < min.X ? min.X : num1;
+			const auto y = value1.Y;
+			const auto num3 = y >  max.Y ? max.Y : y;
+			const auto num4 = num3 < min.Y ? min.Y : num3;
+			const auto z = value1.Z;
+			const auto num5 = z >  max.Z ? max.Z : z;
+			const auto num6 = num5 < min.Z ? min.Z : num5;
+			Vector3 vector3;
+			vector3.X = num2;
+			vector3.Y = num4;
+			vector3.Z = num6;
+			return vector3;
+		}
+
+		static constexpr Vector3 Lerp(Vector3 const& value1, Vector3 const& value2, float amount) {
+			Vector3 vector3;
+			vector3.X = value1.X + (value2.X - value1.X) * amount;
+			vector3.Y = value1.Y + (value2.Y - value1.Y) * amount;
+			vector3.Z = value1.Z + (value2.Z - value1.Z) * amount;
+			return vector3;
+		}
+
+		static constexpr Vector3 Barycentric(Vector3 const& value1, Vector3 const& value2, Vector3 const& value3,
+			float amount1, float amount2) {
+			Vector3 vector3;
+			vector3.X = value1.X + amount1 * (value2.X - value1.X) + amount2 * (value3.X - value1.X);
+			vector3.Y = value1.Y + amount1 * (value2.Y - value1.Y) + amount2 * (value3.Y - value1.Y);
+			vector3.Z = value1.Z + amount1 * (value2.Z - value1.Z) + amount2 * (value3.Z - value1.Z);
+			return vector3;
+		}
+
+		static constexpr Vector3 SmoothStep(Vector3 const& value1, Vector3 const& value2, float amount) {
+			amount = amount > 1.0F ? 1.0F : (amount < 0.0 ? 0.0F : amount);
+			amount = amount * amount * (3.0F - 2.0F * amount);
+			Vector3 vector3;
+			vector3.X = value1.X + (value2.X - value1.X) * amount;
+			vector3.Y = value1.Y + (value2.Y - value1.Y) * amount;
+			vector3.Z = value1.Z + (value2.Z - value1.Z) * amount;
+			return vector3;
+		}
+		static constexpr Vector3 CatmullRom(Vector3 const& value1, Vector3 const& value2, Vector3 const& value3,
+			Vector3 const& value4, float amount) {
+			const auto num1 = amount * amount;
+			const auto num2 = amount * num1;
+			Vector3 vector3;
+			vector3.X = (0.5F * (2.0F * value2.X + (-value1.X + value3.X) * amount + (2.0F * value1.X - 5.0F * value2.X + 4.0F * value3.X - value4.X) * num1 + (-value1.X + 3.0F * value2.X - 3.0F * value3.X + value4.X) * num2));
+			vector3.Y = (0.5F * (2.0F * value2.Y + (-value1.Y + value3.Y) * amount + (2.0F * value1.Y - 5.0F * value2.Y + 4.0F * value3.Y - value4.Y) * num1 + (-value1.Y + 3.0F * value2.Y - 3.0F * value3.Y + value4.Y) * num2));
+			vector3.Z = (0.5F * (2.0F * value2.Z + (-value1.Z + value3.Z) * amount + (2.0F * value1.Z - 5.0F * value2.Z + 4.0F * value3.Z - value4.Z) * num1 + (-value1.Z + 3.0F * value2.Z - 3.0F * value3.Z + value4.Z) * num2));
+			return vector3;
+		}
+
+		static constexpr Vector3 Hermite(Vector3 const& value1, Vector3 const& tangent1, Vector3 const& value2,
+			Vector3 const& tangent2, float amount) {
+			const auto num1 = amount * amount;
+			const auto num2 = amount * num1;
+			const auto num3 = 2.0F * num2 - 3.0F * num1 + 1.0F;
+			const auto num4 = -2.0F * num2 + 3.0F * num1;
+			const auto num5 = num2 - 2.0F * num1 + amount;
+			const auto num6 = num2 - num1;
+			Vector3 vector3;
+			vector3.X = value1.X * num3 + value2.X * num4 + tangent1.X * num5 + tangent2.X * num6;
+			vector3.Y = value1.Y * num3 + value2.Y * num4 + tangent1.Y * num5 + tangent2.Y * num6;
+			vector3.Z = value1.Z * num3 + value2.Z * num4 + tangent1.Z * num5 + tangent2.Z * num6;
+			return vector3;
+		}
+
+		static constexpr Vector3 Negate(Vector3 const& value) {
+			Vector3 vector;
+			vector.X = -value.X;
+			vector.Y = -value.Y;
+			vector.Z = -value.Z;
+			return vector;
+		}
+
+		static constexpr Vector3 Add(Vector3 const& value1, Vector3 const& value2) {
+			Vector3 vector3;
+			vector3.X = value1.X + value2.X;
+			vector3.Y = value1.Y + value2.Y;
+			vector3.Z = value1.Z + value2.Z;
+			return vector3;
+		}
+
+		static constexpr Vector3 Subtract(Vector3 const& value1, Vector3 const& value2) {
+			Vector3 vector3;
+			vector3.X = value1.X - value2.X;
+			vector3.Y = value1.Y - value2.Y;
+			vector3.Z = value1.Z - value2.Z;
+			return vector3;
+		}
+
+		static constexpr Vector3 Multiply(Vector3 const& value1, Vector3 const& value2) {
+			Vector3 vector3;
+			vector3.X = value1.X * value2.X;
+			vector3.Y = value1.Y * value2.Y;
+			vector3.Z = value1.Z * value2.Z;
+			return vector3;
+		}
+
+		static constexpr Vector3 Multiply(Vector3 const& value1, float scaleFactor) {
+			Vector3 vector3;
+			vector3.X = value1.X * scaleFactor;
+			vector3.Y = value1.Y * scaleFactor;
+			vector3.Z = value1.Z * scaleFactor;
+			return vector3;
+		}
+
+		static constexpr Vector3 Divide(Vector3 const& value1, Vector3 const& value2) {
+			Vector3 vector3;
+			vector3.X = value1.X / value2.X;
+			vector3.Y = value1.Y / value2.Y;
+			vector3.Z = value1.Z / value2.Z;
+			return vector3;
+		}
+
+		static constexpr Vector3 Divide(Vector3 const& value1, float value2) {
+			float num = 1.0F / value2;
+			Vector3 vector3;
+			vector3.X = value1.X * num;
+			vector3.Y = value1.Y * num;
+			vector3.Z = value1.Z * num;
+			return vector3;
+		}
+
+		static Vector3 Transform(Vector3 const& position, Matrix const& matrix);
+		static Vector3 TransformNormal(Vector3 const& normal, Matrix const& matrix);
+		static Vector3 Transform(Vector3 const& value, Quaternion const& rotation);
+		static void Transform(Vector3* sourceArray, Matrix const& matrix,
+			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
+		static void TransformNormal(Vector3* sourceArray, Matrix const& matrix,
+			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
+		static void Transform(Vector3* sourceArray, Quaternion const& rotation,
+			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
+
 	};
 }
 
