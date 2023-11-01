@@ -526,7 +526,242 @@ namespace dxna {
 			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
 		static void Transform(Vector3* sourceArray, Quaternion const& rotation,
 			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
+	};
 
+	struct Vector4 {
+		float X{ 0 };
+		float Y{ 0 };
+		float Z{ 0 };
+		float W{ 0 };
+
+		constexpr Vector4() = default;
+		constexpr Vector4(float value):
+			X(value), Y(value), Z(value), W(value) {}
+		constexpr Vector4(float x, float y, float z, float w) :
+			X(x), Y(y), Z(z), W(w){}
+		constexpr Vector4(Vector2 value, float z, float w) :
+			X(value.X), Y(value.Y), Z(z), W(w) {}
+		constexpr Vector4(Vector3 value, float w) :
+			X(value.X), Y(value.Y), Z(value.Z), W(w) {}
+
+		constexpr Vector4 operator-() const { return Negate(*this); }
+		constexpr bool operator==(Vector4 const& other) const { return Equals(other); }
+		friend constexpr Vector4 operator+(Vector4 const& value1, Vector4 const& value2) { return Vector4::Add(value1, value2); }
+		friend constexpr Vector4 operator-(Vector4 const& value1, Vector4 const& value2) { return Vector4::Subtract(value1, value2); }
+		friend constexpr Vector4 operator*(Vector4 const& value1, Vector4 const& value2) { return Vector4::Multiply(value1, value2); }
+		friend constexpr Vector4 operator*(Vector4 const& value, float scale) { return Vector4::Multiply(value, scale); }
+		friend constexpr Vector4 operator*(float scale, Vector4 const& value) { return Vector4::Multiply(value, scale); }
+		friend constexpr Vector4 operator/(Vector4 const& value1, Vector4 const& value2) { return Vector4::Divide(value1, value2); }
+		friend constexpr Vector4 operator/(Vector4 const& value, float divider) { return Vector4::Divide(value, divider); }
+		
+		float Length() const;
+		void Normalize();
+
+		constexpr float LengthSquared() const {
+			return (X * X) + (Y * Y) + (Z * Z) + (W * W);
+		}
+
+		constexpr bool Equals(Vector4 const& other) const {
+			return X == other.X
+				&& Y == other.Y
+				&& Z == other.Z
+				&& W == other.W;
+		}		
+
+		static constexpr Vector4 Zero() { return Vector4(); }
+		static constexpr Vector4 One() { return Vector4(1); }
+		static constexpr Vector4 UnitX() { return Vector4(1.0F, 0.0F, 0.0F, 0.0F); }
+		static constexpr Vector4 UnitY() { return Vector4(0.0F, 1.0F, 0.0F, 0.0F); }
+		static constexpr Vector4 UnitZ() { return Vector4(0.0F, 0.0F, 1.0F, 0.0F); }
+		static constexpr Vector4 UnitW() { return Vector4(0.0F, 0.0F, 0.0F, 1.0F); }
+
+		static float Distance(Vector4 const& value1, Vector4 const& value2);
+
+		static constexpr float DistanceSquared(Vector4 value1, Vector4 value2)
+		{
+			const auto num1 = value1.X - value2.X;
+			const auto num2 = value1.Y - value2.Y;
+			const auto num3 = value1.Z - value2.Z;
+			const auto num4 = value1.W - value2.W;
+			return num1 * num1 + num2 * num2 + num3 * num3 + num4 * num4;
+		}
+
+		static constexpr float Dot(Vector4 vector1, Vector4 vector2) {
+			return vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z + vector1.W * vector2.W;
+		}
+
+		static constexpr Vector4 Min(Vector4 const& value1, Vector4 const& value2) {
+			Vector4 vector4;
+			vector4.X = value1.X < value2.X ? value1.X : value2.X;
+			vector4.Y = value1.Y < value2.Y ? value1.Y : value2.Y;
+			vector4.Z = value1.Z < value2.Z ? value1.Z : value2.Z;
+			vector4.W = value1.W < value2.W ? value1.W : value2.W;
+			return vector4;
+		}
+
+		static constexpr Vector4 Max(Vector4 const& value1, Vector4 const& value2) {
+			Vector4 vector4;
+			vector4.X = value1.X >  value2.X ? value1.X : value2.X;
+			vector4.Y = value1.Y >  value2.Y ? value1.Y : value2.Y;
+			vector4.Z = value1.Z >  value2.Z ? value1.Z : value2.Z;
+			vector4.W = value1.W > value2.W ? value1.W : value2.W;
+			return vector4;
+		}
+
+		static constexpr Vector4 Clamp(Vector4 const& value1, Vector4 const& min, Vector4 const& max) {
+			const auto x = value1.X;
+			const auto num1 = x > max.X ? max.X : x;
+			const auto num2 = num1 < min.X ? min.X : num1;
+			const auto y = value1.Y;
+			const auto num3 = y >  max.Y ? max.Y : y;
+			const auto num4 = num3 < min.Y ? min.Y : num3;
+			const auto z = value1.Z;
+			const auto num5 = z >  max.Z ? max.Z : z;
+			const auto num6 = num5 < min.Z ? min.Z : num5;
+			const auto w = value1.W;
+			const auto num7 = w >  max.W ? max.W : w;
+			const auto num8 = num7 < min.W ? min.W : num7;
+			Vector4 vector4;
+			vector4.X = num2;
+			vector4.Y = num4;
+			vector4.Z = num6;
+			vector4.W = num8;
+			return vector4;
+		}
+		
+		static constexpr Vector4 Lerp(Vector4 const& value1, Vector4 const& value2, float amount) {
+			Vector4 vector4;
+			vector4.X = value1.X + (value2.X - value1.X) * amount;
+			vector4.Y = value1.Y + (value2.Y - value1.Y) * amount;
+			vector4.Z = value1.Z + (value2.Z - value1.Z) * amount;
+			vector4.W = value1.W + (value2.W - value1.W) * amount;
+			return vector4;
+		}
+
+		static constexpr Vector4 Barycentric(Vector4 const& value1, Vector4 const& value2,
+			Vector4 const& value3, float amount1, float amount2) {
+			Vector4 vector4;
+			vector4.X = value1.X + amount1 * (value2.X - value1.X) + amount2 * (value3.X - value1.X);
+			vector4.Y = value1.Y + amount1 * (value2.Y - value1.Y) + amount2 * (value3.Y - value1.Y);
+			vector4.Z = value1.Z + amount1 * (value2.Z - value1.Z) + amount2 * (value3.Z - value1.Z);
+			vector4.W = value1.W + amount1 * (value2.W - value1.W) + amount2 * (value3.W - value1.W);
+			return vector4;
+		}
+
+		static constexpr Vector4 SmoothStep(Vector4 const& value1, Vector4 const& value2, float amount) {
+			amount = amount > 1.0F ? 1.0F : (amount < 0.0F ? 0.0F : amount);
+			amount = amount * amount * (3.0F - 2.0F * amount);
+			Vector4 vector4;
+			vector4.X = value1.X + (value2.X - value1.X) * amount;
+			vector4.Y = value1.Y + (value2.Y - value1.Y) * amount;
+			vector4.Z = value1.Z + (value2.Z - value1.Z) * amount;
+			vector4.W = value1.W + (value2.W - value1.W) * amount;
+			return vector4;
+		}
+
+		static constexpr Vector4 CatmullRom(Vector4 const& value1, Vector4 const& value2, Vector4 const& value3,
+			Vector4 const& value4, float amount) {
+			const auto num1 = amount * amount;
+			const auto num2 = amount * num1;
+			Vector4 vector4;
+			vector4.X = 0.5F * (2.0F * value2.X + (-value1.X + value3.X) * amount + (2.0F * value1.X - 5.0F * value2.X + 4.0F * value3.X - value4.X) * num1 + (-value1.X + 3.0F * value2.X - 3.0F * value3.X + value4.X) * num2);
+			vector4.Y = 0.5F * (2.0F * value2.Y + (-value1.Y + value3.Y) * amount + (2.0F * value1.Y - 5.0F * value2.Y + 4.0F * value3.Y - value4.Y) * num1 + (-value1.Y + 3.0F * value2.Y - 3.0F * value3.Y + value4.Y) * num2);
+			vector4.Z = 0.5F * (2.0F * value2.Z + (-value1.Z + value3.Z) * amount + (2.0F * value1.Z - 5.0F * value2.Z + 4.0F * value3.Z - value4.Z) * num1 + (-value1.Z + 3.0F * value2.Z - 3.0F * value3.Z + value4.Z) * num2);
+			vector4.W = 0.5F * (2.0F * value2.W + (-value1.W + value3.W) * amount + (2.0F * value1.W - 5.0F * value2.W + 4.0F * value3.W - value4.W) * num1 + (-value1.W + 3.0F * value2.W - 3.0F * value3.W + value4.W) * num2);
+			return vector4;
+		}
+
+		static constexpr Vector4 Hermite(Vector4 const& value1, Vector4 const& tangent1, Vector4 const& value2,
+			Vector4 const& tangent2, float amount) {
+			const auto num1 = amount * amount;
+			const auto num2 = amount * num1;
+			const auto num3 = 2.0F * num2 - 3.0F * num1 + 1.0F;
+			const auto num4 = -2.0F * num2 + 3.0F * num1;
+			const auto num5 = num2 - 2.0F * num1 + amount;
+			const auto num6 = num2 - num1;
+			Vector4 vector4;
+			vector4.X = (float)(value1.X * num3 + value2.X * num4 + tangent1.X * num5 + tangent2.X * num6);
+			vector4.Y = (float)(value1.Y * num3 + value2.Y * num4 + tangent1.Y * num5 + tangent2.Y * num6);
+			vector4.Z = (float)(value1.Z * num3 + value2.Z * num4 + tangent1.Z * num5 + tangent2.Z * num6);
+			vector4.W = (float)(value1.W * num3 + value2.W * num4 + tangent1.W * num5 + tangent2.W * num6);
+			return vector4;
+		}
+
+		static constexpr Vector4 Negate(Vector4 const& value) {
+			Vector4 vector4;
+			vector4.X = -value.X;
+			vector4.Y = -value.Y;
+			vector4.Z = -value.Z;
+			vector4.W = -value.W;
+			return vector4;
+		}
+
+		static constexpr Vector4 Add(Vector4 const& value1, Vector4 const& value2) {
+			Vector4 vector4;
+			vector4.X = value1.X + value2.X;
+			vector4.Y = value1.Y + value2.Y;
+			vector4.Z = value1.Z + value2.Z;
+			vector4.W = value1.W + value2.W;
+			return vector4;
+		}
+
+		static constexpr Vector4 Subtract(Vector4 const& value1, Vector4 const& value2) {
+			Vector4 vector4;
+			vector4.X = value1.X - value2.X;
+			vector4.Y = value1.Y - value2.Y;
+			vector4.Z = value1.Z - value2.Z;
+			vector4.W = value1.W - value2.W;
+			return vector4;
+		}
+
+		static constexpr Vector4 Multiply(Vector4 const& value1, Vector4 const& value2) {
+			Vector4 vector4;
+			vector4.X = value1.X * value2.X;
+			vector4.Y = value1.Y * value2.Y;
+			vector4.Z = value1.Z * value2.Z;
+			vector4.W = value1.W * value2.W;
+			return vector4;
+		}
+
+		static constexpr Vector4 Multiply(Vector4 const& value1, float scaleFactor) {
+			Vector4 vector4;
+			vector4.X = value1.X * scaleFactor;
+			vector4.Y = value1.Y * scaleFactor;
+			vector4.Z = value1.Z * scaleFactor;
+			vector4.W = value1.W * scaleFactor;
+			return vector4;
+		}
+
+		static constexpr Vector4 Divide(Vector4 const& value1, Vector4 const& value2) {
+			Vector4 vector4;
+			vector4.X = value1.X / value2.X;
+			vector4.Y = value1.Y / value2.Y;
+			vector4.Z = value1.Z / value2.Z;
+			vector4.W = value1.W / value2.W;
+			return vector4;
+		}
+
+		static constexpr Vector4 Divide(Vector4 const& value1, float divider) {
+			float num = 1.0F / divider;
+			Vector4 vector4;
+			vector4.X = value1.X * num;
+			vector4.Y = value1.Y * num;
+			vector4.Z = value1.Z * num;
+			vector4.W = value1.W * num;
+			return vector4;
+		}
+
+		static Vector4 Transform(Vector2 const& position, Matrix const& matrix);
+		static Vector4 Transform(Vector3 const& position, Matrix const& matrix);
+		static Vector4 Transform(Vector4 const& vector, Matrix const& matrix);
+		static Vector4 Transform(Vector2 const& value, Quaternion const& rotation);
+		static Vector4 Transform(Vector3 const& position, Quaternion const& rotation);
+		static Vector4 Transform(Vector4 const& vector, Quaternion const& rotation);
+
+		static void Transform(Vector4* sourceArray, Matrix const& matrix,
+			Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex);
+		static void Transform(Vector4* sourceArray, Quaternion const& rotation,
+			Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex);		
 	};
 }
 
