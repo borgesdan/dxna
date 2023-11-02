@@ -292,19 +292,19 @@ namespace dxna {
 			return vector2;
 		}
 
-		static Vector2 Transform(Vector2 const& position, Matrix const& matrix);
-		static Vector2 TransformNormal(Vector2 const& normal, Matrix const& matrix);
-		static Vector2 Transform(Vector2 const& value, Quaternion const& rotation);
+		static constexpr Vector2 Transform(Vector2 const& position, Matrix const& matrix);
+		static constexpr Vector2 TransformNormal(Vector2 const& normal, Matrix const& matrix);
+		static constexpr Vector2 Transform(Vector2 const& value, Quaternion const& rotation);
 
-		static void Transform(Vector2 *sourceArray, Matrix matrix,
+		static constexpr void Transform(Vector2 *sourceArray, Matrix matrix,
 			Vector2 *destinationArray, size_t length, size_t sourceIndex = 0,
 			size_t destinationIndex = 0);
 
-		static void Transform(Vector2* sourceArray, Quaternion rotation,
+		static constexpr void Transform(Vector2* sourceArray, Quaternion rotation,
 			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
 			size_t destinationIndex = 0);
 
-		static void TransformNormal(Vector2* sourceArray, Matrix const& matrix,
+		static constexpr void TransformNormal(Vector2* sourceArray, Matrix const& matrix,
 			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
 			size_t destinationIndex = 0);	
 	};
@@ -1426,150 +1426,180 @@ namespace dxna {
 		static constexpr Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane);
 		static constexpr Matrix CreateReflection(Plane const& value);
 		static Matrix Transform(Matrix const& value, Quaternion const& rotation);		
+	};	
+
+	struct Quaternion {
+		float X{ 0 };
+		float Y{ 0 };
+		float Z{ 0 };
+		float W{ 0 };
+
+		constexpr Quaternion() = default;
+
+		constexpr Quaternion(float X, float Y, float Z, float W)
+			: X(X), Y(Y), Z(Z), W(W) {}
+
+		constexpr Quaternion(Vector3 const& vectorPart, float scalarPart)
+			: X(vectorPart.X), Y(vectorPart.Y), Z(vectorPart.Z), W(scalarPart) {}
+
+		constexpr Quaternion operator-() const { return Quaternion::Negate(*this); }
+		constexpr bool operator==(Quaternion const& other) const { return Equals(other); }
+		friend constexpr Quaternion operator+(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Add(value1, value2); }
+		friend constexpr Quaternion operator-(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Subtract(value1, value2); }
+		friend constexpr Quaternion operator*(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Multiply(value1, value2); }
+		friend constexpr Quaternion operator*(Quaternion const& value, float scale) { return Quaternion::Multiply(value, scale); }
+		friend constexpr Quaternion operator*(float scale, Quaternion const& value) { return Quaternion::Multiply(value, scale); }
+		friend constexpr Quaternion operator/(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Divide(value1, value2); }
+
+		constexpr bool Equals(Quaternion const& other) const {
+			return X == other.X
+				&& Y == other.Y
+				&& Z == other.Z
+				&& W == other.W;
+		}
+
+		constexpr float LengthSquared() const {
+			return X * X + Y * Y + Z * Z + W * W;
+		}
+
+		float Length() const;
+		void Normalize();
+		void Conjugate();
+
+		static constexpr Quaternion Identity() { return Quaternion(0.0f, 0.0f, 0.0f, 1.0f); }
+
+		static Quaternion Normalize(Quaternion const& quaternion);
+
+		static constexpr Quaternion Conjugate(Quaternion const& value) {
+			Quaternion quaternion;
+			quaternion.X = -value.X;
+			quaternion.Y = -value.Y;
+			quaternion.Z = -value.Z;
+			quaternion.W = value.W;
+			return quaternion;
+		}
+
+		static constexpr Quaternion Inverse(Quaternion const& quaternion) {
+			float num = 1.0f / quaternion.X * quaternion.X + quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z + quaternion.W * quaternion.W;
+			Quaternion quaternion1;
+			quaternion1.X = -quaternion.X * num;
+			quaternion1.Y = -quaternion.Y * num;
+			quaternion1.Z = -quaternion.Z * num;
+			quaternion1.W = quaternion.W * num;
+			return quaternion1;
+		}
+
+		static Quaternion CreateFromAxisAngle(Vector3 const& axis, float angle);
+		static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll);
+		static Quaternion CreateFromRotationMatrix(Matrix const& matrix);
+
+		static constexpr float Dot(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+			return quaternion1.X * quaternion2.X + quaternion1.Y * quaternion2.Y + quaternion1.Z * quaternion2.Z + quaternion1.W * quaternion2.W;
+		}
+
+		static Quaternion Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount);
+		static Quaternion Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount);
+
+		static constexpr Quaternion Concatenate(Quaternion const& value1, Quaternion const& value2) {
+			float x1 = value2.X;
+			float y1 = value2.Y;
+			float z1 = value2.Z;
+			float w1 = value2.W;
+			float x2 = value1.X;
+			float y2 = value1.Y;
+			float z2 = value1.Z;
+			float w2 = value1.W;
+			float num1 = (y1 * z2 - z1 * y2);
+			float num2 = (z1 * x2 - x1 * z2);
+			float num3 = (x1 * y2 - y1 * x2);
+			float num4 = (x1 * x2 + y1 * y2 + z1 * z2);
+			Quaternion quaternion;
+			quaternion.X = (x1 * w2 + x2 * w1) + num1;
+			quaternion.Y = (y1 * w2 + y2 * w1) + num2;
+			quaternion.Z = (z1 * w2 + z2 * w1) + num3;
+			quaternion.W = w1 * w2 - num4;
+			return quaternion;
+		}
+
+		static constexpr Quaternion Negate(Quaternion const& quaternion) {
+			Quaternion quaternion1;
+			quaternion1.X = -quaternion.X;
+			quaternion1.Y = -quaternion.Y;
+			quaternion1.Z = -quaternion.Z;
+			quaternion1.W = -quaternion.W;
+			return quaternion1;
+		}
+
+		static constexpr Quaternion Add(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+			Quaternion quaternion;
+			quaternion.X = quaternion1.X + quaternion2.X;
+			quaternion.Y = quaternion1.Y + quaternion2.Y;
+			quaternion.Z = quaternion1.Z + quaternion2.Z;
+			quaternion.W = quaternion1.W + quaternion2.W;
+			return quaternion;
+		}
+
+		static constexpr Quaternion Subtract(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+			Quaternion quaternion;
+			quaternion.X = quaternion1.X - quaternion2.X;
+			quaternion.Y = quaternion1.Y - quaternion2.Y;
+			quaternion.Z = quaternion1.Z - quaternion2.Z;
+			quaternion.W = quaternion1.W - quaternion2.W;
+			return quaternion;
+		}
+
+		static constexpr Quaternion Multiply(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+			float x1 = quaternion1.X;
+			float y1 = quaternion1.Y;
+			float z1 = quaternion1.Z;
+			float w1 = quaternion1.W;
+			float x2 = quaternion2.X;
+			float y2 = quaternion2.Y;
+			float z2 = quaternion2.Z;
+			float w2 = quaternion2.W;
+			float num1 = (y1 * z2 - z1 * y2);
+			float num2 = (z1 * x2 - x1 * z2);
+			float num3 = (x1 * y2 - y1 * x2);
+			float num4 = (x1 * x2 + y1 * y2 + z1 * z2);
+			Quaternion quaternion;
+			quaternion.X = (x1 * w2 + x2 * w1) + num1;
+			quaternion.Y = (y1 * w2 + y2 * w1) + num2;
+			quaternion.Z = (z1 * w2 + z2 * w1) + num3;
+			quaternion.W = w1 * w2 - num4;
+			return quaternion;
+		}
+
+		static constexpr Quaternion Multiply(Quaternion const& quaternion1, float scaleFactor) {
+			Quaternion quaternion;
+			quaternion.X = quaternion1.X * scaleFactor;
+			quaternion.Y = quaternion1.Y * scaleFactor;
+			quaternion.Z = quaternion1.Z * scaleFactor;
+			quaternion.W = quaternion1.W * scaleFactor;
+			return quaternion;
+		}
+
+		static constexpr Quaternion Divide(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+			float x = quaternion1.X;
+			float y = quaternion1.Y;
+			float z = quaternion1.Z;
+			float w = quaternion1.W;
+			float num1 = 1.0f / (quaternion2.X * quaternion2.X + quaternion2.Y * quaternion2.Y + quaternion2.Z * quaternion2.Z + quaternion2.W * quaternion2.W);
+			float num2 = -quaternion2.X * num1;
+			float num3 = -quaternion2.Y * num1;
+			float num4 = -quaternion2.Z * num1;
+			float num5 = quaternion2.W * num1;
+			float num6 = (y * num4 - z * num3);
+			float num7 = (z * num2 - x * num4);
+			float num8 = (x * num3 - y * num2);
+			float num9 = (x * num2 + y * num3 + z * num4);
+			Quaternion quaternion;
+			quaternion.X = (x * num5 + num2 * w) + num6;
+			quaternion.Y = (y * num5 + num3 * w) + num7;
+			quaternion.Z = (z * num5 + num4 * w) + num8;
+			quaternion.W = w * num5 - num9;
+			return quaternion;
+		}		
 	};
-
-	constexpr Vector4 Vector4::Transform(Vector2 const& position, Matrix const& matrix) {
-		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
-		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;
-		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23) + matrix.M43;
-		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24) + matrix.M44;
-		Vector4 vector4;
-		vector4.X = num1;
-		vector4.Y = num2;
-		vector4.Z = num3;
-		vector4.W = num4;
-		return vector4;
-	}
-
-	constexpr Vector4 Vector4::Transform(Vector3 const& position, Matrix const& matrix) {
-		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
-		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
-		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
-		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24 + position.Z * matrix.M34) + matrix.M44;
-		Vector4 vector4;
-		vector4.X = num1;
-		vector4.Y = num2;
-		vector4.Z = num3;
-		vector4.W = num4;
-		return vector4;
-	}
-
-	constexpr Vector4 Vector4::Transform(Vector4 const& vector, Matrix const& matrix) {
-		float num1 = (vector.X * matrix.M11 + vector.Y * matrix.M21 + vector.Z * matrix.M31 + vector.W * matrix.M41);
-		float num2 = (vector.X * matrix.M12 + vector.Y * matrix.M22 + vector.Z * matrix.M32 + vector.W * matrix.M42);
-		float num3 = (vector.X * matrix.M13 + vector.Y * matrix.M23 + vector.Z * matrix.M33 + vector.W * matrix.M43);
-		float num4 = (vector.X * matrix.M14 + vector.Y * matrix.M24 + vector.Z * matrix.M34 + vector.W * matrix.M44);
-		Vector4 vector4;
-		vector4.X = num1;
-		vector4.Y = num2;
-		vector4.Z = num3;
-		vector4.W = num4;
-		return vector4;
-	}
-
-	constexpr void Vector4::Transform(Vector4* sourceArray, Matrix const& matrix,
-		Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
-		if (sourceArray == nullptr)
-			return;
-
-		if (destinationArray == nullptr)
-			return;
-
-		if (length < sourceIndex + length)
-			return;
-
-		if (length < destinationIndex + length)
-			return;
-
-		for (; length > 0; --length)
-		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			float w = sourceArray[sourceIndex].W;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31 + w * matrix.M41);
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32 + w * matrix.M42);
-			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33 + w * matrix.M43);
-			destinationArray[destinationIndex].W = (x * matrix.M14 + y * matrix.M24 + z * matrix.M34 + w * matrix.M44);
-			++sourceIndex;
-			++destinationIndex;
-		}
-	}
-
-	constexpr Vector3 Vector3::Transform(Vector3 const& position, Matrix const& matrix) {
-		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
-		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
-		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
-		Vector3 vector3;
-		vector3.X = num1;
-		vector3.Y = num2;
-		vector3.Z = num3;
-		return vector3;
-	}
-
-	constexpr Vector3 Vector3::TransformNormal(Vector3 const& normal, Matrix const& matrix) {
-		float num1 = (normal.X * matrix.M11 + normal.Y * matrix.M21 + normal.Z * matrix.M31);
-		float num2 = (normal.X * matrix.M12 + normal.Y * matrix.M22 + normal.Z * matrix.M32);
-		float num3 = (normal.X * matrix.M13 + normal.Y * matrix.M23 + normal.Z * matrix.M33);
-		Vector3 vector3;
-		vector3.X = num1;
-		vector3.Y = num2;
-		vector3.Z = num3;
-		return vector3;
-	}
-	
-	constexpr void Vector3::Transform(Vector3* sourceArray, Matrix const& matrix,
-		Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
-		if (sourceArray == nullptr)
-			return;
-
-		if (destinationArray == nullptr)
-			return;
-
-		if (length < sourceIndex + length)
-			return;
-
-		if (length < destinationIndex + length)
-			return;
-
-		for (; length > 0; --length) {
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31) + matrix.M41;
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32) + matrix.M42;
-			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33) + matrix.M43;
-			++sourceIndex;
-			++destinationIndex;
-		}
-	}
-
-	constexpr void Vector3::TransformNormal(Vector3* sourceArray, Matrix const& matrix,
-		Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
-		if (sourceArray == nullptr)
-			return;
-
-		if (destinationArray == nullptr)
-			return;
-
-		if (length < sourceIndex + length)
-			return;
-
-		if (length < destinationIndex + length)
-			return;
-
-		for (; length > 0; --length)
-		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31);
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32);
-			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33);
-			++sourceIndex;
-			++destinationIndex;
-		}
-	}
 }
 
 #endif

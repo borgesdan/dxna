@@ -91,7 +91,7 @@ namespace dxna {
 
 		const auto d = result1.LengthSquared();
 
-		if ((double)d < 9.9999997473787516E-05) 
+		if (d < 9.9999997473787516E-05) 
 			result1 = cameraForwardVector != nullptr ? -(*cameraForwardVector) : Vector3::Forward();			
 		else
 			result1 = Vector3::Multiply(result1, 1.0F / std::sqrt(d));
@@ -130,7 +130,7 @@ namespace dxna {
 
 		float d = result1.LengthSquared();
 
-		if ((double)d < 9.9999997473787516E-05)
+		if (d < 9.9999997473787516E-05)
 			result1 = cameraForwardVector ? -(*cameraForwardVector) : Vector3::Forward();
 		else
 			result1 = Vector3::Multiply(result1, 1.0f / std::sqrt(d));
@@ -141,16 +141,16 @@ namespace dxna {
 		Vector3 result3;
 		Vector3 result4;
 
-		if ((double)std::abs(result2) > 0.998254656791687) {
+		if (std::abs(result2) > 0.998254656791687) {
 			if (objectForwardVector) {
 				result3 = *objectForwardVector;
 				result2 = Vector3::Dot(rotateAxis, result3);
 
-				if ((double)std::abs(result2) > 0.998254656791687)
-					result3 = (double)std::abs((rotateAxis.X * Vector3::Forward().X + rotateAxis.Y * Vector3::Forward().Y + rotateAxis.Z * Vector3::Forward().Z)) > 0.998254656791687 ? Vector3::Right() : Vector3::Forward();
+				if (std::abs(result2) > 0.998254656791687)
+					result3 = std::abs((rotateAxis.X * Vector3::Forward().X + rotateAxis.Y * Vector3::Forward().Y + rotateAxis.Z * Vector3::Forward().Z)) > 0.998254656791687 ? Vector3::Right() : Vector3::Forward();
 			}
 			else
-				result3 = (double)std::abs(rotateAxis.X * Vector3::Forward().X + rotateAxis.Y * Vector3::Forward().Y + rotateAxis.Z * Vector3::Forward().Z) > 0.998254656791687 ? Vector3::Right() : Vector3::Forward();
+				result3 = std::abs(rotateAxis.X * Vector3::Forward().X + rotateAxis.Y * Vector3::Forward().Y + rotateAxis.Z * Vector3::Forward().Z) > 0.998254656791687 ? Vector3::Right() : Vector3::Forward();
 
 			result4 = Vector3::Cross(rotateAxis, result3);
 			result4.Normalize();
@@ -292,7 +292,7 @@ namespace dxna {
 	Matrix Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) {
 		const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-		if (fieldOfView <= 0.0F || (double)fieldOfView >= 3.1415927410125732)
+		if (fieldOfView <= 0.0F || fieldOfView >= 3.1415927410125732)
 			return zero;
 
 		if (nearPlaneDistance <= 0.0F)
@@ -367,5 +367,163 @@ namespace dxna {
 		world.M43 = position.Z;
 		world.M44 = 1.0f;
 		return world;
+	}
+
+	float Quaternion::Length() const {
+		return std::sqrt(LengthSquared());
+	}
+	
+	void Quaternion::Normalize() {
+		float num = 1.0F / Length();
+		X *= num;
+		Y *= num;
+		Z *= num;
+		W *= num;
+	}
+
+	void Quaternion::Conjugate() {
+		X = -X;
+		Y = -Y;
+		Z = -Z;
+	}
+
+	Quaternion Quaternion::Normalize(Quaternion const& quaternion) {
+		float num = 1.0f / quaternion.Length();
+		Quaternion quaternion1;
+		quaternion1.X = quaternion.X * num;
+		quaternion1.Y = quaternion.Y * num;
+		quaternion1.Z = quaternion.Z * num;
+		quaternion1.W = quaternion.W * num;
+		return quaternion1;
+	}
+
+	Quaternion Quaternion::CreateFromAxisAngle(Vector3 const& axis, float angle) {
+		float num1 = angle * 0.5f;
+		float num2 = std::sin(num1);
+		float num3 = std::cos(num1);
+
+		Quaternion fromAxisAngle;
+		fromAxisAngle.X = axis.X * num2;
+		fromAxisAngle.Y = axis.Y * num2;
+		fromAxisAngle.Z = axis.Z * num2;
+		fromAxisAngle.W = num3;
+		return fromAxisAngle;
+	}
+
+	Quaternion Quaternion::CreateFromYawPitchRoll(float yaw, float pitch, float roll) {
+		float num1 = roll * 0.5f;
+		float num2 = std::sin(num1);
+		float num3 = std::cos(num1);
+		float num4 = pitch * 0.5f;
+		float num5 = std::sin(num4);
+		float num6 = std::cos(num4);
+		float num7 = yaw * 0.5f;
+		float num8 = std::sin(num7);
+		float num9 = std::cos(num7);
+
+		Quaternion fromYawPitchRoll;
+		fromYawPitchRoll.X = (num9 * num5 * num3 + num8 * num6 * num2);
+		fromYawPitchRoll.Y = (num8 * num6 * num3 - num9 * num5 * num2);
+		fromYawPitchRoll.Z = (num9 * num6 * num2 - num8 * num5 * num3);
+		fromYawPitchRoll.W = (num9 * num6 * num3 + num8 * num5 * num2);
+		return fromYawPitchRoll;
+	}
+
+	Quaternion Quaternion::CreateFromRotationMatrix(Matrix const& matrix) {
+		float num1 = matrix.M11 + matrix.M22 + matrix.M33;
+		Quaternion fromRotationMatrix;
+
+		if (num1 > 0.0) {
+			float num2 = std::sqrt(num1 + 1.0F);
+			fromRotationMatrix.W = num2 * 0.5f;
+			float num3 = 0.5f / num2;
+			fromRotationMatrix.X = (matrix.M23 - matrix.M32) * num3;
+			fromRotationMatrix.Y = (matrix.M31 - matrix.M13) * num3;
+			fromRotationMatrix.Z = (matrix.M12 - matrix.M21) * num3;
+		}
+		else if (matrix.M11 >= matrix.M22 && matrix.M11 >= matrix.M33) {
+			float num4 = std::sqrt(1.0F + matrix.M11 - matrix.M22 - matrix.M33);
+			float num5 = 0.5f / num4;
+			fromRotationMatrix.X = 0.5f * num4;
+			fromRotationMatrix.Y = (matrix.M12 + matrix.M21) * num5;
+			fromRotationMatrix.Z = (matrix.M13 + matrix.M31) * num5;
+			fromRotationMatrix.W = (matrix.M23 - matrix.M32) * num5;
+		}
+		else if (matrix.M22 > matrix.M33) {
+			float num6 = std::sqrt(1.0F + matrix.M22 - matrix.M11 - matrix.M33);
+			float num7 = 0.5f / num6;
+			fromRotationMatrix.X = (matrix.M21 + matrix.M12) * num7;
+			fromRotationMatrix.Y = 0.5f * num6;
+			fromRotationMatrix.Z = (matrix.M32 + matrix.M23) * num7;
+			fromRotationMatrix.W = (matrix.M31 - matrix.M13) * num7;
+		}
+		else {
+			float num8 = std::sqrt(1.0F + matrix.M33 - matrix.M11 - matrix.M22);
+			float num9 = 0.5f / num8;
+			fromRotationMatrix.X = (matrix.M31 + matrix.M13) * num9;
+			fromRotationMatrix.Y = (matrix.M32 + matrix.M23) * num9;
+			fromRotationMatrix.Z = 0.5f * num8;
+			fromRotationMatrix.W = (matrix.M12 - matrix.M21) * num9;
+		}
+		return fromRotationMatrix;
+	}
+
+	Quaternion Quaternion::Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) {
+		float num1 = amount;
+		float d = quaternion1.X * quaternion2.X + quaternion1.Y * quaternion2.Y + quaternion1.Z * quaternion2.Z + quaternion1.W * quaternion2.W;
+		bool flag = false;
+		
+		if (d < 0.0) {
+			flag = true;
+			d = -d;
+		}
+
+		float num2;
+		float num3;
+
+		if (d > 0.99999898672103882) {
+			num2 = 1.0f - num1;
+			num3 = flag ? -num1 : num1;
+		}
+		else {
+			float a = std::acos(d);
+			float num4 = (1.0F /std::sin(a));
+			num2 = std::sin((1.0F - num1) * a) * num4;
+			num3 = flag ? -std::sin(num1 * a) * num4 : std::sin(num1 * a) * num4;
+		}
+
+		Quaternion quaternion;
+		quaternion.X = (num2 * quaternion1.X + num3 * quaternion2.X);
+		quaternion.Y = (num2 * quaternion1.Y + num3 * quaternion2.Y);
+		quaternion.Z = (num2 * quaternion1.Z + num3 * quaternion2.Z);
+		quaternion.W = (num2 * quaternion1.W + num3 * quaternion2.W);
+
+		return quaternion;
+	}
+
+	Quaternion Quaternion::Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) {
+		float num1 = amount;
+		float num2 = 1.0f - num1;
+		Quaternion quaternion;
+		
+		if (quaternion1.X * quaternion2.X + quaternion1.Y * quaternion2.Y + quaternion1.Z * quaternion2.Z + quaternion1.W * quaternion2.W >= 0.0) {
+			quaternion.X = (num2 * quaternion1.X + num1 * quaternion2.X);
+			quaternion.Y = (num2 * quaternion1.Y + num1 * quaternion2.Y);
+			quaternion.Z = (num2 * quaternion1.Z + num1 * quaternion2.Z);
+			quaternion.W = (num2 * quaternion1.W + num1 * quaternion2.W);
+		}
+		else {
+			quaternion.X = (num2 * quaternion1.X - num1 * quaternion2.X);
+			quaternion.Y = (num2 * quaternion1.Y - num1 * quaternion2.Y);
+			quaternion.Z = (num2 * quaternion1.Z - num1 * quaternion2.Z);
+			quaternion.W = (num2 * quaternion1.W - num1 * quaternion2.W);
+		}
+
+		float num3 = 1.0f / std::sqrt(quaternion.X * quaternion.X + quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z + quaternion.W * quaternion.W);
+		quaternion.X *= num3;
+		quaternion.Y *= num3;
+		quaternion.Z *= num3;
+		quaternion.W *= num3;
+		return quaternion;
 	}
 }
