@@ -334,7 +334,7 @@ namespace dxna {
 		friend constexpr Vector3 operator*(float scale, Vector3 const& value) { return Vector3::Multiply(value, scale); }
 		friend constexpr Vector3 operator/(Vector3 const& value1, Vector3 const& value2) { return Vector3::Divide(value1, value2); }
 		friend constexpr Vector3 operator/(Vector3 const& value, float divider) { return Vector3::Divide(value, divider); }
-		
+
 		constexpr Vector3 operator+=(Vector3 const& other) const { return Vector3::Add(*this, other); }
 		constexpr Vector3 operator-=(Vector3 const& other) const { return Vector3::Subtract(*this, other); }
 		constexpr Vector3 operator*=(Vector3 const& other) const { return Vector3::Multiply(*this, other); }
@@ -1626,7 +1626,7 @@ namespace dxna {
 		}
 
 		constexpr bool Equals(BoundingBox const& other) const {
-			return Min == other.Min	&& Max == other.Max;
+			return Min == other.Min && Max == other.Max;
 		}
 
 		constexpr void GetCorners(Vector3 corners[8]) const {
@@ -1654,29 +1654,29 @@ namespace dxna {
 			corners[7].X = Min.X;
 			corners[7].Y = Min.Y;
 			corners[7].Z = Min.Z;
-		}		
+		}
 
 		constexpr bool Intersects(BoundingBox const& box) const {
-			return Max.X >= box.Min.X 
-				&& Min.X <= box.Max.X 
-				&& Max.Y >= box.Min.Y 
-				&& Min.Y <= box.Max.Y 
-				&& Max.Z >= box.Min.Z 
+			return Max.X >= box.Min.X
+				&& Min.X <= box.Max.X
+				&& Max.Y >= box.Min.Y
+				&& Min.Y <= box.Max.Y
+				&& Max.Z >= box.Min.Z
 				&& Min.Z <= box.Max.Z;
-		}		
-		
+		}
+
 		constexpr ContainmentType Contains(BoundingBox const& box) const {
 			if (Max.X < box.Min.X || Min.X > box.Max.X || Max.Y < box.Min.Y || Min.Y > box.Max.Y || Max.Z < box.Min.Z || Min.Z > box.Max.Z)
 				return ContainmentType::Disjoint;
 
-			return Min.X > box.Min.X || box.Max.X > Max.X || Min.Y > box.Min.Y || box.Max.Y > Max.Y || Min.Z > box.Min.Z || box.Max.Z > Max.Z 
+			return Min.X > box.Min.X || box.Max.X > Max.X || Min.Y > box.Min.Y || box.Max.Y > Max.Y || Min.Z > box.Min.Z || box.Max.Z > Max.Z
 				? ContainmentType::Intersects : ContainmentType::Contains;
-		}		
+		}
 
 		constexpr ContainmentType Contains(Vector3 const& point) const {
-			return Min.X > point.X || point.X > Max.X || Min.Y > point.Y || point.Y > Max.Y || Min.Z > point.Z || point.Z > Max.Z 
+			return Min.X > point.X || point.X > Max.X || Min.Y > point.Y || point.Y > Max.Y || Min.Z > point.Z || point.Z > Max.Z
 				? ContainmentType::Disjoint : ContainmentType::Contains;
-		}		
+		}
 
 		void SupportMapping(Vector3 const& v, Vector3& result) const {
 			result.X = v.X >= 0.0 ? Max.X : Min.X;
@@ -1687,7 +1687,7 @@ namespace dxna {
 		static constexpr BoundingBox CreateMerged(BoundingBox const& original, BoundingBox const& additional) {
 			Vector3 result1 = Vector3::Min(original.Min, additional.Min);
 			Vector3 result2 = Vector3::Max(original.Max, additional.Max);
-			
+
 			BoundingBox result;
 			result.Min = result1;
 			result.Max = result2;
@@ -1702,7 +1702,7 @@ namespace dxna {
 		static constexpr bool Intersects(BoundingFrustum const& frustum);
 		static constexpr PlaneIntersectionType Intersects(Plane const& plane);
 		static nfloat Intersects(Ray const& ray);
-		
+
 	};
 
 	struct BoundingSphere {
@@ -1711,8 +1711,8 @@ namespace dxna {
 
 		constexpr BoundingSphere() = default;
 
-		constexpr BoundingSphere(Vector3 const& center, float radius):
-			Center(center), Radius(radius){}
+		constexpr BoundingSphere(Vector3 const& center, float radius) :
+			Center(center), Radius(radius) {}
 
 		constexpr bool operator==(BoundingSphere const& other) {
 			return Equals(other);
@@ -1725,7 +1725,7 @@ namespace dxna {
 		static BoundingSphere CreateMerged(BoundingSphere const& original, BoundingSphere const& additional);
 		static BoundingSphere CreateFromBoundingBox(BoundingBox const& box);
 		static BoundingSphere CreateFromPoints(Vector3* points, size_t length, size_t offset = 0);
-		
+
 		bool Intersects(BoundingBox const& box) const {
 			Vector3 result1 = Vector3::Clamp(Center, box.Min, box.Max);
 			float result2 = Vector3::DistanceSquared(Center, result1);
@@ -1740,7 +1740,7 @@ namespace dxna {
 		}
 
 		ContainmentType Contains(BoundingBox const& box) const;
-		
+
 		constexpr ContainmentType Contains(Vector3 point) const {
 			return Vector3::DistanceSquared(point, Center) >= Radius * Radius ? ContainmentType::Disjoint : ContainmentType::Contains;
 		}
@@ -1755,7 +1755,7 @@ namespace dxna {
 
 			return radius1 - radius2 < result ? ContainmentType::Intersects : ContainmentType::Contains;
 		}
-		
+
 		void SupportMapping(Vector3 const& v, Vector3& result) const;
 
 		BoundingSphere Transform(Matrix const& matrix) const;
@@ -1765,6 +1765,140 @@ namespace dxna {
 		PlaneIntersectionType Intersects(Plane const& plane) const;
 		nfloat Intersects(Ray const& ray) const;
 		static BoundingSphere CreateFromFrustum(BoundingFrustum const& frustum);
+	};
+
+	struct Plane {
+		Vector3 Normal;
+		float D{ 0 };
+
+		constexpr Plane() = default;
+
+		constexpr Plane(const Vector3& Normal, float D)
+			: Normal(Normal), D(D) {}
+
+		constexpr Plane(float a, float b, float c, float d)
+			: Normal({ a,b, c }), D(d) { }
+
+		constexpr Plane(Vector4 const& value)
+			: Normal({ value.X, value.Y, value.Z }), D(value.W) {}
+
+		Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3);		
+
+		constexpr bool operator==(const Plane& other) const	{
+			return Equals(other);
+		}
+
+		constexpr bool Equals(const Plane& other) const	{
+			return Normal == other.Normal && D == other.D;
+		}
+
+		void Normalize();
+
+		static Plane Normalize(Plane const& value);
+		
+		static constexpr Plane Transform(Plane const& plane, Matrix const& matrix) {
+			Matrix result = Matrix::Invert(matrix);
+			
+			float x = plane.Normal.X;
+			float y = plane.Normal.Y;
+			float z = plane.Normal.Z;
+			float d = plane.D;
+
+			Plane plane1;
+			plane1.Normal.X = (x * result.M11 + y * result.M12 + z * result.M13 + d * result.M14);
+			plane1.Normal.Y = (x * result.M21 + y * result.M22 + z * result.M23 + d * result.M24);
+			plane1.Normal.Z = (x * result.M31 + y * result.M32 + z * result.M33 + d * result.M34);
+			plane1.D = (x * result.M41 + y * result.M42 + z * result.M43 + d * result.M44);
+			return plane1;
+		}
+
+		static Plane Transform(Plane const& plane, Quaternion const& rotation) {
+			float num1 = rotation.X + rotation.X;
+			float num2 = rotation.Y + rotation.Y;
+			float num3 = rotation.Z + rotation.Z;
+			float num4 = rotation.W * num1;
+			float num5 = rotation.W * num2;
+			float num6 = rotation.W * num3;
+			float num7 = rotation.X * num1;
+			float num8 = rotation.X * num2;
+			float num9 = rotation.X * num3;
+			float num10 = rotation.Y * num2;
+			float num11 = rotation.Y * num3;
+			float num12 = rotation.Z * num3;
+			float num13 = 1.0f - num10 - num12;
+			float num14 = num8 - num6;
+			float num15 = num9 + num5;
+			float num16 = num8 + num6;
+			float num17 = 1.0f - num7 - num12;
+			float num18 = num11 - num4;
+			float num19 = num9 - num5;
+			float num20 = num11 + num4;
+			float num21 = 1.0f - num7 - num10;
+			float x = plane.Normal.X;
+			float y = plane.Normal.Y;
+			float z = plane.Normal.Z;
+			Plane plane1;
+			plane1.Normal.X = (x * num13 + y * num14 + z * num15);
+			plane1.Normal.Y = (x * num16 + y * num17 + z * num18);
+			plane1.Normal.Z = (x * num19 + y * num20 + z * num21);
+			plane1.D = plane.D;
+			return plane1;
+		}
+
+		constexpr float Dot(Vector4 const& value) const {
+			return (Normal.X * value.X + Normal.Y * value.Y + Normal.Z * value.Z + D * value.W);
+		}
+
+		constexpr  float DotCoordinate(Vector3 const& value) const {
+			return (Normal.X * value.X + Normal.Y * value.Y + Normal.Z * value.Z) + D;
+		}
+
+		constexpr float DotNormal(Vector3 const& value) const {
+			return (Normal.X * value.X + Normal.Y * value.Y + Normal.Z * value.Z);
+		}
+
+		constexpr PlaneIntersectionType Intersects(BoundingBox const& box) {
+			Vector3 vector3_1;
+			vector3_1.X = Normal.X >= 0.0 ? box.Min.X : box.Max.X;
+			vector3_1.Y = Normal.Y >= 0.0 ? box.Min.Y : box.Max.Y;
+			vector3_1.Z = Normal.Z >= 0.0 ? box.Min.Z : box.Max.Z;
+			Vector3 vector3_2;
+			vector3_2.X = Normal.X >= 0.0 ? box.Max.X : box.Min.X;
+			vector3_2.Y = Normal.Y >= 0.0 ? box.Max.Y : box.Min.Y;
+			vector3_2.Z = Normal.Z >= 0.0 ? box.Max.Z : box.Min.Z;
+			
+			if (Normal.X * vector3_1.X + Normal.Y * vector3_1.Y + Normal.Z * vector3_1.Z + D > 0.0)
+				return PlaneIntersectionType::Front;
+
+			return Normal.X * vector3_2.X + Normal.Y * vector3_2.Y + Normal.Z * vector3_2.Z + D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
+		}
+
+		PlaneIntersectionType Intersects(BoundingSphere const& sphere) const {
+			float num = (sphere.Center.X * Normal.X + sphere.Center.Y * Normal.Y + sphere.Center.Z * Normal.Z) + D;
+			
+			if (num >  sphere.Radius)
+				return PlaneIntersectionType::Front;
+
+			return num < -sphere.Radius ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
+		}
+
+		constexpr PlaneIntersectionType Intersects(BoundingFrustum const& frustum) const;
+	};
+
+	struct BoundingFrustum {
+
+	private:
+		Matrix _matrix;
+
+		Vector3 corner0;
+		Vector3 corner1;
+		Vector3 corner2;
+		Vector3 corner3;
+		Vector3 corner4;
+		Vector3 corner5;
+		Vector3 corner6;
+		Vector3 corner7;
+		Vector3 corner8;
 	};
 }
 
@@ -1782,7 +1916,7 @@ namespace dxna {
 
 	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const {
 		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
-		float result2 =	Vector3::DistanceSquared(sphere.Center, result1);
+		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
 		return result2 <= sphere.Radius * sphere.Radius;
 	}
 }

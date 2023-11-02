@@ -709,4 +709,52 @@ namespace dxna {
 		boundingSphere.Radius = Radius * std::sqrt(d);
 		return boundingSphere;
 	}
+
+	Plane::Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3) {
+		float num1 = point2.X - point1.X;
+		float num2 = point2.Y - point1.Y;
+		float num3 = point2.Z - point1.Z;
+		float num4 = point3.X - point1.X;
+		float num5 = point3.Y - point1.Y;
+		float num6 = point3.Z - point1.Z;
+		float num7 = (num2 * num6 - num3 * num5);
+		float num8 = (num3 * num4 - num1 * num6);
+		float num9 = (num1 * num5 - num2 * num4);
+		float num10 = 1.0f / std::sqrt(num7 * num7 + num8 * num8 + num9 * num9);
+		Normal.X = num7 * num10;
+		Normal.Y = num8 * num10;
+		Normal.Z = num9 * num10;
+		D = -(Normal.X * point1.X + Normal.Y * point1.Y + Normal.Z * point1.Z);
+	}
+
+	void Plane::Normalize()	{
+		float d = (Normal.X * Normal.X + Normal.Y * Normal.Y + Normal.Z * Normal.Z);
+		if (std::abs(d - 1.0f) < 1.1920928955078125E-07)
+			return;
+		float num = 1.0f / std::sqrt(d);
+		Normal.X *= num;
+		Normal.Y *= num;
+		Normal.Z *= num;
+		D *= num;
+	}
+
+	Plane Plane::Normalize(Plane const& value) {
+		float d = (value.Normal.X * value.Normal.X + value.Normal.Y * value.Normal.Y + value.Normal.Z * value.Normal.Z);
+		
+		if ((double)std::abs(d - 1.0f) < 1.1920928955078125E-07) {
+			Plane plane;
+			plane.Normal = value.Normal;
+			plane.D = value.D;
+			return plane;
+		}
+
+		float num = 1.0f / std::sqrt(d);
+		Plane plane1;
+		plane1.Normal.X = value.Normal.X * num;
+		plane1.Normal.Y = value.Normal.Y * num;
+		plane1.Normal.Z = value.Normal.Z * num;
+		plane1.D = value.D * num;
+		return plane1;
+	}
+
 }
