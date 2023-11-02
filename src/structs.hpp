@@ -4,6 +4,7 @@
 #include "cs/cs.hpp"
 #include <vector>
 #include "enumerations.hpp"
+#include "mathhelper.hpp"
 
 namespace dxna {
 	struct Matrix;
@@ -333,6 +334,11 @@ namespace dxna {
 		friend constexpr Vector3 operator*(float scale, Vector3 const& value) { return Vector3::Multiply(value, scale); }
 		friend constexpr Vector3 operator/(Vector3 const& value1, Vector3 const& value2) { return Vector3::Divide(value1, value2); }
 		friend constexpr Vector3 operator/(Vector3 const& value, float divider) { return Vector3::Divide(value, divider); }
+		
+		constexpr Vector3 operator+=(Vector3 const& other) const { return Vector3::Add(*this, other); }
+		constexpr Vector3 operator-=(Vector3 const& other) const { return Vector3::Subtract(*this, other); }
+		constexpr Vector3 operator*=(Vector3 const& other) const { return Vector3::Multiply(*this, other); }
+		constexpr Vector3 operator/=(Vector3 const& other) const { return Vector3::Divide(*this, other); }
 
 
 		float Length() const;
@@ -1698,6 +1704,87 @@ namespace dxna {
 		static nfloat Intersects(Ray const& ray);
 		
 	};
+
+	struct BoundingSphere {
+		Vector3 Center;
+		float Radius{ 0 };
+
+		constexpr BoundingSphere() = default;
+
+		constexpr BoundingSphere(Vector3 const& center, float radius):
+			Center(center), Radius(radius){}
+
+		constexpr bool operator==(BoundingSphere const& other) {
+			return Equals(other);
+		}
+
+		bool constexpr Equals(BoundingSphere const& other) const {
+			return Center == other.Center && Radius == other.Radius;
+		}
+
+		static BoundingSphere CreateMerged(BoundingSphere const& original, BoundingSphere const& additional);
+		static BoundingSphere CreateFromBoundingBox(BoundingBox const& box);
+		static BoundingSphere CreateFromPoints(Vector3* points, size_t length, size_t offset = 0);
+		
+		bool Intersects(BoundingBox const& box) const {
+			Vector3 result1 = Vector3::Clamp(Center, box.Min, box.Max);
+			float result2 = Vector3::DistanceSquared(Center, result1);
+			return result2 <= Radius * Radius;
+		}
+
+		bool Intersects(BoundingSphere const& sphere) const {
+			float result = Vector3::DistanceSquared(Center, sphere.Center);
+			float radius1 = Radius;
+			float radius2 = sphere.Radius;
+			return radius1 * radius1 + 2.0F * radius1 * radius2 + radius2 * radius2 > result;
+		}
+
+		ContainmentType Contains(BoundingBox const& box) const;
+		
+		constexpr ContainmentType Contains(Vector3 point) const {
+			return Vector3::DistanceSquared(point, Center) >= Radius * Radius ? ContainmentType::Disjoint : ContainmentType::Contains;
+		}
+
+		ContainmentType Contains(BoundingSphere sphere) const {
+			float result = Vector3::Distance(Center, sphere.Center);
+			float radius1 = Radius;
+			float radius2 = sphere.Radius;
+
+			if (radius1 + radius2 < result)
+				return ContainmentType::Disjoint;
+
+			return radius1 - radius2 < result ? ContainmentType::Intersects : ContainmentType::Contains;
+		}
+		
+		void SupportMapping(Vector3 const& v, Vector3& result) const;
+
+		BoundingSphere Transform(Matrix const& matrix) const;
+
+		ContainmentType Contains(BoundingFrustum const& frustum) const;
+		bool Intersects(BoundingFrustum const& frustum) const;
+		PlaneIntersectionType Intersects(Plane const& plane) const;
+		nfloat Intersects(Ray const& ray) const;
+		static BoundingSphere CreateFromFrustum(BoundingFrustum const& frustum);
+	};
+}
+
+namespace dxna {
+	constexpr Vector3 dxna::Vector3::Transform(Vector3 const& position, Matrix const& matrix) {
+		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
+		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
+		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
+		Vector3 vector3;
+		vector3.X = num1;
+		vector3.Y = num2;
+		vector3.Z = num3;
+		return vector3;
+	}
+
+	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const {
+		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
+		float result2 =	Vector3::DistanceSquared(sphere.Center, result1);
+		return result2 <= sphere.Radius * sphere.Radius;
+	}
 }
 
 #endif
