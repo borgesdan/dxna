@@ -6,6 +6,7 @@
 namespace dxna {
 	struct Matrix;
 	struct Quaternion;
+	struct Plane;
 
 	struct Point {
 		intcs X{ 0 };
@@ -124,7 +125,7 @@ namespace dxna {
 		constexpr Vector2(float x, float y) : X(x), Y(y) {}
 		constexpr Vector2(float value) : X(value), Y(value) {}
 
-		constexpr Vector2 operator-() const { return Negate(*this); }
+		constexpr Vector2 operator-() const { return Vector2::Negate(*this); }
 		constexpr bool operator==(Vector2 const& other) const { return Equals(other); }
 		friend constexpr Vector2 operator+(Vector2 const& value1, Vector2 const& value2) { return Vector2::Add(value1, value2); }
 		friend constexpr Vector2 operator-(Vector2 const& value1, Vector2 const& value2) { return Vector2::Subtract(value1, value2); }
@@ -239,6 +240,8 @@ namespace dxna {
 			return vector2;
 		}
 
+		static Vector2 Normalize(Vector2 const& value);
+
 		static constexpr Vector2 Negate(Vector2 const& value) {
 			Vector2 vector2;
 			vector2.X = -value.X;
@@ -316,7 +319,7 @@ namespace dxna {
 		constexpr Vector3(float value) : X(value), Y(value), Z(value) {}
 		constexpr Vector3(Vector2 const& value, float z) : X(value.X), Y(value.Y), Z(z) {}
 
-		constexpr Vector3 operator-() const { return Negate(*this); }
+		constexpr Vector3 operator-() const { return Vector3::Negate(*this); }
 		constexpr bool operator==(Vector3 const& other) const { return Equals(other); }
 		friend constexpr Vector3 operator+(Vector3 const& value1, Vector3 const& value2) { return Vector3::Add(value1, value2); }
 		friend constexpr Vector3 operator-(Vector3 const& value1, Vector3 const& value2) { return Vector3::Subtract(value1, value2); }
@@ -460,6 +463,8 @@ namespace dxna {
 			return vector3;
 		}
 
+		static Vector3 Normalize(Vector3 const& value);
+
 		static constexpr Vector3 Negate(Vector3 const& value) {
 			Vector3 vector;
 			vector.X = -value.X;
@@ -517,14 +522,14 @@ namespace dxna {
 			return vector3;
 		}
 
-		static Vector3 Transform(Vector3 const& position, Matrix const& matrix);
-		static Vector3 TransformNormal(Vector3 const& normal, Matrix const& matrix);
-		static Vector3 Transform(Vector3 const& value, Quaternion const& rotation);
-		static void Transform(Vector3* sourceArray, Matrix const& matrix,
+		static constexpr Vector3 Transform(Vector3 const& position, Matrix const& matrix);
+		static constexpr Vector3 TransformNormal(Vector3 const& normal, Matrix const& matrix);
+		static constexpr Vector3 Transform(Vector3 const& value, Quaternion const& rotation);
+		static constexpr void Transform(Vector3* sourceArray, Matrix const& matrix,
 			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
-		static void TransformNormal(Vector3* sourceArray, Matrix const& matrix,
+		static constexpr void TransformNormal(Vector3* sourceArray, Matrix const& matrix,
 			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
-		static void Transform(Vector3* sourceArray, Quaternion const& rotation,
+		static constexpr void Transform(Vector3* sourceArray, Quaternion const& rotation,
 			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
 	};
 
@@ -544,7 +549,7 @@ namespace dxna {
 		constexpr Vector4(Vector3 value, float w) :
 			X(value.X), Y(value.Y), Z(value.Z), W(w) {}
 
-		constexpr Vector4 operator-() const { return Negate(*this); }
+		constexpr Vector4 operator-() const { return Vector4::Negate(*this); }
 		constexpr bool operator==(Vector4 const& other) const { return Equals(other); }
 		friend constexpr Vector4 operator+(Vector4 const& value1, Vector4 const& value2) { return Vector4::Add(value1, value2); }
 		friend constexpr Vector4 operator-(Vector4 const& value1, Vector4 const& value2) { return Vector4::Subtract(value1, value2); }
@@ -680,12 +685,14 @@ namespace dxna {
 			const auto num5 = num2 - 2.0F * num1 + amount;
 			const auto num6 = num2 - num1;
 			Vector4 vector4;
-			vector4.X = (float)(value1.X * num3 + value2.X * num4 + tangent1.X * num5 + tangent2.X * num6);
-			vector4.Y = (float)(value1.Y * num3 + value2.Y * num4 + tangent1.Y * num5 + tangent2.Y * num6);
-			vector4.Z = (float)(value1.Z * num3 + value2.Z * num4 + tangent1.Z * num5 + tangent2.Z * num6);
-			vector4.W = (float)(value1.W * num3 + value2.W * num4 + tangent1.W * num5 + tangent2.W * num6);
+			vector4.X = (value1.X * num3 + value2.X * num4 + tangent1.X * num5 + tangent2.X * num6);
+			vector4.Y = (value1.Y * num3 + value2.Y * num4 + tangent1.Y * num5 + tangent2.Y * num6);
+			vector4.Z = (value1.Z * num3 + value2.Z * num4 + tangent1.Z * num5 + tangent2.Z * num6);
+			vector4.W = (value1.W * num3 + value2.W * num4 + tangent1.W * num5 + tangent2.W * num6);
 			return vector4;
 		}
+
+		static Vector4 Normalize(Vector4 const& value);
 
 		static constexpr Vector4 Negate(Vector4 const& value) {
 			Vector4 vector4;
@@ -751,18 +758,818 @@ namespace dxna {
 			return vector4;
 		}
 
-		static Vector4 Transform(Vector2 const& position, Matrix const& matrix);
-		static Vector4 Transform(Vector3 const& position, Matrix const& matrix);
-		static Vector4 Transform(Vector4 const& vector, Matrix const& matrix);
-		static Vector4 Transform(Vector2 const& value, Quaternion const& rotation);
-		static Vector4 Transform(Vector3 const& position, Quaternion const& rotation);
-		static Vector4 Transform(Vector4 const& vector, Quaternion const& rotation);
+		static constexpr Vector4 Transform(Vector2 const& position, Matrix const& matrix);
+		static constexpr Vector4 Transform(Vector3 const& position, Matrix const& matrix);
+		static constexpr Vector4 Transform(Vector4 const& vector, Matrix const& matrix);
+		static constexpr Vector4 Transform(Vector2 const& value, Quaternion const& rotation);
+		static constexpr Vector4 Transform(Vector3 const& position, Quaternion const& rotation);
+		static constexpr Vector4 Transform(Vector4 const& vector, Quaternion const& rotation);
 
-		static void Transform(Vector4* sourceArray, Matrix const& matrix,
-			Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex);
-		static void Transform(Vector4* sourceArray, Quaternion const& rotation,
+		static constexpr void Transform(Vector4* sourceArray, Matrix const& matrix,
+			Vector4* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
+		static constexpr void Transform(Vector4* sourceArray, Quaternion const& rotation,
 			Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex);		
 	};
+
+	struct Matrix {
+		float M11{ 0 };
+		float M12{ 0 };
+		float M13{ 0 };
+		float M14{ 0 };
+		float M21{ 0 };
+		float M22{ 0 };
+		float M23{ 0 };
+		float M24{ 0 };
+		float M31{ 0 };
+		float M32{ 0 };
+		float M33{ 0 };
+		float M34{ 0 };
+		float M41{ 0 };
+		float M42{ 0 };
+		float M43{ 0 };
+		float M44{ 0 };
+
+		constexpr Matrix() = default;		
+
+		constexpr Matrix(float M11, float M12, float M13, float M14, float M21, float M22, float M23, float M24, float M31, float M32, float M33, float M34, float M41, float M42, float M43, float M44)
+			: M11(M11), M12(M12), M13(M13), M14(M14), M21(M21), M22(M22), M23(M23), M24(M24), M31(M31), M32(M32), M33(M33), M34(M34), M41(M41), M42(M42), M43(M43), M44(M44) {
+		}
+
+		constexpr Matrix operator-() const { return Matrix::Negate(*this); }
+		constexpr bool operator==(Matrix const& other) const { return Equals(other); }
+		friend constexpr Matrix operator+(Matrix const& value1, Matrix const& value2) { return Matrix::Add(value1, value2); }
+		friend constexpr Matrix operator-(Matrix const& value1, Matrix const& value2) { return Matrix::Subtract(value1, value2); }
+		friend constexpr Matrix operator*(Matrix const& value1, Matrix const& value2) { return Matrix::Multiply(value1, value2); }
+		friend constexpr Matrix operator*(Matrix const& value, float scale) { return Matrix::Multiply(value, scale); }
+		friend constexpr Matrix operator*(float scale, Matrix const& value) { return Matrix::Multiply(value, scale); }
+		friend constexpr Matrix operator/(Matrix const& value1, Matrix const& value2) { return Matrix::Divide(value1, value2); }
+		friend constexpr Matrix operator/(Matrix const& value, float divider) { return Matrix::Divide(value, divider); }
+
+
+		constexpr Vector3 Up() const {
+			Vector3 up;
+			up.X = M21;
+			up.Y = M22;
+			up.Z = M23;
+			return up;
+		}
+
+		constexpr Vector3 Down() const {
+			Vector3 down;
+			down.X = -M21;
+			down.Y = -M22;
+			down.Z = -M23;
+			return down;
+		}
+
+		constexpr Vector3 Right() const {
+			Vector3 right;
+			right.X = M11;
+			right.Y = M12;
+			right.Z = M13;
+			return right;
+		}
+
+		constexpr Vector3 Left() const {
+			Vector3 left;
+			left.X = -M11;
+			left.Y = -M12;
+			left.Z = -M13;
+			return left;
+		}
+
+		constexpr Vector3 Forward() const {
+			Vector3 forward;
+			forward.X = -M31;
+			forward.Y = -M32;
+			forward.Z = -M33;
+			return forward;
+		}
+
+		constexpr Vector3 Backward() const {
+			Vector3 backward;
+			backward.X = M31;
+			backward.Y = M32;
+			backward.Z = M33;
+			return backward;
+		}
+
+		constexpr Vector3 Translation() const {
+			Vector3 translation;
+			translation.X = M41;
+			translation.Y = M42;
+			translation.Z = M43;
+			return translation;
+		}
+
+		constexpr void Up(Vector3 const& value) {
+			M21 = value.X;
+			M22 = value.Y;
+			M23 = value.Z;
+		}
+
+		constexpr void Down(Vector3 const& value) {
+			M21 = -value.X;
+			M22 = -value.Y;
+			M23 = -value.Z;
+		}
+
+		constexpr void Right(Vector3 const& value) {
+			M11 = value.X;
+			M12 = value.Y;
+			M13 = value.Z;
+		}
+
+		constexpr void Left(Vector3 const& value) {
+			M11 = -value.X;
+			M12 = -value.Y;
+			M13 = -value.Z;
+		}
+
+		constexpr void Forward(Vector3 const& value) {
+			M31 = -value.X;
+			M32 = -value.Y;
+			M33 = -value.Z;
+		}
+
+		constexpr void Backward(Vector3 const& value) {
+			M31 = value.X;
+			M32 = value.Y;
+			M33 = value.Z;
+		}
+
+		constexpr void Translation(Vector3 const& value) {
+			M41 = value.X;
+			M42 = value.Y;
+			M43 = value.Z;
+		}
+
+		constexpr bool Equals(Matrix const& other) const {
+			return M11 == other.M11 
+				&& M22 == other.M22 
+				&& M33 == other.M33 
+				&& M44 == other.M44 
+				&& M12 == other.M12 
+				&& M13 == other.M13 
+				&& M14 == other.M14 
+				&& M21 == other.M21 
+				&& M23 == other.M23 
+				&& M24 == other.M24 
+				&& M31 == other.M31 
+				&& M32 == other.M32 
+				&& M34 == other.M34 
+				&& M41 == other.M41 
+				&& M42 == other.M42 
+				&& M43 == other.M43;
+		}
+
+		constexpr float Determinant() const {
+			float m11 = M11;
+			float m12 = M12;
+			float m13 = M13;
+			float m14 = M14;
+			float m21 = M21;
+			float m22 = M22;
+			float m23 = M23;
+			float m24 = M24;
+			float m31 = M31;
+			float m32 = M32;
+			float m33 = M33;
+			float m34 = M34;
+			float m41 = M41;
+			float m42 = M42;
+			float m43 = M43;
+			float m44 = M44;
+			float num1 = m33 * m44 - m34 * m43;
+			float num2 = m32 * m44 - m34 * m42;
+			float num3 = m32 * m43 - m33 * m42;
+			float num4 = m31 * m44 - m34 * m41;
+			float num5 = m31 * m43 - m33 * m41;
+			float num6 = m31 * m42 - m32 * m41;
+			return (m11 * (m22 * num1 - m23 * num2 + m24 * num3) - m12 * (m21 * num1 - m23 * num4 + m24 * num5) + m13 * (m21 * num2 - m22 * num4 + m24 * num6) - m14 * (m21 * num3 - m22 * num5 + m23 * num6));
+		}
+
+		static constexpr Matrix Identity() { 
+			return Matrix(
+				1.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 1.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f); 
+		}
+
+		static Matrix CreateBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
+			Vector3 const& cameraUpVector, Vector3* const cameraForwardVector = nullptr);
+
+		static Matrix CreateConstrainedBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
+			Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector);
+
+		static constexpr Matrix CreateTranslation(Vector3 const& position) {
+			Matrix translation;
+			translation.M11 = 1.0f;
+			translation.M12 = 0.0f;
+			translation.M13 = 0.0f;
+			translation.M14 = 0.0f;
+			translation.M21 = 0.0f;
+			translation.M22 = 1.0f;
+			translation.M23 = 0.0f;
+			translation.M24 = 0.0f;
+			translation.M31 = 0.0f;
+			translation.M32 = 0.0f;
+			translation.M33 = 1.0f;
+			translation.M34 = 0.0f;
+			translation.M41 = position.X;
+			translation.M42 = position.Y;
+			translation.M43 = position.Z;
+			translation.M44 = 1.0f;
+			return translation;
+		}
+
+		static constexpr Matrix CreateTranslation(float xPosition, float yPosition, float zPosition) {
+			Matrix translation;
+			translation.M11 = 1.0f;
+			translation.M12 = 0.0f;
+			translation.M13 = 0.0f;
+			translation.M14 = 0.0f;
+			translation.M21 = 0.0f;
+			translation.M22 = 1.0f;
+			translation.M23 = 0.0f;
+			translation.M24 = 0.0f;
+			translation.M31 = 0.0f;
+			translation.M32 = 0.0f;
+			translation.M33 = 1.0f;
+			translation.M34 = 0.0f;
+			translation.M41 = xPosition;
+			translation.M42 = yPosition;
+			translation.M43 = zPosition;
+			translation.M44 = 1.0f;
+			return translation;
+		}
+
+		static constexpr Matrix CreateScale(float xScale, float yScale, float zScale) {
+			const auto num1 = xScale;
+			const auto num2 = yScale;
+			const auto num3 = zScale;
+
+			Matrix scale;
+			scale.M11 = num1;
+			scale.M12 = 0.0f;
+			scale.M13 = 0.0f;
+			scale.M14 = 0.0f;
+			scale.M21 = 0.0f;
+			scale.M22 = num2;
+			scale.M23 = 0.0f;
+			scale.M24 = 0.0f;
+			scale.M31 = 0.0f;
+			scale.M32 = 0.0f;
+			scale.M33 = num3;
+			scale.M34 = 0.0f;
+			scale.M41 = 0.0f;
+			scale.M42 = 0.0f;
+			scale.M43 = 0.0f;
+			scale.M44 = 1.0f;
+			return scale;
+		}
+
+		static constexpr Matrix CreateScale(Vector3 const& scales) {
+			const auto x = scales.X;
+			const auto y = scales.Y;
+			const auto z = scales.Z;
+
+			Matrix scale;
+			scale.M11 = x;
+			scale.M12 = 0.0f;
+			scale.M13 = 0.0f;
+			scale.M14 = 0.0f;
+			scale.M21 = 0.0f;
+			scale.M22 = y;
+			scale.M23 = 0.0f;
+			scale.M24 = 0.0f;
+			scale.M31 = 0.0f;
+			scale.M32 = 0.0f;
+			scale.M33 = z;
+			scale.M34 = 0.0f;
+			scale.M41 = 0.0f;
+			scale.M42 = 0.0f;
+			scale.M43 = 0.0f;
+			scale.M44 = 1.0f;
+			return scale;
+		}
+
+		static constexpr Matrix CreateScale(float scale) {
+			const auto num = scale;
+
+			Matrix scale1;
+			scale1.M11 = num;
+			scale1.M12 = 0.0f;
+			scale1.M13 = 0.0f;
+			scale1.M14 = 0.0f;
+			scale1.M21 = 0.0f;
+			scale1.M22 = num;
+			scale1.M23 = 0.0f;
+			scale1.M24 = 0.0f;
+			scale1.M31 = 0.0f;
+			scale1.M32 = 0.0f;
+			scale1.M33 = num;
+			scale1.M34 = 0.0f;
+			scale1.M41 = 0.0f;
+			scale1.M42 = 0.0f;
+			scale1.M43 = 0.0f;
+			scale1.M44 = 1.0f;
+			return scale1;
+		}
+
+		static Matrix CreateRotationX(float radians);
+		static Matrix CreateRotationY(float radians);
+		static Matrix CreateRotationZ(float radians);
+		static Matrix CreateFromAxisAngle(Vector3 const& axis, float angle);
+		static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance);
+		
+		static constexpr Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance) {
+			const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			
+			if (nearPlaneDistance <= 0.0F)
+				return zero;
+
+			if (farPlaneDistance <= 0.0F)
+				return zero;
+
+			if (nearPlaneDistance >= farPlaneDistance)
+				return zero;
+			
+			Matrix perspective;
+			perspective.M11 = 2.0f * nearPlaneDistance / width;
+			perspective.M12 = perspective.M13 = perspective.M14 = 0.0f;
+			perspective.M22 = 2.0f * nearPlaneDistance / height;
+			perspective.M21 = perspective.M23 = perspective.M24 = 0.0f;
+			perspective.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+			perspective.M31 = perspective.M32 = 0.0f;
+			perspective.M34 = -1.0f;
+			perspective.M41 = perspective.M42 = perspective.M44 = 0.0f;
+			perspective.M43 = nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+			return perspective;
+		}
+
+		static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom,
+			float top, float nearPlaneDistance, float farPlaneDistance) {
+			const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+			if (nearPlaneDistance <= 0.0F)
+				return zero;
+
+			if (farPlaneDistance <= 0.0F)
+				return zero;
+
+			if (nearPlaneDistance >= farPlaneDistance)
+				return zero;			
+
+			Matrix perspectiveOffCenter;
+			perspectiveOffCenter.M11 = 2.0F * nearPlaneDistance / (right - left);
+			perspectiveOffCenter.M12 = perspectiveOffCenter.M13 = perspectiveOffCenter.M14 = 0.0f;
+			perspectiveOffCenter.M22 = 2.0F * nearPlaneDistance / (top - bottom);
+			perspectiveOffCenter.M21 = perspectiveOffCenter.M23 = perspectiveOffCenter.M24 = 0.0f;
+			perspectiveOffCenter.M31 = (left + right) / (right - left);
+			perspectiveOffCenter.M32 = (top + bottom) / (top - bottom);
+			perspectiveOffCenter.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+			perspectiveOffCenter.M34 = -1.0f;
+			perspectiveOffCenter.M43 = nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+			perspectiveOffCenter.M41 = perspectiveOffCenter.M42 = perspectiveOffCenter.M44 = 0.0f;
+			return perspectiveOffCenter;
+		}
+
+		static constexpr Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane) {
+			Matrix orthographic;
+			orthographic.M11 = 2.0f / width;
+			orthographic.M12 = orthographic.M13 = orthographic.M14 = 0.0f;
+			orthographic.M22 = 2.0f / height;
+			orthographic.M21 = orthographic.M23 = orthographic.M24 = 0.0f;
+			orthographic.M33 = 1.0F / (zNearPlane - zFarPlane);
+			orthographic.M31 = orthographic.M32 = orthographic.M34 = 0.0f;
+			orthographic.M41 = orthographic.M42 = 0.0f;
+			orthographic.M43 = zNearPlane / (zNearPlane - zFarPlane);
+			orthographic.M44 = 1.0f;
+			return orthographic;
+		}
+
+		static constexpr Matrix CreateOrthographicOffCenter(float left, float right, float bottom,
+			float top, float zNearPlane, float zFarPlane) {
+
+			Matrix orthographicOffCenter;
+			orthographicOffCenter.M11 = 2.0F / (right - left);
+			orthographicOffCenter.M12 = orthographicOffCenter.M13 = orthographicOffCenter.M14 = 0.0f;
+			orthographicOffCenter.M22 = 2.0F / (top - bottom);
+			orthographicOffCenter.M21 = orthographicOffCenter.M23 = orthographicOffCenter.M24 = 0.0f;
+			orthographicOffCenter.M33 = 1.0F / (zNearPlane - zFarPlane);
+			orthographicOffCenter.M31 = orthographicOffCenter.M32 = orthographicOffCenter.M34 = 0.0f;
+			orthographicOffCenter.M41 = ((left + right) / (left - right));
+			orthographicOffCenter.M42 = ((top + bottom) / (bottom - top));
+			orthographicOffCenter.M43 = zNearPlane / (zNearPlane - zFarPlane);
+			orthographicOffCenter.M44 = 1.0f;
+			return orthographicOffCenter;
+		}
+
+		static Matrix CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector);
+		static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up);
+
+		static constexpr Matrix Transpose(Matrix const& matrix) {
+			Matrix matrix1;
+			matrix1.M11 = matrix.M11;
+			matrix1.M12 = matrix.M21;
+			matrix1.M13 = matrix.M31;
+			matrix1.M14 = matrix.M41;
+			matrix1.M21 = matrix.M12;
+			matrix1.M22 = matrix.M22;
+			matrix1.M23 = matrix.M32;
+			matrix1.M24 = matrix.M42;
+			matrix1.M31 = matrix.M13;
+			matrix1.M32 = matrix.M23;
+			matrix1.M33 = matrix.M33;
+			matrix1.M34 = matrix.M43;
+			matrix1.M41 = matrix.M14;
+			matrix1.M42 = matrix.M24;
+			matrix1.M43 = matrix.M34;
+			matrix1.M44 = matrix.M44;
+			return matrix1;
+		}
+
+		static constexpr Matrix Invert(Matrix const& matrix) {
+			float m11 = matrix.M11;
+			float m12 = matrix.M12;
+			float m13 = matrix.M13;
+			float m14 = matrix.M14;
+			float m21 = matrix.M21;
+			float m22 = matrix.M22;
+			float m23 = matrix.M23;
+			float m24 = matrix.M24;
+			float m31 = matrix.M31;
+			float m32 = matrix.M32;
+			float m33 = matrix.M33;
+			float m34 = matrix.M34;
+			float m41 = matrix.M41;
+			float m42 = matrix.M42;
+			float m43 = matrix.M43;
+			float m44 = matrix.M44;
+			float num1 = (m33 * m44 - m34 * m43);
+			float num2 = (m32 * m44 - m34 * m42);
+			float num3 = (m32 * m43 - m33 * m42);
+			float num4 = (m31 * m44 - m34 * m41);
+			float num5 = (m31 * m43 - m33 * m41);
+			float num6 = (m31 * m42 - m32 * m41);
+			float num7 = (m22 * num1 - m23 * num2 + m24 * num3);
+			float num8 = -(m21 * num1 - m23 * num4 + m24 * num5);
+			float num9 = (m21 * num2 - m22 * num4 + m24 * num6);
+			float num10 = -(m21 * num3 - m22 * num5 + m23 * num6);
+			float num11 = (1.0F / (m11 * num7 + m12 * num8 + m13 * num9 + m14 * num10));
+			Matrix matrix1;
+			matrix1.M11 = num7 * num11;
+			matrix1.M21 = num8 * num11;
+			matrix1.M31 = num9 * num11;
+			matrix1.M41 = num10 * num11;
+			matrix1.M12 = -(m12 * num1 - m13 * num2 + m14 * num3) * num11;
+			matrix1.M22 = (m11 * num1 - m13 * num4 + m14 * num5) * num11;
+			matrix1.M32 = -(m11 * num2 - m12 * num4 + m14 * num6) * num11;
+			matrix1.M42 = (m11 * num3 - m12 * num5 + m13 * num6) * num11;
+			float num12 = (m23 * m44 - m24 * m43);
+			float num13 = (m22 * m44 - m24 * m42);
+			float num14 = (m22 * m43 - m23 * m42);
+			float num15 = (m21 * m44 - m24 * m41);
+			float num16 = (m21 * m43 - m23 * m41);
+			float num17 = (m21 * m42 - m22 * m41);
+			matrix1.M13 = (m12 * num12 - m13 * num13 + m14 * num14) * num11;
+			matrix1.M23 = -(m11 * num12 - m13 * num15 + m14 * num16) * num11;
+			matrix1.M33 = (m11 * num13 - m12 * num15 + m14 * num17) * num11;
+			matrix1.M43 = -(m11 * num14 - m12 * num16 + m13 * num17) * num11;
+			float num18 = (m23 * m34 - m24 * m33);
+			float num19 = (m22 * m34 - m24 * m32);
+			float num20 = (m22 * m33 - m23 * m32);
+			float num21 = (m21 * m34 - m24 * m31);
+			float num22 = (m21 * m33 - m23 * m31);
+			float num23 = (m21 * m32 - m22 * m31);
+			matrix1.M14 = -(m12 * num18 - m13 * num19 + m14 * num20) * num11;
+			matrix1.M24 = (m11 * num18 - m13 * num21 + m14 * num22) * num11;
+			matrix1.M34 = -(m11 * num19 - m12 * num21 + m14 * num23) * num11;
+			matrix1.M44 = (m11 * num20 - m12 * num22 + m13 * num23) * num11;
+			return matrix1;
+		}
+
+		static constexpr Matrix Lerp(Matrix const& matrix1, Matrix const& matrix2, float amount) {
+			Matrix matrix;
+			matrix.M11 = matrix1.M11 + (matrix2.M11 - matrix1.M11) * amount;
+			matrix.M12 = matrix1.M12 + (matrix2.M12 - matrix1.M12) * amount;
+			matrix.M13 = matrix1.M13 + (matrix2.M13 - matrix1.M13) * amount;
+			matrix.M14 = matrix1.M14 + (matrix2.M14 - matrix1.M14) * amount;
+			matrix.M21 = matrix1.M21 + (matrix2.M21 - matrix1.M21) * amount;
+			matrix.M22 = matrix1.M22 + (matrix2.M22 - matrix1.M22) * amount;
+			matrix.M23 = matrix1.M23 + (matrix2.M23 - matrix1.M23) * amount;
+			matrix.M24 = matrix1.M24 + (matrix2.M24 - matrix1.M24) * amount;
+			matrix.M31 = matrix1.M31 + (matrix2.M31 - matrix1.M31) * amount;
+			matrix.M32 = matrix1.M32 + (matrix2.M32 - matrix1.M32) * amount;
+			matrix.M33 = matrix1.M33 + (matrix2.M33 - matrix1.M33) * amount;
+			matrix.M34 = matrix1.M34 + (matrix2.M34 - matrix1.M34) * amount;
+			matrix.M41 = matrix1.M41 + (matrix2.M41 - matrix1.M41) * amount;
+			matrix.M42 = matrix1.M42 + (matrix2.M42 - matrix1.M42) * amount;
+			matrix.M43 = matrix1.M43 + (matrix2.M43 - matrix1.M43) * amount;
+			matrix.M44 = matrix1.M44 + (matrix2.M44 - matrix1.M44) * amount;
+			return matrix;
+		}
+
+		static constexpr Matrix Negate(Matrix const& matrix) {
+			Matrix matrix1;
+			matrix1.M11 = -matrix.M11;
+			matrix1.M12 = -matrix.M12;
+			matrix1.M13 = -matrix.M13;
+			matrix1.M14 = -matrix.M14;
+			matrix1.M21 = -matrix.M21;
+			matrix1.M22 = -matrix.M22;
+			matrix1.M23 = -matrix.M23;
+			matrix1.M24 = -matrix.M24;
+			matrix1.M31 = -matrix.M31;
+			matrix1.M32 = -matrix.M32;
+			matrix1.M33 = -matrix.M33;
+			matrix1.M34 = -matrix.M34;
+			matrix1.M41 = -matrix.M41;
+			matrix1.M42 = -matrix.M42;
+			matrix1.M43 = -matrix.M43;
+			matrix1.M44 = -matrix.M44;
+			return matrix1;
+		}
+
+		static constexpr Matrix Add(Matrix const& matrix1, Matrix const& matrix2) {
+			Matrix matrix;
+			matrix.M11 = matrix1.M11 + matrix2.M11;
+			matrix.M12 = matrix1.M12 + matrix2.M12;
+			matrix.M13 = matrix1.M13 + matrix2.M13;
+			matrix.M14 = matrix1.M14 + matrix2.M14;
+			matrix.M21 = matrix1.M21 + matrix2.M21;
+			matrix.M22 = matrix1.M22 + matrix2.M22;
+			matrix.M23 = matrix1.M23 + matrix2.M23;
+			matrix.M24 = matrix1.M24 + matrix2.M24;
+			matrix.M31 = matrix1.M31 + matrix2.M31;
+			matrix.M32 = matrix1.M32 + matrix2.M32;
+			matrix.M33 = matrix1.M33 + matrix2.M33;
+			matrix.M34 = matrix1.M34 + matrix2.M34;
+			matrix.M41 = matrix1.M41 + matrix2.M41;
+			matrix.M42 = matrix1.M42 + matrix2.M42;
+			matrix.M43 = matrix1.M43 + matrix2.M43;
+			matrix.M44 = matrix1.M44 + matrix2.M44;
+			return matrix;
+		}
+
+		static constexpr Matrix Subtract(Matrix const& matrix1, Matrix const& matrix2) {
+			Matrix matrix;
+			matrix.M11 = matrix1.M11 - matrix2.M11;
+			matrix.M12 = matrix1.M12 - matrix2.M12;
+			matrix.M13 = matrix1.M13 - matrix2.M13;
+			matrix.M14 = matrix1.M14 - matrix2.M14;
+			matrix.M21 = matrix1.M21 - matrix2.M21;
+			matrix.M22 = matrix1.M22 - matrix2.M22;
+			matrix.M23 = matrix1.M23 - matrix2.M23;
+			matrix.M24 = matrix1.M24 - matrix2.M24;
+			matrix.M31 = matrix1.M31 - matrix2.M31;
+			matrix.M32 = matrix1.M32 - matrix2.M32;
+			matrix.M33 = matrix1.M33 - matrix2.M33;
+			matrix.M34 = matrix1.M34 - matrix2.M34;
+			matrix.M41 = matrix1.M41 - matrix2.M41;
+			matrix.M42 = matrix1.M42 - matrix2.M42;
+			matrix.M43 = matrix1.M43 - matrix2.M43;
+			matrix.M44 = matrix1.M44 - matrix2.M44;
+			return matrix;
+		}
+
+		static constexpr Matrix Multiply(Matrix const& matrix1, Matrix const& matrix2) {
+			Matrix matrix;
+			matrix.M11 = matrix1.M11 * matrix2.M11 + matrix1.M12 * matrix2.M21 + matrix1.M13 * matrix2.M31 + matrix1.M14 * matrix2.M41;
+			matrix.M12 = matrix1.M11 * matrix2.M12 + matrix1.M12 * matrix2.M22 + matrix1.M13 * matrix2.M32 + matrix1.M14 * matrix2.M42;
+			matrix.M13 = matrix1.M11 * matrix2.M13 + matrix1.M12 * matrix2.M23 + matrix1.M13 * matrix2.M33 + matrix1.M14 * matrix2.M43;
+			matrix.M14 = matrix1.M11 * matrix2.M14 + matrix1.M12 * matrix2.M24 + matrix1.M13 * matrix2.M34 + matrix1.M14 * matrix2.M44;
+			matrix.M21 = matrix1.M21 * matrix2.M11 + matrix1.M22 * matrix2.M21 + matrix1.M23 * matrix2.M31 + matrix1.M24 * matrix2.M41;
+			matrix.M22 = matrix1.M21 * matrix2.M12 + matrix1.M22 * matrix2.M22 + matrix1.M23 * matrix2.M32 + matrix1.M24 * matrix2.M42;
+			matrix.M23 = matrix1.M21 * matrix2.M13 + matrix1.M22 * matrix2.M23 + matrix1.M23 * matrix2.M33 + matrix1.M24 * matrix2.M43;
+			matrix.M24 = matrix1.M21 * matrix2.M14 + matrix1.M22 * matrix2.M24 + matrix1.M23 * matrix2.M34 + matrix1.M24 * matrix2.M44;
+			matrix.M31 = matrix1.M31 * matrix2.M11 + matrix1.M32 * matrix2.M21 + matrix1.M33 * matrix2.M31 + matrix1.M34 * matrix2.M41;
+			matrix.M32 = matrix1.M31 * matrix2.M12 + matrix1.M32 * matrix2.M22 + matrix1.M33 * matrix2.M32 + matrix1.M34 * matrix2.M42;
+			matrix.M33 = matrix1.M31 * matrix2.M13 + matrix1.M32 * matrix2.M23 + matrix1.M33 * matrix2.M33 + matrix1.M34 * matrix2.M43;
+			matrix.M34 = matrix1.M31 * matrix2.M14 + matrix1.M32 * matrix2.M24 + matrix1.M33 * matrix2.M34 + matrix1.M34 * matrix2.M44;
+			matrix.M41 = matrix1.M41 * matrix2.M11 + matrix1.M42 * matrix2.M21 + matrix1.M43 * matrix2.M31 + matrix1.M44 * matrix2.M41;
+			matrix.M42 = matrix1.M41 * matrix2.M12 + matrix1.M42 * matrix2.M22 + matrix1.M43 * matrix2.M32 + matrix1.M44 * matrix2.M42;
+			matrix.M43 = matrix1.M41 * matrix2.M13 + matrix1.M42 * matrix2.M23 + matrix1.M43 * matrix2.M33 + matrix1.M44 * matrix2.M43;
+			matrix.M44 = matrix1.M41 * matrix2.M14 + matrix1.M42 * matrix2.M24 + matrix1.M43 * matrix2.M34 + matrix1.M44 * matrix2.M44;
+			return matrix;
+		}
+
+		static constexpr Matrix Multiply(Matrix const& matrix1, float scaleFactor) {
+			float num = scaleFactor;
+			Matrix matrix;
+			matrix.M11 = matrix1.M11 * num;
+			matrix.M12 = matrix1.M12 * num;
+			matrix.M13 = matrix1.M13 * num;
+			matrix.M14 = matrix1.M14 * num;
+			matrix.M21 = matrix1.M21 * num;
+			matrix.M22 = matrix1.M22 * num;
+			matrix.M23 = matrix1.M23 * num;
+			matrix.M24 = matrix1.M24 * num;
+			matrix.M31 = matrix1.M31 * num;
+			matrix.M32 = matrix1.M32 * num;
+			matrix.M33 = matrix1.M33 * num;
+			matrix.M34 = matrix1.M34 * num;
+			matrix.M41 = matrix1.M41 * num;
+			matrix.M42 = matrix1.M42 * num;
+			matrix.M43 = matrix1.M43 * num;
+			matrix.M44 = matrix1.M44 * num;
+			return matrix;
+		}
+
+		static constexpr Matrix Divide(Matrix const& matrix1, Matrix const& matrix2) {
+			Matrix matrix;
+			matrix.M11 = matrix1.M11 / matrix2.M11;
+			matrix.M12 = matrix1.M12 / matrix2.M12;
+			matrix.M13 = matrix1.M13 / matrix2.M13;
+			matrix.M14 = matrix1.M14 / matrix2.M14;
+			matrix.M21 = matrix1.M21 / matrix2.M21;
+			matrix.M22 = matrix1.M22 / matrix2.M22;
+			matrix.M23 = matrix1.M23 / matrix2.M23;
+			matrix.M24 = matrix1.M24 / matrix2.M24;
+			matrix.M31 = matrix1.M31 / matrix2.M31;
+			matrix.M32 = matrix1.M32 / matrix2.M32;
+			matrix.M33 = matrix1.M33 / matrix2.M33;
+			matrix.M34 = matrix1.M34 / matrix2.M34;
+			matrix.M41 = matrix1.M41 / matrix2.M41;
+			matrix.M42 = matrix1.M42 / matrix2.M42;
+			matrix.M43 = matrix1.M43 / matrix2.M43;
+			matrix.M44 = matrix1.M44 / matrix2.M44;
+			return matrix;
+		}
+
+		static constexpr Matrix Divide(Matrix const& matrix1, float divider) {
+			float num = 1.0f / divider;
+			Matrix matrix;
+			matrix.M11 = matrix1.M11 * num;
+			matrix.M12 = matrix1.M12 * num;
+			matrix.M13 = matrix1.M13 * num;
+			matrix.M14 = matrix1.M14 * num;
+			matrix.M21 = matrix1.M21 * num;
+			matrix.M22 = matrix1.M22 * num;
+			matrix.M23 = matrix1.M23 * num;
+			matrix.M24 = matrix1.M24 * num;
+			matrix.M31 = matrix1.M31 * num;
+			matrix.M32 = matrix1.M32 * num;
+			matrix.M33 = matrix1.M33 * num;
+			matrix.M34 = matrix1.M34 * num;
+			matrix.M41 = matrix1.M41 * num;
+			matrix.M42 = matrix1.M42 * num;
+			matrix.M43 = matrix1.M43 * num;
+			matrix.M44 = matrix1.M44 * num;
+			return matrix;
+		}
+
+		static constexpr Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll);
+		static constexpr Matrix CreateFromQuaternion(Quaternion const& quaternion);
+		static constexpr Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane);
+		static constexpr Matrix CreateReflection(Plane const& value);
+		static Matrix Transform(Matrix const& value, Quaternion const& rotation);		
+	};
+
+	constexpr Vector4 Vector4::Transform(Vector2 const& position, Matrix const& matrix) {
+		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
+		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;
+		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23) + matrix.M43;
+		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24) + matrix.M44;
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+
+	constexpr Vector4 Vector4::Transform(Vector3 const& position, Matrix const& matrix) {
+		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
+		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
+		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
+		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24 + position.Z * matrix.M34) + matrix.M44;
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+
+	constexpr Vector4 Vector4::Transform(Vector4 const& vector, Matrix const& matrix) {
+		float num1 = (vector.X * matrix.M11 + vector.Y * matrix.M21 + vector.Z * matrix.M31 + vector.W * matrix.M41);
+		float num2 = (vector.X * matrix.M12 + vector.Y * matrix.M22 + vector.Z * matrix.M32 + vector.W * matrix.M42);
+		float num3 = (vector.X * matrix.M13 + vector.Y * matrix.M23 + vector.Z * matrix.M33 + vector.W * matrix.M43);
+		float num4 = (vector.X * matrix.M14 + vector.Y * matrix.M24 + vector.Z * matrix.M34 + vector.W * matrix.M44);
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+
+	constexpr void Vector4::Transform(Vector4* sourceArray, Matrix const& matrix,
+		Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			float w = sourceArray[sourceIndex].W;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31 + w * matrix.M41);
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32 + w * matrix.M42);
+			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33 + w * matrix.M43);
+			destinationArray[destinationIndex].W = (x * matrix.M14 + y * matrix.M24 + z * matrix.M34 + w * matrix.M44);
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
+	constexpr Vector3 Vector3::Transform(Vector3 const& position, Matrix const& matrix) {
+		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
+		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
+		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
+		Vector3 vector3;
+		vector3.X = num1;
+		vector3.Y = num2;
+		vector3.Z = num3;
+		return vector3;
+	}
+
+	constexpr Vector3 Vector3::TransformNormal(Vector3 const& normal, Matrix const& matrix) {
+		float num1 = (normal.X * matrix.M11 + normal.Y * matrix.M21 + normal.Z * matrix.M31);
+		float num2 = (normal.X * matrix.M12 + normal.Y * matrix.M22 + normal.Z * matrix.M32);
+		float num3 = (normal.X * matrix.M13 + normal.Y * matrix.M23 + normal.Z * matrix.M33);
+		Vector3 vector3;
+		vector3.X = num1;
+		vector3.Y = num2;
+		vector3.Z = num3;
+		return vector3;
+	}
+	
+	constexpr void Vector3::Transform(Vector3* sourceArray, Matrix const& matrix,
+		Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+
+		for (; length > 0; --length) {
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31) + matrix.M41;
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32) + matrix.M42;
+			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33) + matrix.M43;
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
+	constexpr void Vector3::TransformNormal(Vector3* sourceArray, Matrix const& matrix,
+		Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31);
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32);
+			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33);
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
 }
 
 #endif

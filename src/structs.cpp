@@ -10,6 +10,15 @@ namespace dxna {
 		Y *= num;
 	}
 
+	Vector2 Vector2::Normalize(Vector2 const& value) {
+		float num = 1.0F / std::sqrt(value.Length());
+		Vector2 vector;
+		vector.X *= num;
+		vector.Y *= num;
+
+		return vector;
+	}
+
 	float Vector2::Distance(Vector2 const& value1, Vector2 const& value2) {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
@@ -25,6 +34,16 @@ namespace dxna {
 		Z *= num;
 	}
 
+	Vector3 Vector3::Normalize(Vector3 const& value) {
+		float num = 1.0F / std::sqrt(value.Length());
+		Vector3 vector;
+		vector.X *= num;
+		vector.Y *= num;
+		vector.Z *= num;
+
+		return vector;
+	}
+
 	float Vector3::Distance(Vector3 const& value1, Vector3 const& value2) {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
@@ -34,7 +53,6 @@ namespace dxna {
 
 	float Vector4::Length() const {
 		return std::sqrt(LengthSquared());
-
 	}
 
 	float Vector4::Distance(Vector4 const& value1, Vector4 const& value2) {
@@ -51,5 +69,303 @@ namespace dxna {
 		Y *= num;
 		Z *= num;
 		W *= num;
+	}
+
+	Vector4 Vector4::Normalize(Vector4 const& value) {
+		float num = 1.0F / std::sqrt(value.Length());
+		Vector4 vector;
+		vector.X *= num;
+		vector.Y *= num;
+		vector.Z *= num;
+		vector.W *= num;
+
+		return vector;
+	}
+
+	Matrix Matrix::CreateBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
+		Vector3 const& cameraUpVector, Vector3* const cameraForwardVector) {
+		Vector3 result1;
+		result1.X = objectPosition.X - cameraPosition.X;
+		result1.Y = objectPosition.Y - cameraPosition.Y;
+		result1.Z = objectPosition.Z - cameraPosition.Z;
+
+		const auto d = result1.LengthSquared();
+
+		if ((double)d < 9.9999997473787516E-05) 
+			result1 = cameraForwardVector != nullptr ? -(*cameraForwardVector) : Vector3::Forward();			
+		else
+			result1 = Vector3::Multiply(result1, 1.0F / std::sqrt(d));
+		Vector3 result2 = Vector3::Cross(cameraUpVector, result1);
+		result2.Normalize();
+
+		Vector3 result3 = Vector3::Cross(result1, result2);
+
+		Matrix billboard;
+		billboard.M11 = result2.X;
+		billboard.M12 = result2.Y;
+		billboard.M13 = result2.Z;
+		billboard.M14 = 0.0f;
+		billboard.M21 = result3.X;
+		billboard.M22 = result3.Y;
+		billboard.M23 = result3.Z;
+		billboard.M24 = 0.0f;
+		billboard.M31 = result1.X;
+		billboard.M32 = result1.Y;
+		billboard.M33 = result1.Z;
+		billboard.M34 = 0.0f;
+		billboard.M41 = objectPosition.X;
+		billboard.M42 = objectPosition.Y;
+		billboard.M43 = objectPosition.Z;
+		billboard.M44 = 1.0f;
+
+		return billboard;
+	}
+
+	Matrix Matrix::CreateConstrainedBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
+		Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector) {
+		Vector3 result1;
+		result1.X = objectPosition.X - cameraPosition.X;
+		result1.Y = objectPosition.Y - cameraPosition.Y;
+		result1.Z = objectPosition.Z - cameraPosition.Z;
+
+		float d = result1.LengthSquared();
+
+		if ((double)d < 9.9999997473787516E-05)
+			result1 = cameraForwardVector ? -(*cameraForwardVector) : Vector3::Forward();
+		else
+			result1 = Vector3::Multiply(result1, 1.0f / std::sqrt(d));
+
+		Vector3 vector2 = rotateAxis;
+		auto result2 = Vector3::Dot(rotateAxis, result1);
+
+		Vector3 result3;
+		Vector3 result4;
+
+		if ((double)std::abs(result2) > 0.998254656791687) {
+			if (objectForwardVector) {
+				result3 = *objectForwardVector;
+				result2 = Vector3::Dot(rotateAxis, result3);
+
+				if ((double)std::abs(result2) > 0.998254656791687)
+					result3 = (double)std::abs((rotateAxis.X * Vector3::Forward().X + rotateAxis.Y * Vector3::Forward().Y + rotateAxis.Z * Vector3::Forward().Z)) > 0.998254656791687 ? Vector3::Right() : Vector3::Forward();
+			}
+			else
+				result3 = (double)std::abs(rotateAxis.X * Vector3::Forward().X + rotateAxis.Y * Vector3::Forward().Y + rotateAxis.Z * Vector3::Forward().Z) > 0.998254656791687 ? Vector3::Right() : Vector3::Forward();
+
+			result4 = Vector3::Cross(rotateAxis, result3);
+			result4.Normalize();
+
+			result3 = Vector3::Cross(result4, rotateAxis);
+			result3.Normalize();
+		}
+		else
+		{
+			result4 = Vector3::Cross(rotateAxis, result1);
+			result4.Normalize();
+
+			result3 = Vector3::Cross(result4, vector2);
+			result3.Normalize();
+		}
+
+		Matrix constrainedBillboard;
+		constrainedBillboard.M11 = result4.X;
+		constrainedBillboard.M12 = result4.Y;
+		constrainedBillboard.M13 = result4.Z;
+		constrainedBillboard.M14 = 0.0f;
+		constrainedBillboard.M21 = vector2.X;
+		constrainedBillboard.M22 = vector2.Y;
+		constrainedBillboard.M23 = vector2.Z;
+		constrainedBillboard.M24 = 0.0f;
+		constrainedBillboard.M31 = result3.X;
+		constrainedBillboard.M32 = result3.Y;
+		constrainedBillboard.M33 = result3.Z;
+		constrainedBillboard.M34 = 0.0f;
+		constrainedBillboard.M41 = objectPosition.X;
+		constrainedBillboard.M42 = objectPosition.Y;
+		constrainedBillboard.M43 = objectPosition.Z;
+		constrainedBillboard.M44 = 1.0f;
+		return constrainedBillboard;
+	}
+
+	Matrix Matrix::CreateRotationX(float radians) {
+		const auto num1 = std::cos(radians);
+		const auto num2 = std::sin(radians);
+		Matrix rotationX;
+		rotationX.M11 = 1.0f;
+		rotationX.M12 = 0.0f;
+		rotationX.M13 = 0.0f;
+		rotationX.M14 = 0.0f;
+		rotationX.M21 = 0.0f;
+		rotationX.M22 = num1;
+		rotationX.M23 = num2;
+		rotationX.M24 = 0.0f;
+		rotationX.M31 = 0.0f;
+		rotationX.M32 = -num2;
+		rotationX.M33 = num1;
+		rotationX.M34 = 0.0f;
+		rotationX.M41 = 0.0f;
+		rotationX.M42 = 0.0f;
+		rotationX.M43 = 0.0f;
+		rotationX.M44 = 1.0f;
+		return rotationX;
+	}
+
+	Matrix Matrix::CreateRotationY(float radians) {
+		const auto num1 = std::cos(radians);
+		const auto num2 = std::sin(radians);
+		Matrix rotationY;
+		rotationY.M11 = num1;
+		rotationY.M12 = 0.0f;
+		rotationY.M13 = -num2;
+		rotationY.M14 = 0.0f;
+		rotationY.M21 = 0.0f;
+		rotationY.M22 = 1.0f;
+		rotationY.M23 = 0.0f;
+		rotationY.M24 = 0.0f;
+		rotationY.M31 = num2;
+		rotationY.M32 = 0.0f;
+		rotationY.M33 = num1;
+		rotationY.M34 = 0.0f;
+		rotationY.M41 = 0.0f;
+		rotationY.M42 = 0.0f;
+		rotationY.M43 = 0.0f;
+		rotationY.M44 = 1.0f;
+		return rotationY;
+	}
+
+	Matrix Matrix::CreateRotationZ(float radians) {
+		const auto num1 = std::cos(radians);
+		const auto num2 = std::sin(radians);
+		Matrix rotationZ;
+		rotationZ.M11 = num1;
+		rotationZ.M12 = num2;
+		rotationZ.M13 = 0.0f;
+		rotationZ.M14 = 0.0f;
+		rotationZ.M21 = -num2;
+		rotationZ.M22 = num1;
+		rotationZ.M23 = 0.0f;
+		rotationZ.M24 = 0.0f;
+		rotationZ.M31 = 0.0f;
+		rotationZ.M32 = 0.0f;
+		rotationZ.M33 = 1.0f;
+		rotationZ.M34 = 0.0f;
+		rotationZ.M41 = 0.0f;
+		rotationZ.M42 = 0.0f;
+		rotationZ.M43 = 0.0f;
+		rotationZ.M44 = 1.0f;
+		return rotationZ;
+	}
+
+	Matrix Matrix::CreateFromAxisAngle(Vector3 const& axis, float angle) {
+		float x = axis.X;
+		float y = axis.Y;
+		float z = axis.Z;
+		float num1 = std::sin(angle);
+		float num2 = std::cos(angle);
+		float num3 = x * x;
+		float num4 = y * y;
+		float num5 = z * z;
+		float num6 = x * y;
+		float num7 = x * z;
+		float num8 = y * z;
+
+		Matrix fromAxisAngle;
+		fromAxisAngle.M11 = num3 + num2 * (1.0f - num3);
+		fromAxisAngle.M12 = (num6 - num2 * num6 + num1 * z);
+		fromAxisAngle.M13 = (num7 - num2 * num7 - num1 * y);
+		fromAxisAngle.M14 = 0.0f;
+		fromAxisAngle.M21 = (num6 - num2 * num6 - num1 * z);
+		fromAxisAngle.M22 = num4 + num2 * (1.0f - num4);
+		fromAxisAngle.M23 = (num8 - num2 * num8 + num1 * x);
+		fromAxisAngle.M24 = 0.0f;
+		fromAxisAngle.M31 = (num7 - num2 * num7 + num1 * y);
+		fromAxisAngle.M32 = (num8 - num2 * num8 - num1 * x);
+		fromAxisAngle.M33 = num5 + num2 * (1.0f - num5);
+		fromAxisAngle.M34 = 0.0f;
+		fromAxisAngle.M41 = 0.0f;
+		fromAxisAngle.M42 = 0.0f;
+		fromAxisAngle.M43 = 0.0f;
+		fromAxisAngle.M44 = 1.0f;
+		return fromAxisAngle;
+	}
+
+	Matrix Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) {
+		const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+		if (fieldOfView <= 0.0F || (double)fieldOfView >= 3.1415927410125732)
+			return zero;
+
+		if (nearPlaneDistance <= 0.0F)
+			return zero;
+
+		if (farPlaneDistance <= 0.0F)
+			return zero;
+
+		if (nearPlaneDistance >= farPlaneDistance)
+			return zero;
+
+		const auto num1 = 1.0F / std::tan(fieldOfView * 0.5F);
+		const auto num2 = num1 / aspectRatio;
+		Matrix perspectiveFieldOfView;
+		perspectiveFieldOfView.M11 = num2;
+		perspectiveFieldOfView.M12 = perspectiveFieldOfView.M13 = perspectiveFieldOfView.M14 = 0.0f;
+		perspectiveFieldOfView.M22 = num1;
+		perspectiveFieldOfView.M21 = perspectiveFieldOfView.M23 = perspectiveFieldOfView.M24 = 0.0f;
+		perspectiveFieldOfView.M31 = perspectiveFieldOfView.M32 = 0.0f;
+		perspectiveFieldOfView.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+		perspectiveFieldOfView.M34 = -1.0f;
+		perspectiveFieldOfView.M41 = perspectiveFieldOfView.M42 = perspectiveFieldOfView.M44 = 0.0f;
+		perspectiveFieldOfView.M43 = (nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance));
+		return perspectiveFieldOfView;
+	}
+
+	Matrix Matrix::CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector) {
+		Vector3 vector3_1 = Vector3::Normalize(cameraPosition - cameraTarget);
+		Vector3 vector3_2 = Vector3::Normalize(Vector3::Cross(cameraUpVector, vector3_1));
+		Vector3 vector1 = Vector3::Cross(vector3_1, vector3_2);
+
+		Matrix lookAt;
+		lookAt.M11 = vector3_2.X;
+		lookAt.M12 = vector1.X;
+		lookAt.M13 = vector3_1.X;
+		lookAt.M14 = 0.0f;
+		lookAt.M21 = vector3_2.Y;
+		lookAt.M22 = vector1.Y;
+		lookAt.M23 = vector3_1.Y;
+		lookAt.M24 = 0.0f;
+		lookAt.M31 = vector3_2.Z;
+		lookAt.M32 = vector1.Z;
+		lookAt.M33 = vector3_1.Z;
+		lookAt.M34 = 0.0f;
+		lookAt.M41 = -Vector3::Dot(vector3_2, cameraPosition);
+		lookAt.M42 = -Vector3::Dot(vector1, cameraPosition);
+		lookAt.M43 = -Vector3::Dot(vector3_1, cameraPosition);
+		lookAt.M44 = 1.0f;
+		return lookAt;
+	}
+
+	Matrix Matrix::CreateWorld(Vector3 position, Vector3 forward, Vector3 up) {
+		Vector3 vector3_1 = Vector3::Normalize(-forward);
+		Vector3 vector2 = Vector3::Normalize(Vector3::Cross(up, vector3_1));
+		Vector3 vector3_2 = Vector3::Cross(vector3_1, vector2);
+
+		Matrix world;
+		world.M11 = vector2.X;
+		world.M12 = vector2.Y;
+		world.M13 = vector2.Z;
+		world.M14 = 0.0f;
+		world.M21 = vector3_2.X;
+		world.M22 = vector3_2.Y;
+		world.M23 = vector3_2.Z;
+		world.M24 = 0.0f;
+		world.M31 = vector3_1.X;
+		world.M32 = vector3_1.Y;
+		world.M33 = vector3_1.Z;
+		world.M34 = 0.0f;
+		world.M41 = position.X;
+		world.M42 = position.Y;
+		world.M43 = position.Z;
+		world.M44 = 1.0f;
+		return world;
 	}
 }
