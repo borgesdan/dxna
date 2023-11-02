@@ -2,22 +2,25 @@
 //
 
 #include "main.hpp"
-#include <windows.h> 
-#include <windowsx.h> 
-#include <sstream>     
-#include "mathhelper.hpp"
-
-#include "input/input.hpp"
 
 using namespace dxna;
 using namespace std;
+using namespace cs;
 
 int main() {
-	Vector2 vec1(5);
-	Vector2 vec2(10);
+	Nullable<float> f;
+	cout
+		<< f.HasValue()
+		<< " "
+		<< f.Value()
+		<< endl;
 
-	//auto vec3 = vec1 * vec2;
-	auto equal = vec1 != vec2;
+	Nullable<float> f2(1.5F);
+	cout
+		<< f2.HasValue()
+		<< " "
+		<< f2.Value()
+		<< endl;
 
 	return 0;
 }

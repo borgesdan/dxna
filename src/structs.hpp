@@ -1,12 +1,17 @@
 #ifndef DXNA_STRUCTS_HPP
 #define DXNA_STRUCTS_HPP
 
-#include "cs/cstypes.hpp"
+#include "cs/cs.hpp"
+#include <vector>
+#include "enumerations.hpp"
 
 namespace dxna {
 	struct Matrix;
 	struct Quaternion;
 	struct Plane;
+	struct BoundingSphere;
+	struct BoundingFrustum;
+	struct Ray;
 
 	struct Point {
 		intcs X{ 0 };
@@ -115,7 +120,7 @@ namespace dxna {
 		constexpr bool operator==(Rectangle const& value2) const {
 			return Equals(value2);
 		}
-	};	
+	};
 
 	struct Vector2 {
 		float X{ 0 };
@@ -134,18 +139,18 @@ namespace dxna {
 		friend constexpr Vector2 operator*(float scale, Vector2 const& value) { return Vector2::Multiply(value, scale); }
 		friend constexpr Vector2 operator/(Vector2 const& value1, Vector2 const& value2) { return Vector2::Divide(value1, value2); }
 		friend constexpr Vector2 operator/(Vector2 const& value, float divider) { return Vector2::Divide(value, divider); }
-		
+
 		constexpr bool Equals(Vector2 const& other) const { return X == other.X && Y == other.Y; }
 		constexpr float LengthSquared() const { return X * X + Y * Y; }
-		
-		float Length() const;		
+
+		float Length() const;
 		void Normalize();
 
 		static constexpr Vector2 Zero() { return Vector2(); }
 		static constexpr Vector2 One() { return Vector2(1.0); }
 		static constexpr Vector2 UnitX() { return Vector2(1.0, 0.0); }
-		static constexpr Vector2 UnitY() { return Vector2(0.0, 1.0); }	
-		
+		static constexpr Vector2 UnitY() { return Vector2(0.0, 1.0); }
+
 		static float Distance(Vector2 const& value1, Vector2 const& value2);
 
 		static constexpr float DistanceSquared(Vector2 const& value1, Vector2 const& value2) {
@@ -197,7 +202,7 @@ namespace dxna {
 			vector2.X = value1.X + (value2.X - value1.X) * amount;
 			vector2.Y = value1.Y + (value2.Y - value1.Y) * amount;
 			return vector2;
-		}		
+		}
 
 		static constexpr Vector2 Barycentric(Vector2 const& value1, Vector2 const& value2, Vector2 const& value3,
 			float amount1, float amount2) {
@@ -206,7 +211,7 @@ namespace dxna {
 			vector2.Y = value1.Y + amount1 * (value2.Y - value1.Y) + amount2 * (value3.Y - value1.Y);
 			return vector2;
 		}
-		
+
 		static constexpr Vector2 SmoothStep(Vector2 const& value1, Vector2 const& value2, float amount) {
 			amount = amount > 1.0 ? 1.0F : (amount < 0.0 ? 0.0F : amount);
 			amount = amount * amount * (3.0F - 2.0F * amount);
@@ -296,8 +301,8 @@ namespace dxna {
 		static constexpr Vector2 TransformNormal(Vector2 const& normal, Matrix const& matrix);
 		static constexpr Vector2 Transform(Vector2 const& value, Quaternion const& rotation);
 
-		static constexpr void Transform(Vector2 *sourceArray, Matrix matrix,
-			Vector2 *destinationArray, size_t length, size_t sourceIndex = 0,
+		static constexpr void Transform(Vector2* sourceArray, Matrix matrix,
+			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
 			size_t destinationIndex = 0);
 
 		static constexpr void Transform(Vector2* sourceArray, Quaternion rotation,
@@ -306,7 +311,7 @@ namespace dxna {
 
 		static constexpr void TransformNormal(Vector2* sourceArray, Matrix const& matrix,
 			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
-			size_t destinationIndex = 0);	
+			size_t destinationIndex = 0);
 	};
 
 	struct Vector3 {
@@ -333,8 +338,8 @@ namespace dxna {
 		float Length() const;
 		void Normalize();
 
-		constexpr bool Equals(const Vector3& other) const {	return X == other.X && Y == other.Y && Z == other.Z; }
-		constexpr float LengthSquared() const { return (X * X) + (Y * Y) + (Z * Z);	}
+		constexpr bool Equals(const Vector3& other) const { return X == other.X && Y == other.Y && Z == other.Z; }
+		constexpr float LengthSquared() const { return (X * X) + (Y * Y) + (Z * Z); }
 
 		static constexpr Vector3 Zero() { return Vector3(); };
 		static constexpr Vector3 One() { return Vector3(1.F, 1.F, 1.F); }
@@ -344,9 +349,9 @@ namespace dxna {
 		static constexpr Vector3 Up() { return UnitY(); }
 		static constexpr Vector3 Down() { return -UnitY(); }
 		static constexpr Vector3 Right() { return UnitX(); }
-		static constexpr Vector3 Left(){ { return -UnitX(); } }
+		static constexpr Vector3 Left() { { return -UnitX(); } }
 		static constexpr Vector3 Forward() { return -UnitZ(); }
-		static constexpr Vector3 Backward() { return UnitZ(); }		
+		static constexpr Vector3 Backward() { return UnitZ(); }
 
 		static float Distance(Vector3 const& value1, Vector3 const& value2);
 
@@ -359,7 +364,7 @@ namespace dxna {
 
 		static constexpr float Dot(Vector3 const& vector1, Vector3 const& vector2) {
 			return vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z;
-		}	
+		}
 
 		static constexpr Vector3 Cross(Vector3 const& vector1, Vector3 const& vector2) {
 			Vector3 vector3;
@@ -388,9 +393,9 @@ namespace dxna {
 
 		static constexpr Vector3 Max(Vector3 const& value1, Vector3 const& value2) {
 			Vector3 vector3;
-			vector3.X = value1.X >  value2.X ? value1.X : value2.X;
-			vector3.Y = value1.Y >  value2.Y ? value1.Y : value2.Y;
-			vector3.Z = value1.Z >  value2.Z ? value1.Z : value2.Z;
+			vector3.X = value1.X > value2.X ? value1.X : value2.X;
+			vector3.Y = value1.Y > value2.Y ? value1.Y : value2.Y;
+			vector3.Z = value1.Z > value2.Z ? value1.Z : value2.Z;
 			return vector3;
 		}
 
@@ -399,10 +404,10 @@ namespace dxna {
 			const auto num1 = x > max.X ? max.X : x;
 			const auto num2 = num1 < min.X ? min.X : num1;
 			const auto y = value1.Y;
-			const auto num3 = y >  max.Y ? max.Y : y;
+			const auto num3 = y > max.Y ? max.Y : y;
 			const auto num4 = num3 < min.Y ? min.Y : num3;
 			const auto z = value1.Z;
-			const auto num5 = z >  max.Z ? max.Z : z;
+			const auto num5 = z > max.Z ? max.Z : z;
 			const auto num6 = num5 < min.Z ? min.Z : num5;
 			Vector3 vector3;
 			vector3.X = num2;
@@ -540,10 +545,10 @@ namespace dxna {
 		float W{ 0 };
 
 		constexpr Vector4() = default;
-		constexpr Vector4(float value):
+		constexpr Vector4(float value) :
 			X(value), Y(value), Z(value), W(value) {}
 		constexpr Vector4(float x, float y, float z, float w) :
-			X(x), Y(y), Z(z), W(w){}
+			X(x), Y(y), Z(z), W(w) {}
 		constexpr Vector4(Vector2 value, float z, float w) :
 			X(value.X), Y(value.Y), Z(z), W(w) {}
 		constexpr Vector4(Vector3 value, float w) :
@@ -558,7 +563,7 @@ namespace dxna {
 		friend constexpr Vector4 operator*(float scale, Vector4 const& value) { return Vector4::Multiply(value, scale); }
 		friend constexpr Vector4 operator/(Vector4 const& value1, Vector4 const& value2) { return Vector4::Divide(value1, value2); }
 		friend constexpr Vector4 operator/(Vector4 const& value, float divider) { return Vector4::Divide(value, divider); }
-		
+
 		float Length() const;
 		void Normalize();
 
@@ -571,7 +576,7 @@ namespace dxna {
 				&& Y == other.Y
 				&& Z == other.Z
 				&& W == other.W;
-		}		
+		}
 
 		static constexpr Vector4 Zero() { return Vector4(); }
 		static constexpr Vector4 One() { return Vector4(1); }
@@ -606,9 +611,9 @@ namespace dxna {
 
 		static constexpr Vector4 Max(Vector4 const& value1, Vector4 const& value2) {
 			Vector4 vector4;
-			vector4.X = value1.X >  value2.X ? value1.X : value2.X;
-			vector4.Y = value1.Y >  value2.Y ? value1.Y : value2.Y;
-			vector4.Z = value1.Z >  value2.Z ? value1.Z : value2.Z;
+			vector4.X = value1.X > value2.X ? value1.X : value2.X;
+			vector4.Y = value1.Y > value2.Y ? value1.Y : value2.Y;
+			vector4.Z = value1.Z > value2.Z ? value1.Z : value2.Z;
 			vector4.W = value1.W > value2.W ? value1.W : value2.W;
 			return vector4;
 		}
@@ -618,13 +623,13 @@ namespace dxna {
 			const auto num1 = x > max.X ? max.X : x;
 			const auto num2 = num1 < min.X ? min.X : num1;
 			const auto y = value1.Y;
-			const auto num3 = y >  max.Y ? max.Y : y;
+			const auto num3 = y > max.Y ? max.Y : y;
 			const auto num4 = num3 < min.Y ? min.Y : num3;
 			const auto z = value1.Z;
-			const auto num5 = z >  max.Z ? max.Z : z;
+			const auto num5 = z > max.Z ? max.Z : z;
 			const auto num6 = num5 < min.Z ? min.Z : num5;
 			const auto w = value1.W;
-			const auto num7 = w >  max.W ? max.W : w;
+			const auto num7 = w > max.W ? max.W : w;
 			const auto num8 = num7 < min.W ? min.W : num7;
 			Vector4 vector4;
 			vector4.X = num2;
@@ -633,7 +638,7 @@ namespace dxna {
 			vector4.W = num8;
 			return vector4;
 		}
-		
+
 		static constexpr Vector4 Lerp(Vector4 const& value1, Vector4 const& value2, float amount) {
 			Vector4 vector4;
 			vector4.X = value1.X + (value2.X - value1.X) * amount;
@@ -768,7 +773,7 @@ namespace dxna {
 		static constexpr void Transform(Vector4* sourceArray, Matrix const& matrix,
 			Vector4* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
 		static constexpr void Transform(Vector4* sourceArray, Quaternion const& rotation,
-			Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex);		
+			Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex);
 	};
 
 	struct Matrix {
@@ -789,7 +794,7 @@ namespace dxna {
 		float M43{ 0 };
 		float M44{ 0 };
 
-		constexpr Matrix() = default;		
+		constexpr Matrix() = default;
 
 		constexpr Matrix(float M11, float M12, float M13, float M14, float M21, float M22, float M23, float M24, float M31, float M32, float M33, float M34, float M41, float M42, float M43, float M44)
 			: M11(M11), M12(M12), M13(M13), M14(M14), M21(M21), M22(M22), M23(M23), M24(M24), M31(M31), M32(M32), M33(M33), M34(M34), M41(M41), M42(M42), M43(M43), M44(M44) {
@@ -905,21 +910,21 @@ namespace dxna {
 		}
 
 		constexpr bool Equals(Matrix const& other) const {
-			return M11 == other.M11 
-				&& M22 == other.M22 
-				&& M33 == other.M33 
-				&& M44 == other.M44 
-				&& M12 == other.M12 
-				&& M13 == other.M13 
-				&& M14 == other.M14 
-				&& M21 == other.M21 
-				&& M23 == other.M23 
-				&& M24 == other.M24 
-				&& M31 == other.M31 
-				&& M32 == other.M32 
-				&& M34 == other.M34 
-				&& M41 == other.M41 
-				&& M42 == other.M42 
+			return M11 == other.M11
+				&& M22 == other.M22
+				&& M33 == other.M33
+				&& M44 == other.M44
+				&& M12 == other.M12
+				&& M13 == other.M13
+				&& M14 == other.M14
+				&& M21 == other.M21
+				&& M23 == other.M23
+				&& M24 == other.M24
+				&& M31 == other.M31
+				&& M32 == other.M32
+				&& M34 == other.M34
+				&& M41 == other.M41
+				&& M42 == other.M42
 				&& M43 == other.M43;
 		}
 
@@ -949,12 +954,12 @@ namespace dxna {
 			return (m11 * (m22 * num1 - m23 * num2 + m24 * num3) - m12 * (m21 * num1 - m23 * num4 + m24 * num5) + m13 * (m21 * num2 - m22 * num4 + m24 * num6) - m14 * (m21 * num3 - m22 * num5 + m23 * num6));
 		}
 
-		static constexpr Matrix Identity() { 
+		static constexpr Matrix Identity() {
 			return Matrix(
 				1.0f, 0.0f, 0.0f, 0.0f,
 				0.0f, 1.0f, 0.0f, 0.0f,
 				0.0f, 0.0f, 1.0f, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f); 
+				0.0f, 0.0f, 0.0f, 1.0f);
 		}
 
 		static Matrix CreateBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
@@ -1083,10 +1088,10 @@ namespace dxna {
 		static Matrix CreateRotationZ(float radians);
 		static Matrix CreateFromAxisAngle(Vector3 const& axis, float angle);
 		static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance);
-		
+
 		static constexpr Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance) {
 			const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			
+
 			if (nearPlaneDistance <= 0.0F)
 				return zero;
 
@@ -1095,7 +1100,7 @@ namespace dxna {
 
 			if (nearPlaneDistance >= farPlaneDistance)
 				return zero;
-			
+
 			Matrix perspective;
 			perspective.M11 = 2.0f * nearPlaneDistance / width;
 			perspective.M12 = perspective.M13 = perspective.M14 = 0.0f;
@@ -1120,7 +1125,7 @@ namespace dxna {
 				return zero;
 
 			if (nearPlaneDistance >= farPlaneDistance)
-				return zero;			
+				return zero;
 
 			Matrix perspectiveOffCenter;
 			perspectiveOffCenter.M11 = 2.0F * nearPlaneDistance / (right - left);
@@ -1425,8 +1430,8 @@ namespace dxna {
 		static constexpr Matrix CreateFromQuaternion(Quaternion const& quaternion);
 		static constexpr Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane);
 		static constexpr Matrix CreateReflection(Plane const& value);
-		static Matrix Transform(Matrix const& value, Quaternion const& rotation);		
-	};	
+		static Matrix Transform(Matrix const& value, Quaternion const& rotation);
+	};
 
 	struct Quaternion {
 		float X{ 0 };
@@ -1598,7 +1603,100 @@ namespace dxna {
 			quaternion.Z = (z * num5 + num4 * w) + num8;
 			quaternion.W = w * num5 - num9;
 			return quaternion;
+		}
+	};
+
+	struct BoundingBox {
+		Vector3 Min;
+		Vector3 Max;
+
+		constexpr BoundingBox() = default;
+
+		constexpr BoundingBox(Vector3 const& min, Vector3 const& max) :
+			Min(min), Max(max) {}
+
+		constexpr bool operator==(BoundingBox const& other) {
+			return Equals(other);
+		}
+
+		constexpr bool Equals(BoundingBox const& other) const {
+			return Min == other.Min	&& Max == other.Max;
+		}
+
+		constexpr void GetCorners(Vector3 corners[8]) const {
+			corners[0].X = Min.X;
+			corners[0].Y = Max.Y;
+			corners[0].Z = Max.Z;
+			corners[1].X = Max.X;
+			corners[1].Y = Max.Y;
+			corners[1].Z = Max.Z;
+			corners[2].X = Max.X;
+			corners[2].Y = Min.Y;
+			corners[2].Z = Max.Z;
+			corners[3].X = Min.X;
+			corners[3].Y = Min.Y;
+			corners[3].Z = Max.Z;
+			corners[4].X = Min.X;
+			corners[4].Y = Max.Y;
+			corners[4].Z = Min.Z;
+			corners[5].X = Max.X;
+			corners[5].Y = Max.Y;
+			corners[5].Z = Min.Z;
+			corners[6].X = Max.X;
+			corners[6].Y = Min.Y;
+			corners[6].Z = Min.Z;
+			corners[7].X = Min.X;
+			corners[7].Y = Min.Y;
+			corners[7].Z = Min.Z;
 		}		
+
+		constexpr bool Intersects(BoundingBox const& box) const {
+			return Max.X >= box.Min.X 
+				&& Min.X <= box.Max.X 
+				&& Max.Y >= box.Min.Y 
+				&& Min.Y <= box.Max.Y 
+				&& Max.Z >= box.Min.Z 
+				&& Min.Z <= box.Max.Z;
+		}		
+		
+		constexpr ContainmentType Contains(BoundingBox const& box) const {
+			if (Max.X < box.Min.X || Min.X > box.Max.X || Max.Y < box.Min.Y || Min.Y > box.Max.Y || Max.Z < box.Min.Z || Min.Z > box.Max.Z)
+				return ContainmentType::Disjoint;
+
+			return Min.X > box.Min.X || box.Max.X > Max.X || Min.Y > box.Min.Y || box.Max.Y > Max.Y || Min.Z > box.Min.Z || box.Max.Z > Max.Z 
+				? ContainmentType::Intersects : ContainmentType::Contains;
+		}		
+
+		constexpr ContainmentType Contains(Vector3 const& point) const {
+			return Min.X > point.X || point.X > Max.X || Min.Y > point.Y || point.Y > Max.Y || Min.Z > point.Z || point.Z > Max.Z 
+				? ContainmentType::Disjoint : ContainmentType::Contains;
+		}		
+
+		void SupportMapping(Vector3 const& v, Vector3& result) const {
+			result.X = v.X >= 0.0 ? Max.X : Min.X;
+			result.Y = v.Y >= 0.0 ? Max.Y : Min.Y;
+			result.Z = v.Z >= 0.0 ? Max.Z : Min.Z;
+		}
+
+		static constexpr BoundingBox CreateMerged(BoundingBox const& original, BoundingBox const& additional) {
+			Vector3 result1 = Vector3::Min(original.Min, additional.Min);
+			Vector3 result2 = Vector3::Max(original.Max, additional.Max);
+			
+			BoundingBox result;
+			result.Min = result1;
+			result.Max = result2;
+
+			return result;
+		}
+
+		constexpr bool Intersects(BoundingSphere const& sphere) const;
+		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const;
+		constexpr ContainmentType Contains(BoundingSphere const& sphere) const;
+		static constexpr BoundingBox CreateFromSphere(BoundingSphere const& sphere);
+		static constexpr bool Intersects(BoundingFrustum const& frustum);
+		static constexpr PlaneIntersectionType Intersects(Plane const& plane);
+		static nfloat Intersects(Ray const& ray);
+		
 	};
 }
 

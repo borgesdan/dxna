@@ -8,6 +8,18 @@ namespace dxna {
         LandscapeRight = 2,
         Portrait = 4,
     };
+
+    enum class PlaneIntersectionType {
+        Front,
+        Back,
+        Intersecting,
+    };
+
+    enum class ContainmentType {
+        Disjoint,
+        Contains,
+        Intersects,
+    };
 }
 
 #endif
