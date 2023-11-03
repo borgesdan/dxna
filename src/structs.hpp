@@ -1897,6 +1897,8 @@ namespace dxna {
 			return PlaneIntersectionType::Intersecting;
 		}
 
+		nfloat Intersects(Ray const& ray) const;
+
 	public:
 		static constexpr float ClassifyPoint(Vector3 const& point, Plane const& plane) {
 			return point.X * plane.Normal.X + point.Y * plane.Normal.Y + point.Z * plane.Normal.Z + plane.D;
@@ -2174,6 +2176,40 @@ namespace dxna {
 		Plane _planes3;
 		Plane _planes4;
 		Plane _planes5;
+	};
+
+	struct Ray {
+		Vector3 Position;
+		Vector3 Direction;
+
+		constexpr Ray() = default;		
+
+		constexpr Ray(const Vector3& Position, const Vector3& Direction)
+			: Position(Position), Direction(Direction) {}
+
+		constexpr bool operator==(Ray const& other) const {
+			return Equals(other);
+		}
+
+		constexpr bool Equals(Ray const& other) const {
+			return Position == other.Position && Direction == other.Direction;
+		}
+
+		nfloat Intersects(BoundingBox const& box) const {
+			return box.Intersects(*this);
+		}
+
+		nfloat Intersects(BoundingFrustum const& frustum) const {
+			frustum.Intersects(*this);
+		}
+
+		nfloat Intersects(Plane const& plane) {
+			plane.Intersects(*this);
+		}
+
+		nfloat Intersects(BoundingSphere const& sphere) const {
+			sphere.Intersects(*this);
+		}
 	};
 }
 

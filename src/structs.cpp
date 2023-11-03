@@ -741,7 +741,7 @@ namespace dxna {
 	Plane Plane::Normalize(Plane const& value) {
 		float d = (value.Normal.X * value.Normal.X + value.Normal.Y * value.Normal.Y + value.Normal.Z * value.Normal.Z);
 		
-		if ((double)std::abs(d - 1.0f) < 1.1920928955078125E-07) {
+		if (std::abs(d - 1.0f) < 1.1920928955078125E-07) {
 			Plane plane;
 			plane.Normal = value.Normal;
 			plane.D = value.D;
@@ -757,8 +757,83 @@ namespace dxna {
 		return plane1;
 	}
 
+	nfloat Plane::Intersects(Ray const& ray) const
+	{
+		float num1 = (Normal.X * ray.Direction.X + Normal.Y * ray.Direction.Y + Normal.Z * ray.Direction.Z);
+
+		if (std::abs(num1) < 9.9999997473787516E-06)
+			return nfloat();
+
+		float num2 = (Normal.X * ray.Position.X + Normal.Y * ray.Position.Y + Normal.Z * ray.Position.Z);
+		float num3 = (-D - num2) / num1;
+
+		if (num3 < 0.0F) {
+			if (num3 < -9.9999997473787516E-06)
+				return nfloat();
+
+			num3 = 0.0f;
+		}
+		return nfloat(num3);
+	}
+
 	float Plane::PerpendicularDistance(Vector3 const& point, Plane const& plane) {
 		return std::abs((plane.Normal.X * point.X + plane.Normal.Y * point.Y + plane.Normal.Z * point.Z)
 			/ std::sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
+	}
+
+	constexpr nfloat BoundingFrustum::Intersects(Ray const& ray) const
+	{
+		ContainmentType result1 = Contains(ray.Position);
+		auto result = nfloat();
+		
+		if (result1 == ContainmentType::Contains) {
+			return nfloat(0.0f);
+		}
+		else {
+			float num1 = MinFloat;
+			float num2 = MaxFloat;			
+
+			for (size_t i = 0; i < PlaneCount; ++i) {
+				const auto plane = getPlane(i);
+
+				Vector3 normal = plane.Normal;
+				float result2 =	Vector3::Dot(ray.Direction, normal);
+				float result3 =	Vector3::Dot(ray.Position, normal);
+				result3 += plane.D;
+
+				if (std::abs(result2) < 9.9999997473787516E-06)
+				{
+					if (result3 > 0.0)
+						return result;
+				}
+				else
+				{
+					float num3 = -result3 / result2;
+					if (result2 < 0.0)
+					{
+						if (num3 >  num2)
+							return result;
+						if (num3 > num1)
+							num1 = num3;
+					}
+					else
+					{
+						if (num3 < num1)
+							return result;
+						if (num3 < num2)
+							num2 = num3;
+					}
+				}
+			}
+			
+			float num4 = num1 >= 0.0 ? num1 : num2;
+			
+			if (num4 < 0.0)
+				return;
+			
+			result = nfloat(num4);
+		}
+
+		return result;
 	}
 }
