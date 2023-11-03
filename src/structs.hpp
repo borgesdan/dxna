@@ -164,7 +164,7 @@ namespace dxna {
 			return value1.X * value2.X + value1.Y * value2.Y;
 		}
 
-		static constexpr Vector2 Reflect(Vector2 const& vector, Vector2 const& normal) {
+		static constexpr Vector2 lect(Vector2 const& vector, Vector2 const& normal) {
 			const auto num = vector.X * normal.X + vector.Y * normal.Y;
 			return Vector2(
 				vector.X - 2.0F * num * normal.X,
@@ -380,7 +380,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Reflect(Vector3 const& vector, Vector3 const& normal) {
+		static constexpr Vector3 lect(Vector3 const& vector, Vector3 const& normal) {
 			const auto num = vector.X * normal.X + vector.Y * normal.Y + vector.Z * normal.Z;
 			Vector3 vector3;
 			vector3.X = vector.X - 2.0F * num * normal.X;
@@ -1435,7 +1435,7 @@ namespace dxna {
 		static constexpr Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll);
 		static constexpr Matrix CreateFromQuaternion(Quaternion const& quaternion);
 		static constexpr Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane);
-		static constexpr Matrix CreateReflection(Plane const& value);
+		static constexpr Matrix Createlection(Plane const& value);
 		static Matrix Transform(Matrix const& value, Quaternion const& rotation);
 	};
 
@@ -1512,18 +1512,18 @@ namespace dxna {
 		static Quaternion Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount);
 
 		static constexpr Quaternion Concatenate(Quaternion const& value1, Quaternion const& value2) {
-			float x1 = value2.X;
-			float y1 = value2.Y;
-			float z1 = value2.Z;
-			float w1 = value2.W;
-			float x2 = value1.X;
-			float y2 = value1.Y;
-			float z2 = value1.Z;
-			float w2 = value1.W;
-			float num1 = (y1 * z2 - z1 * y2);
-			float num2 = (z1 * x2 - x1 * z2);
-			float num3 = (x1 * y2 - y1 * x2);
-			float num4 = (x1 * x2 + y1 * y2 + z1 * z2);
+			const auto x1 = value2.X;
+			const auto y1 = value2.Y;
+			const auto z1 = value2.Z;
+			const auto w1 = value2.W;
+			const auto x2 = value1.X;
+			const auto y2 = value1.Y;
+			const auto z2 = value1.Z;
+			const auto w2 = value1.W;
+			const auto num1 = (y1 * z2 - z1 * y2);
+			const auto num2 = (z1 * x2 - x1 * z2);
+			const auto num3 = (x1 * y2 - y1 * x2);
+			const auto num4 = (x1 * x2 + y1 * y2 + z1 * z2);
 			Quaternion quaternion;
 			quaternion.X = (x1 * w2 + x2 * w1) + num1;
 			quaternion.Y = (y1 * w2 + y2 * w1) + num2;
@@ -1560,18 +1560,18 @@ namespace dxna {
 		}
 
 		static constexpr Quaternion Multiply(Quaternion const& quaternion1, Quaternion const& quaternion2) {
-			float x1 = quaternion1.X;
-			float y1 = quaternion1.Y;
-			float z1 = quaternion1.Z;
-			float w1 = quaternion1.W;
-			float x2 = quaternion2.X;
-			float y2 = quaternion2.Y;
-			float z2 = quaternion2.Z;
-			float w2 = quaternion2.W;
-			float num1 = (y1 * z2 - z1 * y2);
-			float num2 = (z1 * x2 - x1 * z2);
-			float num3 = (x1 * y2 - y1 * x2);
-			float num4 = (x1 * x2 + y1 * y2 + z1 * z2);
+			const auto x1 = quaternion1.X;
+			const auto y1 = quaternion1.Y;
+			const auto z1 = quaternion1.Z;
+			const auto w1 = quaternion1.W;
+			const auto x2 = quaternion2.X;
+			const auto y2 = quaternion2.Y;
+			const auto z2 = quaternion2.Z;
+			const auto w2 = quaternion2.W;
+			const auto num1 = (y1 * z2 - z1 * y2);
+			const auto num2 = (z1 * x2 - x1 * z2);
+			const auto num3 = (x1 * y2 - y1 * x2);
+			const auto num4 = (x1 * x2 + y1 * y2 + z1 * z2);
 			Quaternion quaternion;
 			quaternion.X = (x1 * w2 + x2 * w1) + num1;
 			quaternion.Y = (y1 * w2 + y2 * w1) + num2;
@@ -1590,19 +1590,19 @@ namespace dxna {
 		}
 
 		static constexpr Quaternion Divide(Quaternion const& quaternion1, Quaternion const& quaternion2) {
-			float x = quaternion1.X;
-			float y = quaternion1.Y;
-			float z = quaternion1.Z;
-			float w = quaternion1.W;
-			float num1 = 1.0f / (quaternion2.X * quaternion2.X + quaternion2.Y * quaternion2.Y + quaternion2.Z * quaternion2.Z + quaternion2.W * quaternion2.W);
-			float num2 = -quaternion2.X * num1;
-			float num3 = -quaternion2.Y * num1;
-			float num4 = -quaternion2.Z * num1;
-			float num5 = quaternion2.W * num1;
-			float num6 = (y * num4 - z * num3);
-			float num7 = (z * num2 - x * num4);
-			float num8 = (x * num3 - y * num2);
-			float num9 = (x * num2 + y * num3 + z * num4);
+			const auto x = quaternion1.X;
+			const auto y = quaternion1.Y;
+			const auto z = quaternion1.Z;
+			const auto w = quaternion1.W;
+			const auto num1 = 1.0f / (quaternion2.X * quaternion2.X + quaternion2.Y * quaternion2.Y + quaternion2.Z * quaternion2.Z + quaternion2.W * quaternion2.W);
+			const auto num2 = -quaternion2.X * num1;
+			const auto num3 = -quaternion2.Y * num1;
+			const auto num4 = -quaternion2.Z * num1;
+			const auto num5 = quaternion2.W * num1;
+			const auto num6 = (y * num4 - z * num3);
+			const auto num7 = (z * num2 - x * num4);
+			const auto num8 = (x * num3 - y * num2);
+			const auto num9 = (x * num2 + y * num3 + z * num4);
 			Quaternion quaternion;
 			quaternion.X = (x * num5 + num2 * w) + num6;
 			quaternion.Y = (y * num5 + num3 * w) + num7;
@@ -1727,15 +1727,15 @@ namespace dxna {
 		static BoundingSphere CreateFromPoints(Vector3* points, size_t length, size_t offset = 0);
 
 		bool Intersects(BoundingBox const& box) const {
-			Vector3 result1 = Vector3::Clamp(Center, box.Min, box.Max);
-			float result2 = Vector3::DistanceSquared(Center, result1);
+			const auto result1 = Vector3::Clamp(Center, box.Min, box.Max);
+			const auto result2 = Vector3::DistanceSquared(Center, result1);
 			return result2 <= Radius * Radius;
 		}
 
 		bool Intersects(BoundingSphere const& sphere) const {
-			float result = Vector3::DistanceSquared(Center, sphere.Center);
-			float radius1 = Radius;
-			float radius2 = sphere.Radius;
+			const auto result = Vector3::DistanceSquared(Center, sphere.Center);
+			const auto radius1 = Radius;
+			const auto radius2 = sphere.Radius;
 			return radius1 * radius1 + 2.0F * radius1 * radius2 + radius2 * radius2 > result;
 		}
 
@@ -1746,9 +1746,9 @@ namespace dxna {
 		}
 
 		ContainmentType Contains(BoundingSphere sphere) const {
-			float result = Vector3::Distance(Center, sphere.Center);
-			float radius1 = Radius;
-			float radius2 = sphere.Radius;
+			const auto result = Vector3::Distance(Center, sphere.Center);
+			const auto radius1 = Radius;
+			const auto radius2 = sphere.Radius;
 
 			if (radius1 + radius2 < result)
 				return ContainmentType::Disjoint;
@@ -1782,27 +1782,25 @@ namespace dxna {
 		constexpr Plane(Vector4 const& value)
 			: Normal({ value.X, value.Y, value.Z }), D(value.W) {}
 
-		Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3);		
+		Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3);
 
-		constexpr bool operator==(const Plane& other) const	{
+		constexpr bool operator==(const Plane& other) const {
 			return Equals(other);
 		}
 
-		constexpr bool Equals(const Plane& other) const	{
+		constexpr bool Equals(const Plane& other) const {
 			return Normal == other.Normal && D == other.D;
 		}
 
 		void Normalize();
-
 		static Plane Normalize(Plane const& value);
-		
+
 		static constexpr Plane Transform(Plane const& plane, Matrix const& matrix) {
-			Matrix result = Matrix::Invert(matrix);
-			
-			float x = plane.Normal.X;
-			float y = plane.Normal.Y;
-			float z = plane.Normal.Z;
-			float d = plane.D;
+			const auto result = Matrix::Invert(matrix);
+			const auto x = plane.Normal.X;
+			const auto y = plane.Normal.Y;
+			const auto z = plane.Normal.Z;
+			const auto d = plane.D;
 
 			Plane plane1;
 			plane1.Normal.X = (x * result.M11 + y * result.M12 + z * result.M13 + d * result.M14);
@@ -1813,35 +1811,37 @@ namespace dxna {
 		}
 
 		static Plane Transform(Plane const& plane, Quaternion const& rotation) {
-			float num1 = rotation.X + rotation.X;
-			float num2 = rotation.Y + rotation.Y;
-			float num3 = rotation.Z + rotation.Z;
-			float num4 = rotation.W * num1;
-			float num5 = rotation.W * num2;
-			float num6 = rotation.W * num3;
-			float num7 = rotation.X * num1;
-			float num8 = rotation.X * num2;
-			float num9 = rotation.X * num3;
-			float num10 = rotation.Y * num2;
-			float num11 = rotation.Y * num3;
-			float num12 = rotation.Z * num3;
-			float num13 = 1.0f - num10 - num12;
-			float num14 = num8 - num6;
-			float num15 = num9 + num5;
-			float num16 = num8 + num6;
-			float num17 = 1.0f - num7 - num12;
-			float num18 = num11 - num4;
-			float num19 = num9 - num5;
-			float num20 = num11 + num4;
-			float num21 = 1.0f - num7 - num10;
-			float x = plane.Normal.X;
-			float y = plane.Normal.Y;
-			float z = plane.Normal.Z;
+			const auto num1 = rotation.X + rotation.X;
+			const auto num2 = rotation.Y + rotation.Y;
+			const auto num3 = rotation.Z + rotation.Z;
+			const auto num4 = rotation.W * num1;
+			const auto num5 = rotation.W * num2;
+			const auto num6 = rotation.W * num3;
+			const auto num7 = rotation.X * num1;
+			const auto num8 = rotation.X * num2;
+			const auto num9 = rotation.X * num3;
+			const auto num10 = rotation.Y * num2;
+			const auto num11 = rotation.Y * num3;
+			const auto num12 = rotation.Z * num3;
+			const auto num13 = 1.0f - num10 - num12;
+			const auto num14 = num8 - num6;
+			const auto num15 = num9 + num5;
+			const auto num16 = num8 + num6;
+			const auto num17 = 1.0f - num7 - num12;
+			const auto num18 = num11 - num4;
+			const auto num19 = num9 - num5;
+			const auto num20 = num11 + num4;
+			const auto num21 = 1.0f - num7 - num10;
+			const auto x = plane.Normal.X;
+			const auto y = plane.Normal.Y;
+			const auto z = plane.Normal.Z;
+
 			Plane plane1;
 			plane1.Normal.X = (x * num13 + y * num14 + z * num15);
 			plane1.Normal.Y = (x * num16 + y * num17 + z * num18);
 			plane1.Normal.Z = (x * num19 + y * num20 + z * num21);
 			plane1.D = plane.D;
+
 			return plane1;
 		}
 
@@ -1862,11 +1862,12 @@ namespace dxna {
 			vector3_1.X = Normal.X >= 0.0 ? box.Min.X : box.Max.X;
 			vector3_1.Y = Normal.Y >= 0.0 ? box.Min.Y : box.Max.Y;
 			vector3_1.Z = Normal.Z >= 0.0 ? box.Min.Z : box.Max.Z;
+
 			Vector3 vector3_2;
 			vector3_2.X = Normal.X >= 0.0 ? box.Max.X : box.Min.X;
 			vector3_2.Y = Normal.Y >= 0.0 ? box.Max.Y : box.Min.Y;
 			vector3_2.Z = Normal.Z >= 0.0 ? box.Max.Z : box.Min.Z;
-			
+
 			if (Normal.X * vector3_1.X + Normal.Y * vector3_1.Y + Normal.Z * vector3_1.Z + D > 0.0)
 				return PlaneIntersectionType::Front;
 
@@ -1874,31 +1875,305 @@ namespace dxna {
 		}
 
 		PlaneIntersectionType Intersects(BoundingSphere const& sphere) const {
-			float num = (sphere.Center.X * Normal.X + sphere.Center.Y * Normal.Y + sphere.Center.Z * Normal.Z) + D;
-			
-			if (num >  sphere.Radius)
+			const auto num = (sphere.Center.X * Normal.X + sphere.Center.Y * Normal.Y + sphere.Center.Z * Normal.Z) + D;
+
+			if (num > sphere.Radius)
 				return PlaneIntersectionType::Front;
 
 			return num < -sphere.Radius ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
 		}
 
 		constexpr PlaneIntersectionType Intersects(BoundingFrustum const& frustum) const;
+
+		constexpr PlaneIntersectionType Intersects(Vector3 const& point) const {
+			float distance = DotCoordinate(point);
+
+			if (distance > 0)
+				return PlaneIntersectionType::Front;
+
+			if (distance < 0)
+				return PlaneIntersectionType::Back;
+
+			return PlaneIntersectionType::Intersecting;
+		}
+
+	public:
+		static constexpr float ClassifyPoint(Vector3 const& point, Plane const& plane) {
+			return point.X * plane.Normal.X + point.Y * plane.Normal.Y + point.Z * plane.Normal.Z + plane.D;
+		}
+
+		static float PerpendicularDistance(Vector3 const& point, Plane const& plane);
 	};
 
 	struct BoundingFrustum {
+		using Matrix_ = dxna::Matrix;
+
+		BoundingFrustum(Matrix_ const& value) : _matrix(value) {
+			createCorners();
+			createPlanes();
+		}
+
+		constexpr bool operator==(const BoundingFrustum& other) const { return Equals(other); }
+
+		constexpr bool Equals(BoundingFrustum const& other) const {
+			return _matrix == other._matrix
+				&& _corners0 == other._corners0
+				&& _corners1 == other._corners1
+				&& _corners2 == other._corners2
+				&& _corners3 == other._corners3
+				&& _corners4 == other._corners4
+				&& _corners5 == other._corners5
+				&& _corners6 == other._corners6
+				&& _corners7 == other._corners7
+				&& _planes0 == other._planes0
+				&& _planes1 == other._planes1
+				&& _planes2 == other._planes2
+				&& _planes3 == other._planes3
+				&& _planes4 == other._planes4
+				&& _planes5 == other._planes5;
+		}
+
+		constexpr Matrix_ Matrix() const { return _matrix; }
+
+		void Matrix(Matrix_ const& value) {
+			_matrix = value;
+			createPlanes();
+			createCorners();
+		}
+
+		constexpr Plane Near() const { return _planes0; }
+		constexpr Plane Far() const { return _planes1; }
+		constexpr Plane Left() const { return _planes2; }
+		constexpr Plane Right() const { return _planes3; }
+		constexpr Plane Top() const { return _planes4; }
+		constexpr Plane Bottom() const { return _planes5; }
+
+		constexpr ContainmentType Contains(BoundingBox const& box) const {
+			auto intersects = false;
+
+			for (size_t i = 0; i < PlaneCount; ++i)
+			{
+				const auto plane = getPlane(i);
+				const auto planeIntersectionType = box.Intersects(plane);
+
+				switch (planeIntersectionType)
+				{
+				case PlaneIntersectionType::Front:
+					return ContainmentType::Disjoint;
+				case PlaneIntersectionType::Intersecting:
+					intersects = true;
+					break;
+				}
+			}
+
+			return intersects ? ContainmentType::Intersects : ContainmentType::Contains;
+		}
+
+		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const {
+			if (*this == frustum)
+				return ContainmentType::Contains;
+
+			auto intersects = false;
+
+			for (size_t i = 0; i < PlaneCount; ++i) {
+				const auto plane = getPlane(i);
+				PlaneIntersectionType planeIntersectionType = frustum.Intersects(plane);
+
+				switch (planeIntersectionType)
+				{
+				case PlaneIntersectionType::Front:
+					return ContainmentType::Disjoint;
+				case PlaneIntersectionType::Intersecting:
+					intersects = true;
+					break;
+				}
+			}
+			return intersects ? ContainmentType::Intersects : ContainmentType::Contains;
+		}
+
+		constexpr ContainmentType Contains(BoundingSphere const& sphere) const {
+			auto intersects = false;
+
+			for (size_t i = 0; i < PlaneCount; ++i) {
+				const auto plane = getPlane(i);
+				auto planeIntersectionType = sphere.Intersects(plane);
+				switch (planeIntersectionType)
+				{
+				case PlaneIntersectionType::Front:
+					return ContainmentType::Disjoint;
+				case PlaneIntersectionType::Intersecting:
+					intersects = true;
+					break;
+				}
+			}
+			return intersects ? ContainmentType::Intersects : ContainmentType::Contains;
+		}
+
+		constexpr ContainmentType Contains(Vector3 const& point) const {
+			for (size_t i = 0; i < PlaneCount; ++i) {
+				const auto plane = getPlane(i);
+
+				if (Plane::ClassifyPoint(point, plane) > 0.0F) {
+					return ContainmentType::Disjoint;
+				}
+			}
+
+			return ContainmentType::Contains;
+		}
+
+		constexpr void GetCorners(Vector3 cornerArray[8]) const {
+			for (size_t i = 0; i < CornerCount; ++i) {
+				const auto corner = getCorners(i);
+
+				cornerArray[i] = corner;
+			}
+		}
+
+		constexpr bool Intersects(BoundingBox const& box) const {
+			const auto containment = Contains(box);
+			return containment != ContainmentType::Disjoint;
+		}
+
+		constexpr bool Intersects(BoundingFrustum const& frustum) const {
+			return Contains(frustum) != ContainmentType::Disjoint;
+		}
+
+		constexpr bool Intersects(BoundingSphere const& sphere) const {
+			const auto containment = Contains(sphere);
+			return containment != ContainmentType::Disjoint;
+		}
+
+		constexpr PlaneIntersectionType Intersects(Plane const& plane) const {
+			auto result = plane.Intersects(_corners0);
+
+			for (size_t i = 1; i < CornerCount; i++) {
+				const auto corner = getCorners(i);
+
+				if (plane.Intersects(corner) != result)
+					result = PlaneIntersectionType::Intersecting;
+			}
+
+			return result;
+		}
+
+		constexpr nfloat Intersects(Ray const& ray) const;
+
+	public:
+		static constexpr int PlaneCount = 6;
+		static constexpr int CornerCount = 8;
 
 	private:
-		Matrix _matrix;
+		static constexpr Vector3 IntersectionPoint(Plane const& a, Plane const& b, Plane const& c) {
+			Vector3 cross = Vector3::Cross(b.Normal, c.Normal);
 
-		Vector3 corner0;
-		Vector3 corner1;
-		Vector3 corner2;
-		Vector3 corner3;
-		Vector3 corner4;
-		Vector3 corner5;
-		Vector3 corner6;
-		Vector3 corner7;
-		Vector3 corner8;
+			float f = Vector3::Dot(a.Normal, cross);
+			f *= -1.0f;
+
+			cross = Vector3::Cross(b.Normal, c.Normal);
+			const auto v1 = Vector3::Multiply(cross, a.D);
+
+			cross = Vector3::Cross(c.Normal, a.Normal);
+			const auto v2 = Vector3::Multiply(cross, b.D);
+
+			cross = Vector3::Cross(a.Normal, b.Normal);
+			const auto v3 = Vector3::Multiply(cross, c.D);
+
+			Vector3 result;
+			result.X = (v1.X + v2.X + v3.X) / f;
+			result.Y = (v1.Y + v2.Y + v3.Y) / f;
+			result.Z = (v1.Z + v2.Z + v3.Z) / f;
+
+			return result;
+		}
+
+		constexpr void createCorners() {
+			_corners0 = IntersectionPoint(_planes0, _planes2, _planes4);
+			_corners1 = IntersectionPoint(_planes0, _planes3, _planes4);
+			_corners2 = IntersectionPoint(_planes0, _planes3, _planes5);
+			_corners3 = IntersectionPoint(_planes0, _planes2, _planes5);
+			_corners4 = IntersectionPoint(_planes1, _planes2, _planes4);
+			_corners5 = IntersectionPoint(_planes1, _planes3, _planes4);
+			_corners6 = IntersectionPoint(_planes1, _planes3, _planes5);
+			_corners7 = IntersectionPoint(_planes1, _planes2, _planes5);
+		}
+
+		void createPlanes() {
+			_planes0 = Plane(-_matrix.M13, -_matrix.M23, -_matrix.M33, -_matrix.M43);
+			_planes1 = Plane(_matrix.M13 - _matrix.M14, _matrix.M23 - _matrix.M24, _matrix.M33 - _matrix.M34, _matrix.M43 - _matrix.M44);
+			_planes2 = Plane(-_matrix.M14 - _matrix.M11, -_matrix.M24 - _matrix.M21, -_matrix.M34 - _matrix.M31, -_matrix.M44 - _matrix.M41);
+			_planes3 = Plane(_matrix.M11 - _matrix.M14, _matrix.M21 - _matrix.M24, _matrix.M31 - _matrix.M34, _matrix.M41 - _matrix.M44);
+			_planes4 = Plane(_matrix.M12 - _matrix.M14, _matrix.M22 - _matrix.M24, _matrix.M32 - _matrix.M34, _matrix.M42 - _matrix.M44);
+			_planes5 = Plane(-_matrix.M14 - _matrix.M12, -_matrix.M24 - _matrix.M22, -_matrix.M34 - _matrix.M32, -_matrix.M44 - _matrix.M42);
+
+			_planes0.Normalize();
+			_planes1.Normalize();
+			_planes2.Normalize();
+			_planes3.Normalize();
+			_planes4.Normalize();
+			_planes5.Normalize();
+		}
+
+		constexpr Plane getPlane(size_t index) const {
+			switch (index)
+			{
+			case 0:
+				return _planes0;
+			case 1:
+				return _planes1;
+			case 2:
+				return _planes2;
+			case 3:
+				return _planes3;
+			case 4:
+				return _planes4;
+			case 5:
+				return _planes5;
+			default:
+				return Plane();
+			}
+		}
+
+		constexpr Vector3 getCorners(size_t index) const {
+			switch (index)
+			{
+			case 0:
+				return _corners0;
+			case 1:
+				return _corners1;
+			case 2:
+				return _corners2;
+			case 3:
+				return _corners3;
+			case 4:
+				return _corners4;
+			case 5:
+				return _corners5;
+			case 6:
+				return _corners6;
+			case 7:
+				return _corners7;
+			default:
+				return Vector3();
+			}
+		}
+
+		Matrix_ _matrix;
+
+		Vector3 _corners0;
+		Vector3 _corners1;
+		Vector3 _corners2;
+		Vector3 _corners3;
+		Vector3 _corners4;
+		Vector3 _corners5;
+		Vector3 _corners6;
+		Vector3 _corners7;
+
+		Plane _planes0;
+		Plane _planes1;
+		Plane _planes2;
+		Plane _planes3;
+		Plane _planes4;
+		Plane _planes5;
 	};
 }
 

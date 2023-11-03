@@ -757,4 +757,8 @@ namespace dxna {
 		return plane1;
 	}
 
+	float Plane::PerpendicularDistance(Vector3 const& point, Plane const& plane) {
+		return std::abs((plane.Normal.X * point.X + plane.Normal.Y * point.Y + plane.Normal.Z * point.Z)
+			/ std::sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
+	}
 }
