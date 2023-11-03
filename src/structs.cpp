@@ -1,5 +1,6 @@
 #include "structs.hpp"
 #include <cmath>
+#include <vector>
 
 namespace dxna {
 	float Vector2::Length() const { return std::sqrt(LengthSquared()); }
@@ -367,6 +368,12 @@ namespace dxna {
 		world.M43 = position.Z;
 		world.M44 = 1.0f;
 		return world;
+	}
+
+	Matrix Matrix::CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+	{
+		const auto result = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
+		return CreateFromQuaternion(result);
 	}
 
 	float Quaternion::Length() const {
@@ -781,59 +788,170 @@ namespace dxna {
 			/ std::sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
 	}
 
-	constexpr nfloat BoundingFrustum::Intersects(Ray const& ray) const
+	Matrix Matrix::CreateShadow(Vector3 const& lightDirection, Plane const& plane)
 	{
-		ContainmentType result1 = Contains(ray.Position);
-		auto result = nfloat();
+		Plane result = Plane::Normalize(plane);
+		float num1 = (result.Normal.X * lightDirection.X + result.Normal.Y * lightDirection.Y + result.Normal.Z * lightDirection.Z);
+		float num2 = -result.Normal.X;
+		float num3 = -result.Normal.Y;
+		float num4 = -result.Normal.Z;
+		float num5 = -result.D;
+
+		Matrix shadow;
+		shadow.M11 = num2 * lightDirection.X + num1;
+		shadow.M21 = num3 * lightDirection.X;
+		shadow.M31 = num4 * lightDirection.X;
+		shadow.M41 = num5 * lightDirection.X;
+		shadow.M12 = num2 * lightDirection.Y;
+		shadow.M22 = num3 * lightDirection.Y + num1;
+		shadow.M32 = num4 * lightDirection.Y;
+		shadow.M42 = num5 * lightDirection.Y;
+		shadow.M13 = num2 * lightDirection.Z;
+		shadow.M23 = num3 * lightDirection.Z;
+		shadow.M33 = num4 * lightDirection.Z + num1;
+		shadow.M43 = num5 * lightDirection.Z;
+		shadow.M14 = 0.0f;
+		shadow.M24 = 0.0f;
+		shadow.M34 = 0.0f;
+		shadow.M44 = num1;
+		return shadow;
+	}
+	
+	Matrix Matrix::CreateReflection(Plane const& original)
+	{
+		auto value = original;
+
+		value.Normalize();
+		float x = value.Normal.X;
+		float y = value.Normal.Y;
+		float z = value.Normal.Z;
+		float num1 = -2.f * x;
+		float num2 = -2.f * y;
+		float num3 = -2.f * z;
+		Matrix reflection;
+		reflection.M11 = (num1 * x + 1.0);
+		reflection.M12 = num2 * x;
+		reflection.M13 = num3 * x;
+		reflection.M14 = 0.0f;
+		reflection.M21 = num1 * y;
+		reflection.M22 = (num2 * y + 1.0);
+		reflection.M23 = num3 * y;
+		reflection.M24 = 0.0f;
+		reflection.M31 = num1 * z;
+		reflection.M32 = num2 * z;
+		reflection.M33 = (num3 * z + 1.0);
+		reflection.M34 = 0.0f;
+		reflection.M41 = num1 * value.D;
+		reflection.M42 = num2 * value.D;
+		reflection.M43 = num3 * value.D;
+		reflection.M44 = 1.f;
+		return reflection;
+	}
+
+	nfloat dxna::BoundingBox::Intersects(Ray const& ray) const
+	{
+		float num1 = 0.0f;
+		float num2 = MaxFloat;
 		
-		if (result1 == ContainmentType::Contains) {
-			return nfloat(0.0f);
+		if (std::abs(ray.Direction.X) < 9.9999999747524271E-07)	{
+			if (ray.Position.X < Min.X || ray.Position.X > Max.X)
+				return nfloat();
 		}
 		else {
-			float num1 = MinFloat;
-			float num2 = MaxFloat;			
-
-			for (size_t i = 0; i < PlaneCount; ++i) {
-				const auto plane = getPlane(i);
-
-				Vector3 normal = plane.Normal;
-				float result2 =	Vector3::Dot(ray.Direction, normal);
-				float result3 =	Vector3::Dot(ray.Position, normal);
-				result3 += plane.D;
-
-				if (std::abs(result2) < 9.9999997473787516E-06)
-				{
-					if (result3 > 0.0)
-						return result;
-				}
-				else
-				{
-					float num3 = -result3 / result2;
-					if (result2 < 0.0)
-					{
-						if (num3 >  num2)
-							return result;
-						if (num3 > num1)
-							num1 = num3;
-					}
-					else
-					{
-						if (num3 < num1)
-							return result;
-						if (num3 < num2)
-							num2 = num3;
-					}
-				}
+			float num3 = 1.0f / ray.Direction.X;
+			float num4 = (Min.X - ray.Position.X) * num3;
+			float num5 = (Max.X - ray.Position.X) * num3;
+			
+			if (num4 > num5) {
+				float num6 = num4;
+				num4 = num5;
+				num5 = num6;
 			}
 			
-			float num4 = num1 >= 0.0 ? num1 : num2;
+			num1 = MathHelper::Max(num4, num1);
+			num2 = MathHelper::Min(num5, num2);
+
+			if (num1 > num2)
+				return nfloat();
+		}
+		
+		if (std::abs(ray.Direction.Y) < 9.9999999747524271E-07)
+		{
+			if (ray.Position.Y < Min.Y || ray.Position.Y > Max.Y)
+				return nfloat();
+		}
+		else {
+			float num7 = 1.0f / ray.Direction.Y;
+			float num8 = (Min.Y - ray.Position.Y) * num7;
+			float num9 = (Max.Y - ray.Position.Y) * num7;
+			if (num8 > num9)
+			{
+				float num10 = num8;
+				num8 = num9;
+				num9 = num10;
+			}
 			
-			if (num4 < 0.0)
-				return;
+			num1 = MathHelper::Max(num8, num1);
+			num2 = MathHelper::Min(num9, num2);
 			
-			result = nfloat(num4);
+			if (num1 > num2)
+				return nfloat();
 		}
 
-		return result;
+		if (std::abs(ray.Direction.Z) < 9.9999999747524271E-07) 	{
+			if (ray.Position.Z < Min.Z || ray.Position.Z > Max.Z)
+				return nfloat();
+		}
+		else
+		{
+			float num11 = 1.0f / ray.Direction.Z;
+			float num12 = (Min.Z - ray.Position.Z) * num11;
+			float num13 = (Max.Z - ray.Position.Z) * num11;
+			
+			if (num12 > num13)
+			{
+				float num14 = num12;
+				num12 = num13;
+				num13 = num14;
+			}
+
+			num1 = MathHelper::Max(num12, num1);
+			float num15 = MathHelper::Min(num13, num2);
+
+			if (num1 > num15)
+				return nfloat();
+		}
+		return nfloat(num1);
+	}
+
+	nfloat BoundingSphere::Intersects(Ray const& ray) const {
+		float num1 = Center.X - ray.Position.X;
+		float num2 = Center.Y - ray.Position.Y;
+		float num3 = Center.Z - ray.Position.Z;
+		float num4 = (num1 * num1 + num2 * num2 + num3 * num3);
+		float num5 = Radius * Radius;
+
+		if (num4 <= num5)
+			return nfloat(0.0f);
+
+		float num6 = (num1 * ray.Direction.X + num2 * ray.Direction.Y + num3 * ray.Direction.Z);
+
+		if (num6 < 0.0)
+			return nfloat();
+
+		float num7 = num4 - num6 * num6;
+		
+		if (num7 >  num5)
+			return nfloat();
+
+		float num8 = std::sqrt(num5 - num7);
+
+		return nfloat(num6 - num8);
+	}
+
+	BoundingSphere dxna::BoundingSphere::CreateFromFrustum(BoundingFrustum const& frustum) {
+		std::vector<Vector3> points(frustum.CornerCount);
+
+		return CreateFromPoints(points.data(), points.size(), 0);
 	}
 }

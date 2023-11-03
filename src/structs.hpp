@@ -2,7 +2,6 @@
 #define DXNA_STRUCTS_HPP
 
 #include "cs/cs.hpp"
-#include <vector>
 #include "enumerations.hpp"
 #include "mathhelper.hpp"
 
@@ -1432,11 +1431,11 @@ namespace dxna {
 			return matrix;
 		}
 
-		static constexpr Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll);
+		static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll);
 		static constexpr Matrix CreateFromQuaternion(Quaternion const& quaternion);
-		static constexpr Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane);
-		static constexpr Matrix Createlection(Plane const& value);
-		static Matrix Transform(Matrix const& value, Quaternion const& rotation);
+		static Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane);
+		static Matrix CreateReflection(Plane const& value);
+		static constexpr Matrix Transform(Matrix const& value, Quaternion const& rotation);
 	};
 
 	struct Quaternion {
@@ -1696,13 +1695,13 @@ namespace dxna {
 		}
 
 		constexpr bool Intersects(BoundingSphere const& sphere) const;
+		constexpr PlaneIntersectionType Intersects(Plane const& plane) const;
 		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const;
 		constexpr ContainmentType Contains(BoundingSphere const& sphere) const;
 		static constexpr BoundingBox CreateFromSphere(BoundingSphere const& sphere);
-		static constexpr bool Intersects(BoundingFrustum const& frustum);
-		static constexpr PlaneIntersectionType Intersects(Plane const& plane);
-		static nfloat Intersects(Ray const& ray);
-
+		constexpr bool Intersects(BoundingFrustum const& frustum);
+		constexpr PlaneIntersectionType Intersects(Plane const& plane);
+		nfloat Intersects(Ray const& ray) const;
 	};
 
 	struct BoundingSphere {
@@ -1760,9 +1759,9 @@ namespace dxna {
 
 		BoundingSphere Transform(Matrix const& matrix) const;
 
-		ContainmentType Contains(BoundingFrustum const& frustum) const;
-		bool Intersects(BoundingFrustum const& frustum) const;
-		PlaneIntersectionType Intersects(Plane const& plane) const;
+		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const;
+		constexpr bool Intersects(BoundingFrustum const& frustum) const;
+		constexpr PlaneIntersectionType Intersects(Plane const& plane) const;
 		nfloat Intersects(Ray const& ray) const;
 		static BoundingSphere CreateFromFrustum(BoundingFrustum const& frustum);
 	};
@@ -2025,8 +2024,7 @@ namespace dxna {
 
 		constexpr void GetCorners(Vector3 cornerArray[8]) const {
 			for (size_t i = 0; i < CornerCount; ++i) {
-				const auto corner = getCorners(i);
-
+				const auto corner = getCorner(i);
 				cornerArray[i] = corner;
 			}
 		}
@@ -2049,7 +2047,7 @@ namespace dxna {
 			auto result = plane.Intersects(_corners0);
 
 			for (size_t i = 1; i < CornerCount; i++) {
-				const auto corner = getCorners(i);
+				const auto corner = getCorner(i);
 
 				if (plane.Intersects(corner) != result)
 					result = PlaneIntersectionType::Intersecting;
@@ -2063,6 +2061,50 @@ namespace dxna {
 	public:
 		static constexpr int PlaneCount = 6;
 		static constexpr int CornerCount = 8;
+
+		constexpr Plane getPlane(size_t index) const {
+			switch (index)
+			{
+			case 0:
+				return _planes0;
+			case 1:
+				return _planes1;
+			case 2:
+				return _planes2;
+			case 3:
+				return _planes3;
+			case 4:
+				return _planes4;
+			case 5:
+				return _planes5;
+			default:
+				return Plane();
+			}
+		}
+
+		constexpr Vector3 getCorner(size_t index) const {
+			switch (index)
+			{
+			case 0:
+				return _corners0;
+			case 1:
+				return _corners1;
+			case 2:
+				return _corners2;
+			case 3:
+				return _corners3;
+			case 4:
+				return _corners4;
+			case 5:
+				return _corners5;
+			case 6:
+				return _corners6;
+			case 7:
+				return _corners7;
+			default:
+				return Vector3();
+			}
+		}
 
 	private:
 		static constexpr Vector3 IntersectionPoint(Plane const& a, Plane const& b, Plane const& c) {
@@ -2113,51 +2155,7 @@ namespace dxna {
 			_planes3.Normalize();
 			_planes4.Normalize();
 			_planes5.Normalize();
-		}
-
-		constexpr Plane getPlane(size_t index) const {
-			switch (index)
-			{
-			case 0:
-				return _planes0;
-			case 1:
-				return _planes1;
-			case 2:
-				return _planes2;
-			case 3:
-				return _planes3;
-			case 4:
-				return _planes4;
-			case 5:
-				return _planes5;
-			default:
-				return Plane();
-			}
-		}
-
-		constexpr Vector3 getCorners(size_t index) const {
-			switch (index)
-			{
-			case 0:
-				return _corners0;
-			case 1:
-				return _corners1;
-			case 2:
-				return _corners2;
-			case 3:
-				return _corners3;
-			case 4:
-				return _corners4;
-			case 5:
-				return _corners5;
-			case 6:
-				return _corners6;
-			case 7:
-				return _corners7;
-			default:
-				return Vector3();
-			}
-		}
+		}		
 
 		Matrix_ _matrix;
 
@@ -2214,6 +2212,120 @@ namespace dxna {
 }
 
 namespace dxna {
+	constexpr Vector2 Vector2::Transform(Vector2 const& position, Matrix const& matrix) {
+		const auto num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
+		const auto num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;	
+		
+		return Vector2(num1, num2);
+	}
+
+	constexpr Vector2 Vector2::TransformNormal(Vector2 const& normal, Matrix const& matrix) {
+		const auto num1 = (normal.X * matrix.M11 + normal.Y * matrix.M21);
+		const auto num2 = (normal.X * matrix.M12 + normal.Y * matrix.M22);
+		
+		return Vector2(num1, num2);
+	}
+
+	constexpr Vector2 Vector2::Transform(Vector2 const& value, Quaternion const& rotation) {
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num3;
+		const auto num5 = rotation.X * num1;
+		const auto num6 = rotation.X * num2;
+		const auto num7 = rotation.Y * num2;
+		const auto num8 = rotation.Z * num3;
+		const auto num9 = (value.X * (1.0 - num7 - num8) + value.Y * (num6 - num4));
+		const auto num10 = (value.X * (num6 + num4) + value.Y * (1.0 - num5 - num8));
+		
+		return Vector2(num9, num10);
+	}
+
+	constexpr void Vector2::Transform(Vector2* sourceArray, Matrix matrix, Vector2* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+
+		for (; length > 0; --length) {
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21) + matrix.M41;
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22) + matrix.M42;
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
+	constexpr void Vector2::Transform(Vector2* sourceArray, Quaternion rotation,
+		Vector2* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num3;
+		const auto num5 = rotation.X * num1;
+		const auto num6 = rotation.X * num2;
+		const auto num7 = rotation.Y * num2;
+		const auto num8 = rotation.Z * num3;
+		const auto num9 = 1.0f - num7 - num8;
+		const auto num10 = num6 - num4;
+		const auto num11 = num6 + num4;
+		const auto num12 = 1.0f - num5 - num8;
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			destinationArray[destinationIndex].X = (x * num9 + y * num10);
+			destinationArray[destinationIndex].Y = (x * num11 + y * num12);
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
+	constexpr void Vector2::TransformNormal(Vector2* sourceArray, Matrix const& matrix,
+		Vector2* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+		
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21);
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22);
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
 	constexpr Vector3 dxna::Vector3::Transform(Vector3 const& position, Matrix const& matrix) {
 		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
 		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
@@ -2225,10 +2337,594 @@ namespace dxna {
 		return vector3;
 	}
 
+	constexpr Vector3 Vector3::TransformNormal(Vector3 const& normal, Matrix const& matrix)
+	{
+		const auto num1 = (normal.X * matrix.M11 + normal.Y * matrix.M21 + normal.Z * matrix.M31);
+		const auto num2 = (normal.X * matrix.M12 + normal.Y * matrix.M22 + normal.Z * matrix.M32);
+		const auto num3 = (normal.X * matrix.M13 + normal.Y * matrix.M23 + normal.Z * matrix.M33);
+		Vector3 vector3;
+		vector3.X = num1;
+		vector3.Y = num2;
+		vector3.Z = num3;
+		return vector3;
+	}
+
+	constexpr Vector3 Vector3::Transform(Vector3 const& value, Quaternion const& rotation)
+	{
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num1;
+		const auto num5 = rotation.W * num2;
+		const auto num6 = rotation.W * num3;
+		const auto num7 = rotation.X * num1;
+		const auto num8 = rotation.X * num2;
+		const auto num9 = rotation.X * num3;
+		const auto num10 = rotation.Y * num2;
+		const auto num11 = rotation.Y * num3;
+		const auto num12 = rotation.Z * num3;
+		const auto num13 = (value.X * (1.0F - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
+		const auto num14 = (value.X * (num8 + num6) + value.Y * (1.0F - num7 - num12) + value.Z * (num11 - num4));
+		const auto num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0F - num7 - num10));
+		Vector3 vector3;
+		vector3.X = num13;
+		vector3.Y = num14;
+		vector3.Z = num15;
+		return vector3;
+	}
+
+	constexpr void Vector3::Transform(Vector3* sourceArray, Matrix const& matrix, Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+		
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31) + matrix.M41;
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32) + matrix.M42;
+			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33) + matrix.M43;
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
+	constexpr void Vector3::TransformNormal(Vector3* sourceArray, Matrix const& matrix, Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31);
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32);
+			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33);
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
+	constexpr void Vector3::Transform(Vector3* sourceArray, Quaternion const& rotation, Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+		
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num1;
+		const auto num5 = rotation.W * num2;
+		const auto num6 = rotation.W * num3;
+		const auto num7 = rotation.X * num1;
+		const auto num8 = rotation.X * num2;
+		const auto num9 = rotation.X * num3;
+		const auto num10 = rotation.Y * num2;
+		const auto num11 = rotation.Y * num3;
+		const auto num12 = rotation.Z * num3;
+		const auto num13 = 1.0f - num10 - num12;
+		const auto num14 = num8 - num6;
+		const auto num15 = num9 + num5;
+		const auto num16 = num8 + num6;
+		const auto num17 = 1.0f - num7 - num12;
+		const auto num18 = num11 - num4;
+		const auto num19 = num9 - num5;
+		const auto num20 = num11 + num4;
+		const auto num21 = 1.0f - num7 - num10;
+
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			destinationArray[destinationIndex].X = (x * num13 + y * num14 + z * num15);
+			destinationArray[destinationIndex].Y = (x * num16 + y * num17 + z * num18);
+			destinationArray[destinationIndex].Z = (x * num19 + y * num20 + z * num21);
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
 	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const {
 		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
 		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
 		return result2 <= sphere.Radius * sphere.Radius;
+	}
+
+	constexpr PlaneIntersectionType BoundingBox::Intersects(Plane const& plane) const
+	{
+		Vector3 vector3_1;
+		vector3_1.X = plane.Normal.X >= 0.0 ? Min.X : Max.X;
+		vector3_1.Y = plane.Normal.Y >= 0.0 ? Min.Y : Max.Y;
+		vector3_1.Z = plane.Normal.Z >= 0.0 ? Min.Z : Max.Z;
+		Vector3 vector3_2;
+		vector3_2.X = plane.Normal.X >= 0.0 ? Max.X : Min.X;
+		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
+		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
+		
+		if (plane.Normal.X * vector3_1.X + plane.Normal.Y * vector3_1.Y + plane.Normal.Z * vector3_1.Z + plane.D > 0.0)
+			return PlaneIntersectionType::Front;
+		
+		return plane.Normal.X * vector3_2.X + plane.Normal.Y * vector3_2.Y + plane.Normal.Z * vector3_2.Z + plane.D < 0.0 ? PlaneIntersectionType::Back: PlaneIntersectionType::Intersecting;
+	}
+
+	constexpr ContainmentType BoundingBox::Contains(BoundingFrustum const& frustum) const
+	{
+		if (!frustum.Intersects(*this))
+			return ContainmentType::Disjoint;
+
+		for (size_t i = 0; i < frustum.CornerCount; ++i) {
+			const auto corner = frustum.getCorner(i);
+
+			if(Contains(corner) == ContainmentType::Disjoint)
+				return ContainmentType::Intersects;
+		}
+		
+		return ContainmentType::Contains;
+	}
+
+	constexpr ContainmentType BoundingBox::Contains(BoundingSphere const& sphere) const
+	{
+		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
+		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
+		float radius = sphere.Radius;
+
+		if (result2 > radius * radius)
+			return ContainmentType::Disjoint;
+
+		return Min.X + radius > sphere.Center.X
+			|| sphere.Center.X > Max.X - radius
+			|| Max.X - Min.X <= radius
+			|| Min.Y + radius > sphere.Center.Y
+			|| sphere.Center.Y > Max.Y - radius
+			|| Max.Y - Min.Y <= radius 
+			|| Min.Z + radius > sphere.Center.Z
+			|| sphere.Center.Z > Max.Z - radius
+			|| Max.X - Min.X <= radius ? ContainmentType::Intersects : ContainmentType::Contains;
+	}
+
+	constexpr BoundingBox BoundingBox::CreateFromSphere(BoundingSphere const& sphere)
+	{
+		BoundingBox fromSphere;
+		fromSphere.Min.X = sphere.Center.X - sphere.Radius;
+		fromSphere.Min.Y = sphere.Center.Y - sphere.Radius;
+		fromSphere.Min.Z = sphere.Center.Z - sphere.Radius;
+		fromSphere.Max.X = sphere.Center.X + sphere.Radius;
+		fromSphere.Max.Y = sphere.Center.Y + sphere.Radius;
+		fromSphere.Max.Z = sphere.Center.Z + sphere.Radius;
+		return fromSphere;
+	}
+
+	constexpr bool BoundingBox::Intersects(BoundingFrustum const& frustum)
+	{
+		return frustum.Intersects(*this);
+	}
+
+	constexpr PlaneIntersectionType BoundingBox::Intersects(Plane const& plane)
+	{
+		Vector3 vector3_1;
+		vector3_1.X = plane.Normal.X >= 0.0 ? Min.X : Max.X;
+		vector3_1.Y = plane.Normal.Y >= 0.0 ? Min.Y : Max.Y;
+		vector3_1.Z = plane.Normal.Z >= 0.0 ? Min.Z : Max.Z;
+		
+		Vector3 vector3_2;
+		vector3_2.X = plane.Normal.X >= 0.0 ? Max.X : Min.X;
+		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
+		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
+		
+		if (plane.Normal.X * vector3_1.X + plane.Normal.Y * vector3_1.Y + plane.Normal.Z * vector3_1.Z + plane.D > 0.0)
+			return PlaneIntersectionType::Front;
+
+		return plane.Normal.X * vector3_2.X 
+			+ plane.Normal.Y * vector3_2.Y
+			+ plane.Normal.Z * vector3_2.Z
+			+ plane.D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
+	}	
+
+	constexpr Vector4 dxna::Vector4::Transform(Vector2 const& position, Matrix const& matrix)
+	{
+		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
+		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;
+		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23) + matrix.M43;
+		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24) + matrix.M44;
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+	
+	constexpr Vector4 Vector4::Transform(Vector3 const& position, Matrix const& matrix) {
+		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
+		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
+		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
+		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24 + position.Z * matrix.M34) + matrix.M44;
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+	
+	constexpr Vector4 Vector4::Transform(Vector4 const& vector, Matrix const& matrix)
+	{
+		float num1 = (vector.X * matrix.M11 + vector.Y * matrix.M21 + vector.Z * matrix.M31 + vector.W * matrix.M41);
+		float num2 = (vector.X * matrix.M12 + vector.Y * matrix.M22 + vector.Z * matrix.M32 + vector.W * matrix.M42);
+		float num3 = (vector.X * matrix.M13 + vector.Y * matrix.M23 + vector.Z * matrix.M33 + vector.W * matrix.M43);
+		float num4 = (vector.X * matrix.M14 + vector.Y * matrix.M24 + vector.Z * matrix.M34 + vector.W * matrix.M44);
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+	
+	constexpr Vector4 Vector4::Transform(Vector2 const& value, Quaternion const& rotation)
+	{
+		float num1 = rotation.X + rotation.X;
+		float num2 = rotation.Y + rotation.Y;
+		float num3 = rotation.Z + rotation.Z;
+		float num4 = rotation.W * num1;
+		float num5 = rotation.W * num2;
+		float num6 = rotation.W * num3;
+		float num7 = rotation.X * num1;
+		float num8 = rotation.X * num2;
+		float num9 = rotation.X * num3;
+		float num10 = rotation.Y * num2;
+		float num11 = rotation.Y * num3;
+		float num12 = rotation.Z * num3;
+		float num13 = (value.X * (1.0 - num10 - num12) + value.Y * (num8 - num6));
+		float num14 = (value.X * (num8 + num6) + value.Y * (1.0 - num7 - num12));
+		float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4));
+		Vector4 vector4;
+		vector4.X = num13;
+		vector4.Y = num14;
+		vector4.Z = num15;
+		vector4.W = 1.0f;
+		return vector4;
+	}
+	
+	constexpr Vector4 Vector4::Transform(Vector3 const& value, Quaternion const& rotation) {
+		float num1 = rotation.X + rotation.X;
+		float num2 = rotation.Y + rotation.Y;
+		float num3 = rotation.Z + rotation.Z;
+		float num4 = rotation.W * num1;
+		float num5 = rotation.W * num2;
+		float num6 = rotation.W * num3;
+		float num7 = rotation.X * num1;
+		float num8 = rotation.X * num2;
+		float num9 = rotation.X * num3;
+		float num10 = rotation.Y * num2;
+		float num11 = rotation.Y * num3;
+		float num12 = rotation.Z * num3;
+		float num13 = (value.X * (1.0 - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
+		float num14 = (value.X * (num8 + num6) + value.Y * (1.0 - num7 - num12) + value.Z * (num11 - num4));
+		float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0 - num7 - num10));
+		Vector4 vector4;
+		vector4.X = num13;
+		vector4.Y = num14;
+		vector4.Z = num15;
+		vector4.W = 1.0f;
+		return vector4;
+	}
+	
+	constexpr Vector4 Vector4::Transform(Vector4 const& value, Quaternion const& rotation)
+	{
+		float num1 = rotation.X + rotation.X;
+		float num2 = rotation.Y + rotation.Y;
+		float num3 = rotation.Z + rotation.Z;
+		float num4 = rotation.W * num1;
+		float num5 = rotation.W * num2;
+		float num6 = rotation.W * num3;
+		float num7 = rotation.X * num1;
+		float num8 = rotation.X * num2;
+		float num9 = rotation.X * num3;
+		float num10 = rotation.Y * num2;
+		float num11 = rotation.Y * num3;
+		float num12 = rotation.Z * num3;
+		float num13 = (value.X * (1.0 - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
+		float num14 = (value.X * (num8 + num6) + value.Y * (1.0 - num7 - num12) + value.Z * (num11 - num4));
+		float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0 - num7 - num10));
+		Vector4 vector4;
+		vector4.X = num13;
+		vector4.Y = num14;
+		vector4.Z = num15;
+		vector4.W = value.W;
+		return vector4;
+	}
+	
+	constexpr void Vector4::Transform(Vector4* sourceArray, Matrix const& matrix, Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+		
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			float w = sourceArray[sourceIndex].W;
+			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31 + w * matrix.M41);
+			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32 + w * matrix.M42);
+			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33 + w * matrix.M43);
+			destinationArray[destinationIndex].W = (x * matrix.M14 + y * matrix.M24 + z * matrix.M34 + w * matrix.M44);
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+	
+	constexpr void Vector4::Transform(Vector4* sourceArray, Quaternion const& rotation, Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex){
+		if (sourceArray == nullptr)
+			return;
+
+		if (destinationArray == nullptr)
+			return;
+
+		if (length < sourceIndex + length)
+			return;
+
+		if (length < destinationIndex + length)
+			return;
+
+		float num1 = rotation.X + rotation.X;
+		float num2 = rotation.Y + rotation.Y;
+		float num3 = rotation.Z + rotation.Z;
+		float num4 = rotation.W * num1;
+		float num5 = rotation.W * num2;
+		float num6 = rotation.W * num3;
+		float num7 = rotation.X * num1;
+		float num8 = rotation.X * num2;
+		float num9 = rotation.X * num3;
+		float num10 = rotation.Y * num2;
+		float num11 = rotation.Y * num3;
+		float num12 = rotation.Z * num3;
+		float num13 = 1.0f - num10 - num12;
+		float num14 = num8 - num6;
+		float num15 = num9 + num5;
+		float num16 = num8 + num6;
+		float num17 = 1.0f - num7 - num12;
+		float num18 = num11 - num4;
+		float num19 = num9 - num5;
+		float num20 = num11 + num4;
+		float num21 = 1.0f - num7 - num10;
+		for (; length > 0; --length)
+		{
+			float x = sourceArray[sourceIndex].X;
+			float y = sourceArray[sourceIndex].Y;
+			float z = sourceArray[sourceIndex].Z;
+			float w = sourceArray[sourceIndex].W;
+			destinationArray[destinationIndex].X = (x * num13 + y * num14 + z * num15);
+			destinationArray[destinationIndex].Y = (x * num16 + y * num17 + z * num18);
+			destinationArray[destinationIndex].Z = (x * num19 + y * num20 + z * num21);
+			destinationArray[destinationIndex].W = w;
+			++sourceIndex;
+			++destinationIndex;
+		}
+	}
+
+	constexpr Matrix dxna::Matrix::CreateFromQuaternion(Quaternion const& quaternion)
+	{
+		float num1 = quaternion.X * quaternion.X;
+		float num2 = quaternion.Y * quaternion.Y;
+		float num3 = quaternion.Z * quaternion.Z;
+		float num4 = quaternion.X * quaternion.Y;
+		float num5 = quaternion.Z * quaternion.W;
+		float num6 = quaternion.Z * quaternion.X;
+		float num7 = quaternion.Y * quaternion.W;
+		float num8 = quaternion.Y * quaternion.Z;
+		float num9 = quaternion.X * quaternion.W;
+
+		Matrix result;
+		result.M11 = (1.0 - 2.0 * (num2 + num3));
+		result.M12 = (2.0 * (num4 + num5));
+		result.M13 = (2.0 * (num6 - num7));
+		result.M14 = 0.0f;
+		result.M21 = (2.0 * (num4 - num5));
+		result.M22 = (1.0 - 2.0 * (num3 + num1));
+		result.M23 = (2.0 * (num8 + num9));
+		result.M24 = 0.0f;
+		result.M31 = (2.0 * (num6 + num7));
+		result.M32 = (2.0 * (num8 - num9));
+		result.M33 = (1.0 - 2.0 * (num2 + num1));
+		result.M34 = 0.0f;
+		result.M41 = 0.0f;
+		result.M42 = 0.0f;
+		result.M43 = 0.0f;
+		result.M44 = 1.0f;
+
+		return result;
+	}
+
+	constexpr Matrix dxna::Matrix::Transform(Matrix const& value, Quaternion const& rotation)
+	{
+		float num1 = rotation.X + rotation.X;
+		float num2 = rotation.Y + rotation.Y;
+		float num3 = rotation.Z + rotation.Z;
+		float num4 = rotation.W * num1;
+		float num5 = rotation.W * num2;
+		float num6 = rotation.W * num3;
+		float num7 = rotation.X * num1;
+		float num8 = rotation.X * num2;
+		float num9 = rotation.X * num3;
+		float num10 = rotation.Y * num2;
+		float num11 = rotation.Y * num3;
+		float num12 = rotation.Z * num3;
+		float num13 = 1.0f - num10 - num12;
+		float num14 = num8 - num6;
+		float num15 = num9 + num5;
+		float num16 = num8 + num6;
+		float num17 = 1.0f - num7 - num12;
+		float num18 = num11 - num4;
+		float num19 = num9 - num5;
+		float num20 = num11 + num4;
+		float num21 = 1.0f - num7 - num10;
+		Matrix matrix;
+		matrix.M11 = (value.M11 * num13 + value.M12 * num14 + value.M13 * num15);
+		matrix.M12 = (value.M11 * num16 + value.M12 * num17 + value.M13 * num18);
+		matrix.M13 = (value.M11 * num19 + value.M12 * num20 + value.M13 * num21);
+		matrix.M14 = value.M14;
+		matrix.M21 = (value.M21 * num13 + value.M22 * num14 + value.M23 * num15);
+		matrix.M22 = (value.M21 * num16 + value.M22 * num17 + value.M23 * num18);
+		matrix.M23 = (value.M21 * num19 + value.M22 * num20 + value.M23 * num21);
+		matrix.M24 = value.M24;
+		matrix.M31 = (value.M31 * num13 + value.M32 * num14 + value.M33 * num15);
+		matrix.M32 = (value.M31 * num16 + value.M32 * num17 + value.M33 * num18);
+		matrix.M33 = (value.M31 * num19 + value.M32 * num20 + value.M33 * num21);
+		matrix.M34 = value.M34;
+		matrix.M41 = (value.M41 * num13 + value.M42 * num14 + value.M43 * num15);
+		matrix.M42 = (value.M41 * num16 + value.M42 * num17 + value.M43 * num18);
+		matrix.M43 = (value.M41 * num19 + value.M42 * num20 + value.M43 * num21);
+		matrix.M44 = value.M44;
+		return matrix;
+	}
+
+	constexpr nfloat BoundingFrustum::Intersects(Ray const& ray) const
+	{
+		ContainmentType result1 = Contains(ray.Position);
+		auto result = nfloat();
+
+		if (result1 == ContainmentType::Contains) {
+			return nfloat(0.0f);
+		}
+		else {
+			float num1 = MinFloat;
+			float num2 = MaxFloat;
+
+			for (size_t i = 0; i < PlaneCount; ++i) {
+				const auto plane = getPlane(i);
+
+				Vector3 normal = plane.Normal;
+				float result2 = Vector3::Dot(ray.Direction, normal);
+				float result3 = Vector3::Dot(ray.Position, normal);
+				result3 += plane.D;
+
+				if (std::abs(result2) < 9.9999997473787516E-06)
+				{
+					if (result3 > 0.0)
+						return result;
+				}
+				else
+				{
+					float num3 = -result3 / result2;
+					if (result2 < 0.0)
+					{
+						if (num3 > num2)
+							return result;
+						if (num3 > num1)
+							num1 = num3;
+					}
+					else
+					{
+						if (num3 < num1)
+							return result;
+						if (num3 < num2)
+							num2 = num3;
+					}
+				}
+			}
+
+			float num4 = num1 >= 0.0 ? num1 : num2;
+
+			if (num4 < 0.0)
+				return result;
+
+			result = nfloat(num4);
+		}
+
+		return result;
+	}
+
+	constexpr ContainmentType dxna::BoundingSphere::Contains(BoundingFrustum const& frustum) const
+	{
+		if (!frustum.Intersects(*this))
+			return ContainmentType::Disjoint;
+
+		float num = Radius * Radius;
+		
+		for (size_t i = 0; i < frustum.CornerCount; ++i) {
+			const auto corner = frustum.getCorner(i);
+			
+			Vector3 vector3;
+			vector3.X = corner.X - Center.X;
+			vector3.Y = corner.Y - Center.Y;
+			vector3.Z = corner.Z - Center.Z;
+			
+			if (vector3.LengthSquared() > num)
+				return ContainmentType::Intersects;
+		}
+
+		return ContainmentType::Contains;
+	}
+	
+	constexpr bool BoundingSphere::Intersects(BoundingFrustum const& frustum) const {
+		return frustum.Intersects(*this);
+	}
+	
+	constexpr PlaneIntersectionType BoundingSphere::Intersects(Plane const& plane) const {
+		return plane.Intersects(*this);
+	}	
+
+	constexpr PlaneIntersectionType Plane::Intersects(BoundingFrustum const& frustum) const {
+		return frustum.Intersects(*this);
 	}
 }
 
