@@ -3,7 +3,7 @@
 
 #include "enumerations.hpp"
 #include <string>
-#include "../color.hpp"
+#include "../structs.hpp"
 
 namespace dxna::graphics {
 	class GraphicsDevice;

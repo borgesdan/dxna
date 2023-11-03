@@ -4,7 +4,6 @@
 #pragma once
 
 #include <iostream>
-#include "color.hpp"
 #include "graphics/viewport.hpp"
 #include "graphics/blendstate.hpp"
 #include "cs/nullable.hpp"
