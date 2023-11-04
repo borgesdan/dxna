@@ -2548,11 +2548,13 @@ namespace dxna {
 	};
 
 	struct Curve {
+		constexpr Curve() = default;
+
 		constexpr bool IsConstant() const {
 			return Keys.Count() <= 1;
 		}
 
-		float Evaluate(float position) {
+		constexpr float Evaluate(float position) {
 			if (Keys.Count() == 0)
 				return 0.0F;
 
@@ -2631,13 +2633,13 @@ namespace dxna {
 			}
 		}
 		
-		void ComputeTangents(CurveTangent const& tangentInType, CurveTangent const& tangentOutType) {
+		constexpr void ComputeTangents(CurveTangent const& tangentInType, CurveTangent const& tangentOutType) {
 			for (size_t i = 0; i < Keys.Count(); ++i) {
 				ComputeTangent(i, tangentInType, tangentOutType);
 			}
 		}
 
-		void ComputeTangent(size_t keyIndex, CurveTangent tangentInType, CurveTangent tangentOutType) {
+		constexpr void ComputeTangent(size_t keyIndex, CurveTangent tangentInType, CurveTangent tangentOutType) {
 			auto key = Keys[keyIndex];
 
 			float p0, p, p1;
