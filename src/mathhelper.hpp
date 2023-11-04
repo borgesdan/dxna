@@ -2,6 +2,7 @@
 #define DXNA_MATHHELPER_HPP
 
 #include <cmath>
+#include <limits>
 
 namespace dxna {
 	struct MathHelper {

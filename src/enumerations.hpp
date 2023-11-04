@@ -20,6 +20,25 @@ namespace dxna {
         Contains,
         Intersects,
     };
+
+    enum class CurveContinuity {
+        Smooth,
+        Step,
+    };
+
+    enum class CurveTangent {
+        Flat,
+        Linear,
+        Smooth,
+    };
+
+    enum class CurveLoopType {
+        Constant,
+        Cycle,
+        CycleOffset,
+        Oscillate,
+        Linear,
+    };
 }
 
 #endif
