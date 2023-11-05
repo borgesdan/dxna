@@ -34,6 +34,40 @@ namespace dxna::graphics {
         Min,
         Max,
     };
+
+    enum class TextureFilter {
+        Linear,
+        Point,
+        Anisotropic,
+        LinearMipPoint,
+        PointMipLinear,
+        MinLinearMagPointMipLinear,
+        MinLinearMagPointMipPoint,
+        MinPointMagLinearMipLinear,
+        MinPointMagLinearMipPoint,
+    };
+
+    enum class TextureAddressMode {
+        Wrap,
+        Clamp,
+        Mirror,
+    };
+
+    enum class TextureFilterMode {
+        Default,
+        Comparison
+    };
+
+    enum class CompareFunction {
+        Always,
+        Never,
+        Less,
+        LessEqual,
+        Equal,
+        GreaterEqual,
+        Greater,
+        NotEqual
+    };
 }
 
 #endif

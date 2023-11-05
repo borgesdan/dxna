@@ -1,4 +1,4 @@
-#include "blendstate.hpp"
+#include "states.hpp"
 #include "enumerations.hpp"
 #include "viewport.hpp"
 #include "graphicsdevice.hpp"

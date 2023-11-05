@@ -1,6 +1,8 @@
 #ifndef CS_NULLABLE_HPP
 #define CS_NULLABLE_HPP
 
+#include "cstypes.hpp"
+
 namespace cs {
 	template <typename T>
 	struct Nullable {

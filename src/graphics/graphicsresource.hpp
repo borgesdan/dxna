@@ -7,22 +7,34 @@
 namespace dxna::graphics {
 	class GraphicsDevice;
 
-	class GraphicsResource {
+	class GraphicsResource {	
 	public:
-		GraphicsResource() = default;		
-		virtual ~GraphicsResource() = default;
+		using GraphicsDevice_ = dxna::graphics::GraphicsDevice;
 
-		std::string Name() const;
-		void Name(std::string const& name);
+		constexpr GraphicsResource() = default;
 
-		GraphicsDevice* Device() { return _parent; }
+		virtual ~GraphicsResource(){}		
+
+		constexpr GraphicsDevice_* GraphicsDevice() { 
+			return graphicsDevice; 
+		}
+		
+		void GraphicsDevice(GraphicsDevice_* value) {
+			if (!value || graphicsDevice == value)
+				return;			
+
+			//TODO
+			graphicsDevice = value;
+		}
 
 	protected:
-		GraphicsDevice* _parent;
+		virtual void GraphicsDeviceResetting() {}
+	
+	public:
+		std::string Name;
 
 	private:
-		std::string _localName;
-		ulongcs _internalHandle{ 0 };
+		GraphicsDevice_ * graphicsDevice;
 	};
 }
 
