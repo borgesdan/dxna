@@ -12,6 +12,7 @@ using intcs		= int32_t;
 using uintcs	= uint32_t;
 using longcs	= int64_t;
 using ulongcs	= uint64_t;
+using charcs	= char16_t;
 
 static constexpr sbytecs    MaxSbyte	= std::numeric_limits<sbytecs>::max();
 static constexpr sbytecs    MinSbyte	= std::numeric_limits<sbytecs>::min();
@@ -29,6 +30,8 @@ static constexpr longcs     MaxLong		= std::numeric_limits<longcs>::max();
 static constexpr longcs     MinLong		= std::numeric_limits<longcs>::min();
 static constexpr ulongcs    MaxUlong	= std::numeric_limits<ulongcs>::max();
 static constexpr ulongcs    MinUlong	= std::numeric_limits<ulongcs>::min();
+static constexpr ulongcs    MaxChar		= std::numeric_limits<charcs>::max();
+static constexpr ulongcs    MinChar		= std::numeric_limits<charcs>::min();
 static constexpr float      MaxFloat	= std::numeric_limits<float>::max();
 static constexpr float      MinFloat	= std::numeric_limits<float>::min();
 static constexpr double     MaxDouble	= std::numeric_limits<double>::max();

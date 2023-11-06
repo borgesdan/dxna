@@ -7,15 +7,19 @@ namespace cs {
 	template <typename T>
 	struct Nullable {
 		constexpr Nullable() = default;
-		constexpr Nullable(T value) : value(value), hasValue(true) {}
+		constexpr Nullable(T const& value) : value(value), hasValue(true) {}
 
 		constexpr bool HasValue() const {
 			return hasValue;
 		}
 
-		constexpr T Value() {
+		constexpr T Value() const {
 			return value;
 		}		
+
+		constexpr operator T() const {
+			return value;
+		}
 
 	private:
 		bool hasValue{ false };
@@ -33,5 +37,7 @@ using nintcs	= cs::Nullable<intcs>;
 using nuintcs	= cs::Nullable<uintcs>;
 using nlongcs	= cs::Nullable<longcs>;
 using nulongcs	= cs::Nullable<ulongcs>;
+using nbool		= cs::Nullable<bool>;
+using ncharcs	= cs::Nullable<charcs>;
 
 #endif

@@ -3,3 +3,4 @@
 #include "nullable.hpp"
 #include "timespan.hpp"
 #include "stream.hpp"
+#include "reader.hpp"
