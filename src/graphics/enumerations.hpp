@@ -68,6 +68,30 @@ namespace dxna::graphics {
         Greater,
         NotEqual
     };
+
+    enum class DepthFormat {
+        None,
+        Depth16,
+        Depth24,
+        Depth24Stencil8
+    };
+
+    enum class CullMode {
+        None,
+        CullClockwiseFace,
+        CullCounterClockwiseFace
+    };
+
+    enum class StencilOperation {
+        Keep,
+        Zero,
+        Replace,
+        Increment,
+        Decrement,
+        IncrementSaturation,
+        DecrementSaturation,
+        Invert
+    };
 }
 
 #endif

@@ -155,13 +155,56 @@ namespace dxna::graphics {
 		Color BlendFactor{ Colors::White };
 		intcs MultiSampleMask{ MaxInt };
 		bool IndependentBlendEnable{ false };
-		
+
 		std::vector<TargetBlendState_> TargetBlendState{
 			TargetBlendState_(this),
 			TargetBlendState_(this),
 			TargetBlendState_(this),
 			TargetBlendState_(this),
 		};
+	};
+
+	struct DepthStencilState : public GraphicsResource {
+
+		constexpr DepthStencilState() = default;
+
+		constexpr DepthStencilState(std::string const& name, bool depthBufferEnable, bool depthBufferWriteEnable) {
+			Name = name;
+			DepthBufferEnable = depthBufferEnable;
+			DepthBufferWriteEnable = depthBufferWriteEnable;			
+		}
+
+		bool BindToGraphicsDevice(GraphicsDevice_* device) {
+			const auto currentDevice = GraphicsDevice();
+
+			if (currentDevice != nullptr && currentDevice != device)
+				return false;
+
+			GraphicsDevice(device);
+
+			return true;
+		}
+
+		static DepthStencilState Default() { return DepthStencilState("DepthStencilState.Default", true, true); }
+		static DepthStencilState DepthRead() { return DepthStencilState("DepthStencilState.DepthRead", true, false); }
+		static DepthStencilState None() { return DepthStencilState("DepthStencilState.None", false, false); }
+
+		bool DepthBufferEnable{ true };
+		bool DepthBufferWriteEnable{ true };
+		CompareFunction DepthBufferFunction{ CompareFunction::LessEqual };
+		bool StencilEnable{ true };
+		CompareFunction StencilFunction{ CompareFunction::Always };
+		StencilOperation StencilPass{ StencilOperation::Keep };
+		StencilOperation StencilFail{ StencilOperation::Keep };
+		StencilOperation StencilDepthBufferFail{ StencilOperation::Keep };
+		bool TwoSidedStencilMode{ false };
+		CompareFunction CounterClockwiseStencilFunction{ CompareFunction::Always };
+		StencilOperation CounterClockwiseStencilFail{ StencilOperation::Keep };
+		StencilOperation CounterClockwiseStencilPass{ StencilOperation::Keep };
+		StencilOperation CounterClockwiseStencilDepthBufferFail{ StencilOperation::Keep };
+		intcs StencilMask{ MaxInt };
+		intcs StencilWriteMask{ MaxInt };
+		intcs ReferenceStencil{ 0 };
 	};
 }
 
