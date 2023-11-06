@@ -171,7 +171,7 @@ namespace dxna::graphics {
 		constexpr DepthStencilState(std::string const& name, bool depthBufferEnable, bool depthBufferWriteEnable) {
 			Name = name;
 			DepthBufferEnable = depthBufferEnable;
-			DepthBufferWriteEnable = depthBufferWriteEnable;			
+			DepthBufferWriteEnable = depthBufferWriteEnable;
 		}
 
 		bool BindToGraphicsDevice(GraphicsDevice_* device) {
@@ -205,6 +205,41 @@ namespace dxna::graphics {
 		intcs StencilMask{ MaxInt };
 		intcs StencilWriteMask{ MaxInt };
 		intcs ReferenceStencil{ 0 };
+	};
+
+	using CullMode_ = dxna::graphics::CullMode;
+	using FillMode_ = dxna::graphics::FillMode;
+
+	struct RasterizerState : public GraphicsResource {
+		constexpr RasterizerState() = default;
+
+		constexpr RasterizerState(std::string const& name, CullMode const& cullMode) {
+			Name = name;
+			CullMode = cullMode;
+		}
+
+		bool BindToGraphicsDevice(GraphicsDevice_* device) {
+			const auto currentDevice = GraphicsDevice();
+
+			if (currentDevice != nullptr && currentDevice != device)
+				return false;
+
+			GraphicsDevice(device);
+
+			return true;
+		}
+
+		static RasterizerState CullClockwise() { return RasterizerState("RasterizerState.CullClockwise", CullMode::CullClockwiseFace); }
+		static RasterizerState CullCounterClockwise() { return RasterizerState("RasterizerState.CullCounterClockwise", CullMode::CullCounterClockwiseFace); }
+		static RasterizerState CullNone() { return RasterizerState("RasterizerState.CullNone", CullMode::None); }
+
+		CullMode_ CullMode{ CullMode::CullCounterClockwiseFace };
+		float DepthBias{ 0.0F };
+		FillMode_ FillMode{ FillMode::Solid };
+		bool MultiSampleAntiAlias{ true };
+		bool ScissorTestEnable{ false };
+		float SlopeScaleDepthBias{ 0.0F };
+		bool DepthClipEnable{ true };
 	};
 }
 

@@ -82,6 +82,11 @@ namespace dxna::graphics {
         CullCounterClockwiseFace
     };
 
+    enum class FillMode {
+        Solid,
+        WireFrame
+    };
+
     enum class StencilOperation {
         Keep,
         Zero,
