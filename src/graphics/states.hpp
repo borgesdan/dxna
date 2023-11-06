@@ -2,10 +2,8 @@
 #define DXNA_GRAPHICS_BLENDSTATE_HPP
 
 #include "graphicsresource.hpp"
-#include "enumerations.hpp"
 #include <string>
-#include "../structs.hpp"
-
+#include <vector>
 
 namespace dxna::graphics {
 	struct SamplerState : public GraphicsResource {
@@ -23,9 +21,11 @@ namespace dxna::graphics {
 			const auto currentDevice = GraphicsDevice();
 
 			if (currentDevice != nullptr && currentDevice != device)
-				return;
+				return false;
 
 			GraphicsDevice(device);
+
+			return true;
 		}
 
 		static SamplerState AnisotropicClamp() {
@@ -64,47 +64,104 @@ namespace dxna::graphics {
 		CompareFunction ComparisonFunction{ CompareFunction::Never };
 	};
 
-	class BlendState {
-		using WriteChannel = dxna::graphics::ColorWriteChannels;
-	public:
-		BlendState();
+	struct BlendState;
+	using ColorWriteChannels_ = dxna::graphics::ColorWriteChannels;
+
+	struct TargetBlendState {
+		constexpr TargetBlendState(BlendState const* parent) {
+			Parent = parent;
+		}
+
+		const BlendState* Parent;
+		BlendFunction AlphaBlendFunction{ BlendFunction::Add };
+		Blend AlphaDestinationBlend{ Blend::Zero };
+		Blend AlphaSourceBlend{ Blend::One };
+		BlendFunction ColorBlendFunction{ BlendFunction::Add };
+		Blend ColorDestinationBlend{ Blend::Zero };
+		Blend ColorSourceBlend{ Blend::One };
+		ColorWriteChannels_ ColorWriteChannels{ ColorWriteChannels_::All };
+	};
+
+	using TargetBlendState_ = dxna::graphics::TargetBlendState;
+
+	struct BlendState : public GraphicsResource {
+		constexpr BlendState() = default;
+
+		BlendState(std::string const& name, Blend const& source, Blend const& destination) {
+			Name = name;
+			ColorSourceBlend(source);
+			AlphaSourceBlend(source);
+			ColorDestinationBlend(destination);
+			AlphaDestinationBlend(destination);
+		}
+
+		bool BindToGraphicsDevice(GraphicsDevice_* device) {
+			const auto currentDevice = GraphicsDevice();
+
+			if (currentDevice != nullptr && currentDevice != device)
+				return false;
+
+			GraphicsDevice(device);
+
+			return true;
+		}
+
+		BlendFunction AlphaBlendFunction() const { return TargetBlendState[0].AlphaBlendFunction; }
+
+		void AlphaBlendFunction(BlendFunction const& value) { TargetBlendState[0].AlphaBlendFunction = value; }
+
+		Blend AlphaDestinationBlend() const { return TargetBlendState[0].AlphaDestinationBlend; }
+
+		void AlphaDestinationBlend(Blend const& value) { TargetBlendState[0].AlphaDestinationBlend = value; }
+
+		Blend AlphaSourceBlend() const { return TargetBlendState[0].AlphaSourceBlend; }
+
+		void AlphaSourceBlend(Blend const& value) { TargetBlendState[0].AlphaSourceBlend = value; }
+
+		BlendFunction ColorBlendFunction() const { return TargetBlendState[0].ColorBlendFunction; }
+
+		void ColorBlendFunction(BlendFunction const& value) { TargetBlendState[0].ColorBlendFunction = value; }
+
+		Blend ColorDestinationBlend() const { return TargetBlendState[0].ColorDestinationBlend; }
+
+		void ColorDestinationBlend(Blend const& value) { TargetBlendState[0].ColorDestinationBlend = value; }
+
+		Blend ColorSourceBlend() const { return TargetBlendState[0].ColorSourceBlend; }
+
+		void ColorSourceBlend(Blend const& value) { TargetBlendState[0].ColorSourceBlend = value; }
+
+		ColorWriteChannels_ ColorWriteChannels() const { return TargetBlendState[0].ColorWriteChannels; }
+
+		void ColorWriteChannels(ColorWriteChannels_ const& value) { TargetBlendState[0].ColorWriteChannels = value; }
+
+		ColorWriteChannels_ ColorWriteChannels1() const { return TargetBlendState[1].ColorWriteChannels; }
+
+		void ColorWriteChannels1(ColorWriteChannels_ const& value) { TargetBlendState[1].ColorWriteChannels = value; }
+
+		ColorWriteChannels_ ColorWriteChannels2() const { return TargetBlendState[2].ColorWriteChannels; }
+
+		void ColorWriteChannels2(ColorWriteChannels_ const& value) { TargetBlendState[2].ColorWriteChannels = value; }
+
+		ColorWriteChannels_ ColorWriteChannels3() const { return TargetBlendState[3].ColorWriteChannels; }
+
+		void ColorWriteChannels3(ColorWriteChannels_ const& value) { TargetBlendState[3].ColorWriteChannels = value; }
+
+		static BlendState Additive() { return BlendState("BlendState.Additive", Blend::SourceAlpha, Blend::One); }
+		static BlendState AlphaBlend() { return BlendState("BlendState.AlphaBlend", Blend::One, Blend::InverseSourceAlpha); }
+		static BlendState NonPremultiplied() { return BlendState("BlendState.NonPremultiplied", Blend::SourceAlpha, Blend::InverseSourceAlpha); }
+		static BlendState Opaque() { return BlendState("BlendState.Opaque", Blend::One, Blend::Zero); }
 
 	public:
-		Blend ColorSourceBlend() const;
-		Blend ColorDestinationBlend() const;
-		BlendFunction ColorBlendFunction() const;
-		Blend AlphaSourceBlend() const;
-		Blend AlphaDestinationBlend() const;
-		BlendFunction AlphaBlendFunction() const;
-		WriteChannel ColorWriteChannels() const;
-		WriteChannel ColorWriteChannels1() const;
-		WriteChannel ColorWriteChannels2() const;
-		WriteChannel ColorWriteChannels3() const;
-		Color BlendFactor() const;
-		int MultiSampleMask() const;
-		void Apply(GraphicsDevice& device);
-
-		void ColorSourceBlend(Blend const& value);
-		void ColorDestinationBlend(Blend const& value);
-		void ColorBlendFunction(BlendFunction const& value);
-		void AlphaSourceBlend(Blend const& value);
-		void AlphaDestinationBlend(Blend const& value);
-		void AlphaBlendFunction(BlendFunction const& value);
-		void ColorWriteChannels(WriteChannel const& value);
-		void ColorWriteChannels1(WriteChannel const& value);
-		void ColorWriteChannels2(WriteChannel const& value);
-		void ColorWriteChannels3(WriteChannel const& value);
-		void BlendFactor(Color const& value);
-		void MultiSampleMask(int const& value);
-
-	public:
-		static const BlendState Opaque();
-		static const BlendState AlphaBlend();
-		static const BlendState Additive();
-		static const BlendState NonPremultiplied();
-
-	private:
-		BlendState(Blend source, Blend destination, std::string const& name);
+		Color BlendFactor{ Colors::White };
+		intcs MultiSampleMask{ MaxInt };
+		bool IndependentBlendEnable{ false };
+		
+		std::vector<TargetBlendState_> TargetBlendState{
+			TargetBlendState_(this),
+			TargetBlendState_(this),
+			TargetBlendState_(this),
+			TargetBlendState_(this),
+		};
 	};
 }
 

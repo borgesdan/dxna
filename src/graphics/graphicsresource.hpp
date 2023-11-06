@@ -3,14 +3,15 @@
 
 #include <string>
 #include "../cs/cstypes.hpp"
+#include "enumerations.hpp"
+#include "../structs.hpp"
 
 namespace dxna::graphics {
 	class GraphicsDevice;
+	using GraphicsDevice_ = dxna::graphics::GraphicsDevice;
 
 	class GraphicsResource {	
-	public:
-		using GraphicsDevice_ = dxna::graphics::GraphicsDevice;
-
+	public:	
 		constexpr GraphicsResource() = default;
 
 		virtual ~GraphicsResource(){}		
