@@ -153,7 +153,7 @@ namespace dxna::graphics {
 
 	public:
 		Color BlendFactor{ Colors::White };
-		intcs MultiSampleMask{ MaxInt };
+		intcs MultiSampleMask{ IntMaxValue };
 		bool IndependentBlendEnable{ false };
 
 		std::vector<TargetBlendState_> TargetBlendState{
@@ -202,8 +202,8 @@ namespace dxna::graphics {
 		StencilOperation CounterClockwiseStencilFail{ StencilOperation::Keep };
 		StencilOperation CounterClockwiseStencilPass{ StencilOperation::Keep };
 		StencilOperation CounterClockwiseStencilDepthBufferFail{ StencilOperation::Keep };
-		intcs StencilMask{ MaxInt };
-		intcs StencilWriteMask{ MaxInt };
+		intcs StencilMask{ IntMaxValue };
+		intcs StencilWriteMask{ IntMaxValue };
 		intcs ReferenceStencil{ 0 };
 	};
 

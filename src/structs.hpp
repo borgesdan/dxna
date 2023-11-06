@@ -2285,9 +2285,9 @@ namespace dxna {
 		}
 
 		static constexpr Color FromNonPremultiplied(intcs r, intcs g, intcs b, intcs a) {
-			r = clamp(r * a / MaxByte);
-			g = clamp(g * a / MaxByte);
-			b = clamp(b * a / MaxByte);
+			r = clamp(r * a / ByteMaxValue);
+			g = clamp(g * a / ByteMaxValue);
+			b = clamp(b * a / ByteMaxValue);
 			a = clamp(a);
 
 			g <<= 8;
@@ -2325,7 +2325,7 @@ namespace dxna {
 			if (value < 0)
 				return 0;
 
-			return value > MaxByte ? MaxByte : value;
+			return value > ByteMaxValue ? ByteMaxValue : value;
 		}
 
 		uintcs packedValue{ 0 };
@@ -2469,7 +2469,7 @@ namespace dxna {
 		static constexpr Color Turquoise{ Color(4291878976U) };
 		static constexpr Color Violet{ Color(4293821166U) };
 		static constexpr Color Wheat{ Color(4289978101U) };
-		static constexpr Color White{ Color(MaxUint) };
+		static constexpr Color White{ Color(UIntMaxValue) };
 		static constexpr Color WhiteSmoke{ Color(4294309365U) };
 		static constexpr Color Yellow{ Color(4278255615U) };
 		static constexpr Color YellowGreen{ Color(4281519514U) };
@@ -3374,8 +3374,8 @@ namespace dxna {
 			return nfloat(0.0f);
 		}
 		else {
-			float num1 = MinFloat;
-			float num2 = MaxFloat;
+			float num1 = FloatMinValue;
+			float num2 = FloatMaxValue;
 
 			for (size_t i = 0; i < PlaneCount; ++i) {
 				const auto plane = getPlane(i);

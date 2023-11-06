@@ -851,7 +851,7 @@ namespace dxna {
 	nfloat dxna::BoundingBox::Intersects(Ray const& ray) const
 	{
 		float num1 = 0.0f;
-		float num2 = MaxFloat;
+		float num2 = FloatMaxValue;
 		
 		if (std::abs(ray.Direction.X) < 9.9999999747524271E-07)	{
 			if (ray.Position.X < Min.X || ray.Position.X > Max.X)

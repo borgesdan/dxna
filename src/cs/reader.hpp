@@ -179,7 +179,7 @@ namespace cs {
 			return *(float*)&value;
 		}
 
-		Nullable<float> ReadDouble() {
+		Nullable<double> ReadDouble() {
 			auto result = FillBuffer(8);
 			auto value = ((ulongcs)(buffer[4] | buffer[5] << 8 | buffer[6] << 16 | buffer[7] << 24) << 32 | (ulongcs)(buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24));
 
@@ -221,7 +221,7 @@ namespace cs {
 				if (!num3.HasValue())
 					return nintcs();
 
-				num1 |= ((intcs)num3 & (intcs)MaxSbyte) << num2;
+				num1 |= ((intcs)num3 & (intcs)SByteMaxValue) << num2;
 				num2 += 7;
 
 				if (((intcs)num3 & 128) == 0)
