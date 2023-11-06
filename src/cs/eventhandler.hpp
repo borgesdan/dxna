@@ -1,5 +1,5 @@
-#ifndef CS_EVENTARGS_HPP
-#define CS_EVENTARGS_HPP
+#ifndef DXNA_CS_EVENTARGS_HPP
+#define DXNA_CS_EVENTARGS_HPP
 
 #include <vector>
 #include <algorithm>

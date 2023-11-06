@@ -1,5 +1,5 @@
-#ifndef CS_CSTYPES_HPP
-#define CS_CSTYPES_HPP
+#ifndef DXNA_CS_CSTYPES_HPP
+#define DXNA_CS_CSTYPES_HPP
 
 #include <cstdint>
 #include <limits>

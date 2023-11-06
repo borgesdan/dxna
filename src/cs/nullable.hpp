@@ -1,5 +1,5 @@
-#ifndef CS_NULLABLE_HPP
-#define CS_NULLABLE_HPP
+#ifndef DXNA_CS_NULLABLE_HPP
+#define DXNA_CS_NULLABLE_HPP
 
 #include "cstypes.hpp"
 
