@@ -97,6 +97,34 @@ namespace dxna::graphics {
         DecrementSaturation,
         Invert
     };
+
+    enum class SamplerType {
+        Sampler2D = 0,
+        SamplerCube = 1,
+        SamplerVolume = 2,
+        Sampler1D = 3,
+    };
+
+    enum class VertexElementUsage {
+        Position,
+        Color,
+        TextureCoordinate,
+        Normal,
+        Binormal,
+        Tangent,
+        BlendIndices,
+        BlendWeight,
+        Depth,
+        Fog,
+        PointSize,
+        Sample,
+        TessellateFactor
+    };
+
+    enum class ShaderStage {
+        Vertex,
+        Pixel,
+    };
 }
 
 #endif

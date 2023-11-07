@@ -2265,9 +2265,9 @@ namespace dxna {
 
 		constexpr void PackedValue(uintcs value) { packedValue = value; }
 		constexpr void R(bytecs value) { packedValue = packedValue & 4294967040U | value; }
-		constexpr void G(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & -65281 | value << 8); }
-		constexpr void B(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & -16711681 | value << 16); }
-		constexpr void A(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & 16777215 | value << 24); }
+		constexpr void G(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & -65281 | (intcs)value << 8); }
+		constexpr void B(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & -16711681 | (intcs)value << 16); }
+		constexpr void A(bytecs value) { packedValue = static_cast<uintcs>(static_cast<intcs>(packedValue) & 16777215 | (intcs)value << 24); }
 
 		static constexpr Color Lerp(Color const& value1, Color const& value2, float amount) {
 			amount = MathHelper::Lerp(amount, 0.0F, 1.0F);
