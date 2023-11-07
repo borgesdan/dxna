@@ -11,10 +11,6 @@ namespace cs {
 	class BinaryReader {
 	public:
 		BinaryReader(std::shared_ptr<Stream> const& input) {
-			if (input == nullptr || !input->CanRead()) {
-				canRead = false;
-			}
-
 			stream = input;
 			buffer = std::vector<bytecs>(BufferLength);
 		}
@@ -22,7 +18,7 @@ namespace cs {
 		std::shared_ptr<Stream> BaseStream() const { return stream; }
 
 		intcs PeekChar() {
-			if (!canRead || !stream->CanSeek())
+			if (stream == nullptr || !stream->CanRead() || !stream->CanSeek())
 				return -1;
 
 			longcs position = stream->Position();
@@ -32,6 +28,9 @@ namespace cs {
 		}
 
 		intcs Read() {
+			if (stream == nullptr || !stream->CanRead() || !stream->CanSeek())
+				return -1;
+
 			intcs num1 = 0;
 			longcs num2;
 			longcs num3 = num2 = 0;
@@ -122,7 +121,7 @@ namespace cs {
 			if (!result)
 				return nshortcs();
 
-			return (shortcs)(buffer[0] | buffer[1] << 8);
+			return (shortcs)((intcs)buffer[0] | (intcs)buffer[1] << 8);
 		}
 
 		Nullable<ushortcs> ReadUInt16() {
@@ -131,18 +130,19 @@ namespace cs {
 			if (!result)
 				return nushortcs();
 
-			return (ushortcs)(buffer[0] | (uintcs)buffer[1] << 8);
+			return (ushortcs)((uintcs)buffer[0] | (uintcs)buffer[1] << 8);
 		}
 
 		Nullable<intcs> ReadInt32() {
-			//TODO: IsMemoryStream
-
 			auto result = FillBuffer(4);
 
 			if (!result)
 				return nintcs();
 
-			return buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24;
+			return (intcs)buffer[0] 
+				| (intcs)buffer[1] << 8 
+				| (intcs)buffer[2] << 16 
+				| (intcs)buffer[3] << 24;
 		}
 
 		Nullable<uintcs> ReadUInt32() {
@@ -151,7 +151,10 @@ namespace cs {
 			if (!result)
 				return nuintcs();
 
-			return (uintcs)(buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24);
+			return (uintcs)((intcs)buffer[0]
+				| (intcs)buffer[1] << 8
+				| (intcs)buffer[2] << 16
+				| (intcs)buffer[3] << 24);
 		}
 
 		Nullable<longcs> ReadInt64() {
@@ -160,7 +163,14 @@ namespace cs {
 			if (!result)
 				return nlongcs();
 
-			return (longcs)(uintcs)(buffer[4] | buffer[5] << 8 | buffer[6] << 16 | buffer[7] << 24) << 32 | (ulongcs)(buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24);
+			return (longcs)((intcs)buffer[4] 
+				| (intcs)buffer[5] << 8
+				| (intcs)buffer[6] << 16
+				| (intcs)buffer[7] << 24) << 32
+				| (ulongcs)((intcs)buffer[0]
+					| (intcs)buffer[1] << 8
+					| (intcs)buffer[2] << 16
+					| (intcs)buffer[3] << 24);
 		}
 
 		Nullable<ulongcs> ReadUInt64() {
@@ -169,77 +179,47 @@ namespace cs {
 			if (!result)
 				return nulongcs();
 
-			return (ulongcs)(uintcs)(buffer[4] | buffer[5] << 8 | buffer[6] << 16 | buffer[7] << 24) << 32 | (ulongcs)(buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24);
+			return (ulongcs)((intcs)buffer[4]
+				| (intcs)buffer[5] << 8
+				| (intcs)buffer[6] << 16
+				| (intcs)buffer[7] << 24) << 32
+				| (ulongcs)((intcs)buffer[0]
+					| (intcs)buffer[1] << 8
+					| (intcs)buffer[2] << 16
+					| (intcs)buffer[3] << 24);
 		}
 
 		Nullable<float> ReadSingle() {
 			auto result = FillBuffer(4);
-			auto value = (uintcs)(buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24);
+			auto value = (uintcs)((intcs)buffer[0]
+				| (intcs)buffer[1] << 8
+				| (intcs)buffer[2] << 16
+				| (intcs)buffer[3] << 24);
 
 			return *(float*)&value;
 		}
 
 		Nullable<double> ReadDouble() {
 			auto result = FillBuffer(8);
-			auto value = ((ulongcs)(buffer[4] | buffer[5] << 8 | buffer[6] << 16 | buffer[7] << 24) << 32 | (ulongcs)(buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24));
+			auto value = ((ulongcs)((intcs)buffer[4]
+				| (intcs)buffer[5] << 8
+				| (intcs)buffer[6] << 16
+				| (intcs)buffer[7] << 24) << 32
+				| (ulongcs)((intcs)buffer[0]
+					| (intcs)buffer[1] << 8
+					| (intcs)buffer[2] << 16
+					| (intcs)buffer[3] << 24));
 
 			return *(double*)&value;
-		}
+		}										
 
-		std::string ReadString() {
-			//TODO
-			return std::string();
-		}
-
-		intcs Read(charcs* buffer, intcs index, intcs count) {
-			//TODO
-			return 0;
-		}
-
-		std::vector<charcs> ReadChars(intcs count) {
-			//TODO
-			return std::vector<charcs>();
-		}
-
-		intcs Read(bytecs* buffer, int index, int count) {
-			//TODO
-			return 0;
-		}
-
-		std::vector<bytecs>ReadBytes(int count) {
-			return std::vector<bytecs>();
-		}
-
-	private:
-		nintcs Read7BitEncodedInt() {
-			intcs num1 = 0;
-			intcs num2 = 0;
-			
-			while (num2 != 35) {
-				const auto num3 = ReadByte();
-
-				if (!num3.HasValue())
-					return nintcs();
-
-				num1 |= ((intcs)num3 & (intcs)SByteMaxValue) << num2;
-				num2 += 7;
-
-				if (((intcs)num3 & 128) == 0)
-					return num1;
-			}
-
-			return nintcs();
-		}
-
-		intcs InternalReadChars(char* buffer, intcs index, intcs count) {
-			return 0;
-		}
-
+	private:	
+		/// <summary>Fills the internal buffer with the specified number of bytes read from the stream.</summary>
 		bool FillBuffer(intcs numBytes) {
 			if (!buffer.empty() && (numBytes < 0 || numBytes > BufferLength))
 				return false;
 
-			if (stream == nullptr)
+			if (stream == nullptr || !stream->CanRead())
 				return false;
 
 			intcs offset = 0;
@@ -254,7 +234,7 @@ namespace cs {
 			}
 			else {
 				do {
-					intcs num = stream->Read(buffer.data(), offset, numBytes - offset);
+					intcs num = stream->Read(buffer.data(), buffer.size(), offset, numBytes - offset);
 
 					if (num == 0)
 						return false;
@@ -273,8 +253,7 @@ namespace cs {
 		std::vector<bytecs> charBytes;
 		std::vector<charcs> singleChar;
 		std::vector<bytecs> buffer;
-
-		bool canRead{ true };
+		
 		bool m2BytesPerChar{ true };
 	};
 }
