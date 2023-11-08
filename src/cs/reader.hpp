@@ -211,7 +211,39 @@ namespace cs {
 					| (intcs)buffer[3] << 24));
 
 			return *(double*)&value;
-		}										
+		}			
+
+		std::vector<bytecs> ReadBytes(size_t count) {
+			if (count == 0)
+				return std::vector<bytecs>();
+
+			std::vector<bytecs> numArray(count);
+			int length = 0;
+
+			do {
+				int num = stream->Read(numArray.data(), count, length, count);
+
+				if (num != 0) {
+					length += num;
+					count -= num;
+				}
+				else
+					break;
+
+			} while (count > 0);
+
+			if (length != numArray.size()) {
+				std::vector<bytecs> dst(length);
+
+				for (size_t i = 0; i < length; ++i) {
+					dst[i] = numArray[i];
+				}
+
+				return dst;
+			}
+
+			return numArray;
+		}
 
 	private:	
 		/// <summary>Fills the internal buffer with the specified number of bytes read from the stream.</summary>

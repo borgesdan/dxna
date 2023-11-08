@@ -26,15 +26,19 @@ namespace dxna::graphics {
     };
 
     struct Shader : public GraphicsResource {
-        Shader(GraphicsDevice_ * device, cs::BinaryReader * reader);
+        Shader(GraphicsDevice_* device, cs::BinaryReader* reader);
 
         static int Profile();
 
         int HashKey{0};
-        std::vector<SamplerInfo> Samples;
+        std::vector<SamplerInfo> Samplers;
         std::vector<int> CBuffers;
         ShaderStage Stage;
         std::vector<VertexAttribute> Attributes;
+
+        void PlatformConstruct(ShaderStage const& stage, bytecs* shaderByteCode) {
+            //TODO: remover
+        }
     };
 }
 
