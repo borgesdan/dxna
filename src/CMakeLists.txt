@@ -18,7 +18,7 @@ add_executable (dxna
 "platforms/windows/wgamewindow.cpp"
 "platforms/windows/wgamewindow.cpp"
 "platforms/windows/winput.cpp"
- "structs.cpp" "graphics/shader.cpp")
+ "structs.cpp" "graphics/shader.cpp" "graphics/effect.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET dxna PROPERTY CXX_STANDARD 20)

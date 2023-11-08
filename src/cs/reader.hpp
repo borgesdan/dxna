@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <codecvt>
+#include <locale> 
 
 namespace cs {
 	class BinaryReader {
@@ -245,6 +247,37 @@ namespace cs {
 			return numArray;
 		}
 
+		std::string ReadString() {
+			int num = 0;
+			int val1;
+			
+			if (val1 <= 0)
+				std::string();
+
+			if (charBytes.empty())
+				charBytes = std::vector<bytecs>(MaxCharBytesSize);
+
+			if (charBuffer.empty())
+				charBuffer = std::vector<charcs>(MaxCharBytesSize);
+
+			do {
+				auto byteCount = stream->Read(charBytes.data(), charBytes.size(), 0, val1 - num > MaxCharBytesSize ? MaxCharBytesSize : val1 - num);
+
+				if (byteCount == 0)
+					return std::string();
+
+				//TODO
+				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> cv;
+
+				auto r1 = reinterpret_cast<char*>(charBytes.data());
+
+				const auto result = cv.from_bytes(r1, r1 + byteCount);
+
+			} while (num < val1);
+
+			return std::string();
+		}
+
 	private:	
 		/// <summary>Fills the internal buffer with the specified number of bytes read from the stream.</summary>
 		bool FillBuffer(intcs numBytes) {
@@ -285,6 +318,7 @@ namespace cs {
 		std::vector<bytecs> charBytes;
 		std::vector<charcs> singleChar;
 		std::vector<bytecs> buffer;
+		std::vector<charcs> charBuffer;
 		
 		bool m2BytesPerChar{ true };
 	};

@@ -11,34 +11,81 @@
 namespace dxna::graphics {
     struct SamplerInfo {
         SamplerType type;
-        int textureSlot;
-        int samplerSlot;
+        intcs textureSlot;
+        intcs samplerSlot;
         std::string name;
         SamplerState* state;
-        int parameter;
+        intcs parameter;
     };
 
     struct VertexAttribute {
         VertexElementUsage usage;
-        int index;
+        intcs index;
         std::string name;
-        int location;
+        intcs location;
     };
 
     struct Shader : public GraphicsResource {
         Shader(GraphicsDevice_* device, cs::BinaryReader* reader);
 
-        static int Profile();
+        static intcs Profile();
 
-        int HashKey{0};
+        intcs HashKey{0};
         std::vector<SamplerInfo> Samplers;
-        std::vector<int> CBuffers;
+        std::vector<intcs> CBuffers;
         ShaderStage Stage;
         std::vector<VertexAttribute> Attributes;
 
         void PlatformConstruct(ShaderStage const& stage, bytecs* shaderByteCode) {
             //TODO: remover
         }
+    };
+
+    struct EffectParameter;
+    struct EffectParameterCollection;
+
+    class ConstantBuffer : public GraphicsResource {
+    public:
+        ConstantBuffer(GraphicsDevice_* device, intcs const& sizeInBytes,
+            std::vector<intcs> const& parameterIndexes, std::vector<intcs> const& parameterOffsets,
+            std::string const& name);
+
+        void Clear();
+        void PlatformInitialize() {
+            //TODO: remover
+        }
+        void PlatformClear();
+
+    private:
+        //void SetData(int offset, int rows, int columns, object data);
+
+        intcs SetParameter(intcs offset, EffectParameter const& param);
+        void Update(EffectParameterCollection const& parameters);
+
+        std::vector<bytecs> _buffer;
+        std::vector<intcs> _parameters;
+        std::vector<intcs> _offsets;
+        std::string _name;
+        ulongcs _stateKey;
+        bool _dirty;
+    };
+
+    struct ConstantBufferCollectionSetArgs;
+
+    class ConstantBufferCollection {
+    public:
+        ConstantBufferCollection(ShaderStage const& stage, intcs maxBuffers);
+
+        ConstantBuffer* operator[](size_t index);
+
+        void Clear();
+
+        void SetConstanteBuffer(ConstantBufferCollectionSetArgs& arg);
+
+    private:
+        std::vector<ConstantBuffer> _buffers;
+        ShaderStage _stage;
+        intcs _valid;
     };
 }
 

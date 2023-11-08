@@ -31,7 +31,7 @@ namespace dxna::graphics {
 				Samplers[s].state->MipMapLevelOfDetailBias = (shortcs)reader->ReadSingle();
 			}
 
-			//Samplers[s]->name = reader.ReadString();
+			Samplers[s].name = reader->ReadString();
 			Samplers[s].parameter = (bytecs)reader->ReadByte();
 		}
 
@@ -45,12 +45,23 @@ namespace dxna::graphics {
 		Attributes = std::vector<VertexAttribute>(attributeCount);
 		
 		for (size_t a = 0; a < attributeCount; ++a) {
-			//Attributes[a].name = reader->ReadString();
+			Attributes[a].name = reader->ReadString();
 			Attributes[a].usage = (VertexElementUsage)(bytecs)reader->ReadByte();
 			Attributes[a].index = (bytecs)reader->ReadByte();
 			Attributes[a].location = (shortcs)reader->ReadInt16();
 		}
 
 		PlatformConstruct(Stage, byteCode.data());
+	}
+	
+	ConstantBuffer::ConstantBuffer(GraphicsDevice_* device, intcs const& sizeInBytes, std::vector<intcs> const& parameterIndexes, std::vector<intcs> const& parameterOffsets, std::string const& name) {
+		this->GraphicsDevice(device);
+
+		_buffer = std::vector<bytecs>(sizeInBytes);
+		_parameters = parameterIndexes;
+		_offsets = parameterOffsets;
+		_name = name;
+
+		PlatformInitialize();
 	}
 }
