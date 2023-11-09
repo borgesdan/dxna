@@ -125,6 +125,27 @@ namespace dxna::graphics {
         Vertex,
         Pixel,
     };
+
+    enum class EffectParameterClass {
+        Scalar,
+        Vector,
+        Matrix,
+        Object,
+        Struct
+    };
+
+    enum class EffectParameterType {
+        Void,
+        Bool,
+        Int32,
+        Single,
+        String,
+        Texture,
+        Texture1D,
+        Texture2D,
+        Texture3D,
+        TextureCube
+    };
 }
 
 #endif

@@ -267,11 +267,11 @@ namespace cs {
 					return std::string();
 
 				//TODO
-				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> cv;
+//				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> cv;
 
-				auto r1 = reinterpret_cast<char*>(charBytes.data());
+	//			auto r1 = reinterpret_cast<char*>(charBytes.data());
 
-				const auto result = cv.from_bytes(r1, r1 + byteCount);
+		//		const auto result = cv.from_bytes(r1, r1 + byteCount);
 
 			} while (num < val1);
 
@@ -322,6 +322,8 @@ namespace cs {
 		
 		bool m2BytesPerChar{ true };
 	};
+
+	using BinaryReaderPtr = std::shared_ptr<BinaryReader>;
 }
 
 #endif

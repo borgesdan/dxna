@@ -5,6 +5,7 @@
 #include "../cs/cstypes.hpp"
 #include "enumerations.hpp"
 #include "../structs.hpp"
+#include <memory>
 
 namespace dxna::graphics {
 	class GraphicsDevice;
@@ -37,6 +38,8 @@ namespace dxna::graphics {
 	private:
 		GraphicsDevice_ * graphicsDevice;
 	};
+
+	using GraphicsDevicePtr = std::shared_ptr<GraphicsDevice_>;
 }
 
 #endif

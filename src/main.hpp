@@ -3,8 +3,5 @@
 
 #pragma once
 
-#include <iostream>
-#include "graphics/viewport.hpp"
-#include "cs/nullable.hpp"
 
 // TODO: Reference additional headers your program requires here.
