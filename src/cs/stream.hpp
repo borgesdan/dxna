@@ -32,6 +32,39 @@ namespace cs {
 
 	class MemoryStream : public Stream {
 	public:
+		constexpr MemoryStream(intcs capacity) {
+			if (capacity <= 0)
+				capacity = 1;
+
+			_buffer = std::vector<bytecs>(capacity);
+			_capacity = capacity;
+			_expandable = true;
+			_writable = true;
+			_exposable = true;
+			_origin = 0;
+			_isOpen = true;
+		}
+
+		constexpr MemoryStream(std::vector<bytecs> const& buffer, intcs index, intcs count, bool writable = true, bool publiclyVisible = false) {			
+			if (index < 0)
+				index = 0;
+
+			if (count < 0)
+				count = 0;
+			
+			_buffer = buffer;
+
+			if (_buffer.size() - index < count)
+				_buffer.resize(count);
+
+			_origin = _position = index;
+			_length = _capacity = index + count;
+			_writable = writable;
+			_exposable = publiclyVisible;
+			_expandable = false;
+			_isOpen = true;
+		}
+
 		constexpr virtual bool CanRead() const override { return _isOpen; }
 		constexpr virtual bool CanSeek() const { return _isOpen; }
 		constexpr virtual bool CanWrite() const { return _writable; }
