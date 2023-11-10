@@ -223,7 +223,11 @@ namespace cs {
 			int length = 0;
 
 			do {
-				int num = stream->Read(numArray.data(), count, length, count);
+				int num = stream->Read(
+					numArray.data(),
+					count, 
+					length,
+					count);
 
 				if (num != 0) {
 					length += num;
