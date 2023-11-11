@@ -12,11 +12,9 @@
 #include "shader.hpp"
 #include "states.hpp"
 #include "../types.hpp"
+#include "forward.hpp"
 
 namespace dxna::graphics {
-	class EffectParameter;
-	class EffectParameterCollection;
-	class Effect;
 	class Texture2D;
 	class Texture3D;
 	class TextureCube;
@@ -47,9 +45,7 @@ namespace dxna::graphics {
 		intcs RowCount{ 0 };
 		intcs ColumnCount{ 0 };
 		std::string Semantic;
-	};
-
-	using EffectAnnotationPtr = std::shared_ptr<EffectAnnotation>;
+	};	
 
 	class EffectAnnotationCollection {
 	public:
@@ -73,9 +69,7 @@ namespace dxna::graphics {
 		}
 
 		std::vector<EffectAnnotationPtr> _annotations;
-	};
-
-	using EffectAnnotationCollectionPtr = std::shared_ptr<EffectAnnotationCollection>;
+	};	
 
 	class EffectParameter {
 	public:
@@ -124,9 +118,7 @@ namespace dxna::graphics {
 		std::shared_ptr<EffectAnnotationCollection> Annotations;
 
 		std::any Value;
-	};
-
-	using EffectParameterPtr = std::shared_ptr<EffectParameter>;
+	};	
 
 	class EffectParameterCollection {
 	public:
@@ -150,9 +142,7 @@ namespace dxna::graphics {
 		}
 
 		std::vector<EffectParameterPtr> _parameters;
-	};
-
-	using EffectParameterCollectionPtr = std::shared_ptr<EffectParameterCollection>;
+	};	
 
 	class EffectPass {
 	public:
@@ -181,9 +171,7 @@ namespace dxna::graphics {
 		std::shared_ptr<BlendState> _blendState;
 		std::shared_ptr<DepthStencilState> _depthStencilState;
 		std::shared_ptr<RasterizerState> _rasterizerState;
-	};
-
-	using EffectPassPtr = std::shared_ptr<EffectPass>;
+	};	
 
 	class EffectPassCollection {
 	public:
@@ -207,9 +195,7 @@ namespace dxna::graphics {
 		}
 
 		std::vector<EffectPassPtr> _passes;
-	};
-
-	using EffectPassCollectionPtr = std::shared_ptr<EffectPassCollection>;
+	};	
 
 	class EffectTechnique {
 	public:
@@ -221,9 +207,7 @@ namespace dxna::graphics {
 		std::shared_ptr<EffectPassCollection> Passes;
 		std::shared_ptr<EffectAnnotationCollection> Annotations;
 		std::string Name;
-	};
-
-	using EffectTechniquePtr = std::shared_ptr<EffectTechnique>;
+	};	
 
 	class EffectTechniqueCollection {
 	public:
@@ -247,9 +231,7 @@ namespace dxna::graphics {
 		}
 
 		std::vector<EffectTechniquePtr> _techniques;
-	};
-
-	using EffectTechniqueCollectionPtr = std::shared_ptr<EffectTechniqueCollection>;
+	};	
 
 	class ConstantBuffer : public GraphicsResource {
 	public:
@@ -275,9 +257,7 @@ namespace dxna::graphics {
 		std::string _name;
 		ulongcs _stateKey;
 		bool _dirty;
-	};
-
-	using ConstantBufferPtr = std::shared_ptr<ConstantBuffer>;
+	};	
 
 	class ConstantBufferCollectionSetArgs;
 
@@ -295,9 +275,7 @@ namespace dxna::graphics {
 		std::vector<ConstantBuffer> _buffers;
 		ShaderStage _stage;
 		intcs _valid;
-	};
-
-	using ConstantBufferCollectionPtr = std::shared_ptr<ConstantBufferCollection>;
+	};	
 
 	class Effect : public GraphicsResource {
 	public:

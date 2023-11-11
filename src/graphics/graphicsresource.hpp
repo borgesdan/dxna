@@ -6,10 +6,9 @@
 #include "enumerations.hpp"
 #include "../structs.hpp"
 #include <memory>
+#include "forward.hpp"
 
-namespace dxna::graphics {
-	class GraphicsDevice;	
-	using GraphicsDevicePtr = std::shared_ptr<GraphicsDevice>;
+namespace dxna::graphics {	
 
 	class GraphicsResource {	
 	public:	
@@ -37,9 +36,7 @@ namespace dxna::graphics {
 
 	private:
 		GraphicsDevicePtr graphicsDevice;
-	};
-
-	
+	};	
 }
 
 #endif

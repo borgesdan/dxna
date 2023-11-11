@@ -14,7 +14,7 @@ namespace dxna::graphics {
         intcs textureSlot;
         intcs samplerSlot;
         std::string name;
-        SamplerState* state;
+        SamplerStatePtr state;
         intcs parameter;
     };
 
@@ -25,7 +25,8 @@ namespace dxna::graphics {
         intcs location;
     };
 
-    struct Shader : public GraphicsResource {
+    class Shader : public GraphicsResource {
+    public:
         Shader(GraphicsDevicePtr const& device, cs::BinaryReader* reader);
 
         static intcs Profile();
