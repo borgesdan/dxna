@@ -11,6 +11,7 @@
 #include "enumerations.hpp"
 #include "shader.hpp"
 #include "states.hpp"
+#include "../types.hpp"
 
 namespace dxna::graphics {
 	class EffectParameter;
@@ -149,7 +150,7 @@ namespace dxna::graphics {
 		}
 
 		std::vector<EffectParameterPtr> _parameters;
-	};	
+	};
 
 	using EffectParameterCollectionPtr = std::shared_ptr<EffectParameterCollection>;
 
@@ -206,7 +207,7 @@ namespace dxna::graphics {
 		}
 
 		std::vector<EffectPassPtr> _passes;
-	};	
+	};
 
 	using EffectPassCollectionPtr = std::shared_ptr<EffectPassCollection>;
 
@@ -215,13 +216,13 @@ namespace dxna::graphics {
 		EffectTechnique(std::string const& name,
 			std::shared_ptr<EffectPassCollection> const& passes,
 			std::shared_ptr<EffectAnnotationCollection> const& annotations) :
-		Passes(passes), Annotations(annotations), Name(name){}
+			Passes(passes), Annotations(annotations), Name(name) {}
 
 		std::shared_ptr<EffectPassCollection> Passes;
 		std::shared_ptr<EffectAnnotationCollection> Annotations;
 		std::string Name;
 	};
-	
+
 	using EffectTechniquePtr = std::shared_ptr<EffectTechnique>;
 
 	class EffectTechniqueCollection {
@@ -246,14 +247,14 @@ namespace dxna::graphics {
 		}
 
 		std::vector<EffectTechniquePtr> _techniques;
-	};	
+	};
 
 	using EffectTechniqueCollectionPtr = std::shared_ptr<EffectTechniqueCollection>;
 
 	class ConstantBuffer : public GraphicsResource {
 	public:
-		ConstantBuffer(GraphicsDevice_* device, intcs const& sizeInBytes,
-			std::vector<intcs> const& parameterIndexes, std::vector<intcs> const& parameterOffsets,
+		ConstantBuffer(GraphicsDevicePtr device, intcs const& sizeInBytes,
+			vectorptr<intcs> const& parameterIndexes, vectorptr<intcs> const& parameterOffsets,
 			std::string const& name);
 
 		void Clear();
@@ -269,8 +270,8 @@ namespace dxna::graphics {
 		void Update(EffectParameterCollection const& parameters);
 
 		std::vector<bytecs> _buffer;
-		std::vector<intcs> _parameters;
-		std::vector<intcs> _offsets;
+		vectorptr<intcs> _parameters;
+		vectorptr<intcs> _offsets;
 		std::string _name;
 		ulongcs _stateKey;
 		bool _dirty;
@@ -294,8 +295,8 @@ namespace dxna::graphics {
 		std::vector<ConstantBuffer> _buffers;
 		ShaderStage _stage;
 		intcs _valid;
-	};	
-	
+	};
+
 	using ConstantBufferCollectionPtr = std::shared_ptr<ConstantBufferCollection>;
 
 	class Effect : public GraphicsResource {
@@ -321,13 +322,37 @@ namespace dxna::graphics {
 		EffectTechniqueCollectionPtr Techniques;
 		EffectTechniquePtr CurrentTechnique;
 		std::vector<ConstantBufferPtr> ConstantBuffers;
-	
+
 	protected:
 
 	private:
 		MGFXHeader ReadHeader(std::vector<bytecs> const& effectCode, intcs index);
-		void ReadEffect(cs::BinaryReaderPtr const& reader);
-		
+
+		void ReadEffect(cs::BinaryReaderPtr& reader) {
+			ConstantBuffers.clear();
+
+			const auto size = (intcs)reader->ReadInt32();
+			ConstantBuffers.resize(size);
+
+			for (size_t c = 0; c < ConstantBuffers.size(); ++c) {
+				const auto name = reader->ReadString();
+				const auto sizeInBytes = (intcs)reader->ReadInt16();
+
+				auto parameters = std::make_shared<std::vector<intcs>>((intcs)reader->ReadInt32());
+				auto offsets = std::make_shared<std::vector<intcs>>(parameters->size());
+
+				for (size_t i = 0; i < parameters->size(); ++i) {
+					auto prm = parameters.get();
+					auto ofs = offsets.get();
+
+					prm->at(i) = (intcs)reader->ReadInt32();
+					ofs->at(i) = (intcs)reader->ReadUInt16();
+				}
+
+				//ConstantBuffers[c] = std::make_shared<ConstantBuffer>(GraphicsDevice(), sizeInBytes, parameters, offsets, name);
+			}
+		}
+
 		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader);
 		static EffectPassCollection ReadPasses(cs::BinaryReader& reader,
 			Effect const& effect, std::vector<Shader> const& shaders);
@@ -335,7 +360,7 @@ namespace dxna::graphics {
 
 		std::vector<ShaderPtr> _shaders;
 		bool _isClone{ true };
-	};	
+	};
 }
 
 #endif

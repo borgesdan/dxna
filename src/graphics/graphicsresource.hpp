@@ -8,8 +8,8 @@
 #include <memory>
 
 namespace dxna::graphics {
-	class GraphicsDevice;
-	using GraphicsDevice_ = dxna::graphics::GraphicsDevice;
+	class GraphicsDevice;	
+	using GraphicsDevicePtr = std::shared_ptr<GraphicsDevice>;
 
 	class GraphicsResource {	
 	public:	
@@ -17,11 +17,11 @@ namespace dxna::graphics {
 
 		virtual ~GraphicsResource(){}		
 
-		constexpr GraphicsDevice_* GraphicsDevice() { 
+		GraphicsDevicePtr Device() const { 
 			return graphicsDevice; 
 		}
 		
-		void GraphicsDevice(GraphicsDevice_* value) {
+		void Device(GraphicsDevicePtr const& value) {
 			if (!value || graphicsDevice == value)
 				return;			
 
@@ -30,16 +30,16 @@ namespace dxna::graphics {
 		}
 
 	protected:
-		virtual void GraphicsDeviceResetting() {}
+		virtual void GraphicsDeviceReseting() {}
 	
 	public:
 		std::string Name;
 
 	private:
-		GraphicsDevice_ * graphicsDevice;
+		GraphicsDevicePtr graphicsDevice;
 	};
 
-	using GraphicsDevicePtr = std::shared_ptr<GraphicsDevice_>;
+	
 }
 
 #endif

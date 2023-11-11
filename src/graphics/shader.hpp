@@ -26,7 +26,7 @@ namespace dxna::graphics {
     };
 
     struct Shader : public GraphicsResource {
-        Shader(GraphicsDevice_* device, cs::BinaryReader* reader);
+        Shader(GraphicsDevicePtr const& device, cs::BinaryReader* reader);
 
         static intcs Profile();
 

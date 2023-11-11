@@ -14,15 +14,18 @@ using namespace std;
 using namespace cs;
 
 int main() {
-	any i = 1;
-	any ptr = std::make_shared<Vector2>();
-	auto cast = any_cast<std::shared_ptr<Vector2>>(ptr);
-	cout << ptr.has_value()
-		<< " "
-		<< ptr.type().name()
-		<< " "
-		<< cast->X
-		<< endl;
+	auto parameters = std::make_shared<std::vector<intcs>>(10);
+	auto offsets = std::make_shared<std::vector<intcs>>(50);	
+
+	auto prm = parameters.get();
+
+	prm->at(0) = 10;
+
+	auto prm2 = parameters.get();
+
+	prm2->at(0) = 50;
+
+	cout << prm->at(0) << " " << prm2->at(0) << endl;
 
 	return 0;
 }

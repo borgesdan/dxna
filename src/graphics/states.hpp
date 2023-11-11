@@ -17,13 +17,13 @@ namespace dxna::graphics {
 			AddressW = addressMode;
 		}
 
-		bool BindToGraphicsDevice(GraphicsDevice_* device) {
-			const auto currentDevice = GraphicsDevice();
+		bool BindToGraphicsDevice(GraphicsDevicePtr const& device) {
+			const auto currentDevice = Device();
 
 			if (currentDevice != nullptr && currentDevice != device)
 				return false;
 
-			GraphicsDevice(device);
+			Device(device);
 
 			return true;
 		}
@@ -95,13 +95,13 @@ namespace dxna::graphics {
 			AlphaDestinationBlend(destination);
 		}
 
-		bool BindToGraphicsDevice(GraphicsDevice_* device) {
-			const auto currentDevice = GraphicsDevice();
+		bool BindToGraphicsDevice(GraphicsDevicePtr const& device) {
+			const auto currentDevice = Device();
 
 			if (currentDevice != nullptr && currentDevice != device)
 				return false;
 
-			GraphicsDevice(device);
+			Device(device);
 
 			return true;
 		}
@@ -174,13 +174,13 @@ namespace dxna::graphics {
 			DepthBufferWriteEnable = depthBufferWriteEnable;
 		}
 
-		bool BindToGraphicsDevice(GraphicsDevice_* device) {
-			const auto currentDevice = GraphicsDevice();
+		bool BindToGraphicsDevice(GraphicsDevicePtr const& device) {
+			const auto currentDevice = Device();
 
 			if (currentDevice != nullptr && currentDevice != device)
 				return false;
 
-			GraphicsDevice(device);
+			Device(device);
 
 			return true;
 		}
@@ -218,13 +218,13 @@ namespace dxna::graphics {
 			CullMode = cullMode;
 		}
 
-		bool BindToGraphicsDevice(GraphicsDevice_* device) {
-			const auto currentDevice = GraphicsDevice();
+		bool BindToGraphicsDevice(GraphicsDevicePtr const& device) {
+			const auto currentDevice = Device();
 
 			if (currentDevice != nullptr && currentDevice != device)
 				return false;
 
-			GraphicsDevice(device);
+			Device(device);
 
 			return true;
 		}

@@ -4,6 +4,7 @@
 #include "cstypes.hpp"
 #include "enumerations.hpp"
 #include <vector>
+#include <memory>
 
 namespace cs {
 	class Stream {
@@ -76,9 +77,9 @@ namespace cs {
 			return static_cast<intcs>(_capacity - _origin);
 		}
 
-		constexpr virtual intcs Capacity(size_t value) {
+		constexpr virtual void Capacity(size_t value) {
 			if (!_isOpen || !_expandable || value == _capacity)
-				return 0;
+				return;
 
 			_buffer.resize(value);
 			_capacity = value;
@@ -299,6 +300,9 @@ namespace cs {
 		bool _exposable{ true };
 		bool _isOpen{ false };
 	};
+
+	using StreamPtr = std::shared_ptr<Stream>;
+	using MemoryStreamPtr = std::shared_ptr<MemoryStream>;
 }
 
 #endif

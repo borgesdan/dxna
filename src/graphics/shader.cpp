@@ -1,8 +1,8 @@
 #include "shader.hpp"
 
 namespace dxna::graphics {
-	Shader::Shader(GraphicsDevice_* device, cs::BinaryReader* reader) {
-		this->GraphicsDevice(device);
+	Shader::Shader(GraphicsDevicePtr const& device, cs::BinaryReader* reader) {
+		this->Device(device);
 
 		const auto isVertexShader = (bool)reader->ReadBoolean();
 		Stage = isVertexShader ? ShaderStage::Vertex : ShaderStage::Pixel;
