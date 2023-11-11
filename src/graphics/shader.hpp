@@ -9,40 +9,42 @@
 #include "graphicsresource.hpp"
 
 namespace dxna::graphics {
-    struct SamplerInfo {
-        SamplerType type;
-        intcs textureSlot;
-        intcs samplerSlot;
-        std::string name;
-        SamplerStatePtr state;
-        intcs parameter;
-    };
+	struct SamplerInfo {
+		constexpr SamplerInfo() = default;
 
-    struct VertexAttribute {
-        VertexElementUsage usage;
-        intcs index;
-        std::string name;
-        intcs location;
-    };
+		SamplerType type{ SamplerType::Sampler2D };
+		intcs textureSlot{ 0 };
+		intcs samplerSlot{ 0 };
+		std::string name;
+		SamplerStatePtr state = nullptr;
+		intcs parameter{ 0 };
+	};
 
-    class Shader : public GraphicsResource {
-    public:
-        Shader(GraphicsDevicePtr const& device, cs::BinaryReader* reader);
+	struct VertexAttribute {
+		constexpr VertexAttribute() = default;
 
-        static intcs Profile();
+		VertexElementUsage usage{ VertexElementUsage::Position };
+		intcs index{ 0 };
+		std::string name;
+		intcs location{ 0 };
+	};
 
-        intcs HashKey{0};
-        std::vector<SamplerInfo> Samplers;
-        std::vector<intcs> CBuffers;
-        ShaderStage Stage;
-        std::vector<VertexAttribute> Attributes;
+	class Shader : public GraphicsResource {
+	public:
+		Shader(GraphicsDevicePtr const& device, cs::BinaryReader& reader);
 
-        void PlatformConstruct(ShaderStage const& stage, bytecs* shaderByteCode) {
-            //TODO: remover
-        }
-    };
+		static intcs Profile();
 
-    using ShaderPtr = std::shared_ptr<Shader>;
+		intcs HashKey{ 0 };
+		std::vector<SamplerInfo> Samplers;
+		std::vector<intcs> CBuffers;
+		ShaderStage Stage;
+		std::vector<VertexAttribute> Attributes;
+
+		void PlatformConstruct(ShaderStage const& stage, bytecs* shaderByteCode) {
+			//TODO: remover
+		}
+	};	
 }
 
 #endif

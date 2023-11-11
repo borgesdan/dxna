@@ -13,19 +13,29 @@ using namespace dxna;
 using namespace std;
 using namespace cs;
 
+struct Shd {
+
+	Shd(int i) : value(i){}
+
+	int value;
+};
+
 int main() {
-	auto parameters = std::make_shared<std::vector<intcs>>(10);
-	auto offsets = std::make_shared<std::vector<intcs>>(50);	
+	vector<shared_ptr<Shd>> vec1{
+		make_shared<Shd>(5),
+		make_shared<Shd>(6),
+		make_shared<Shd>(7),
+		make_shared<Shd>(8),
+		make_shared<Shd>(9),
+	};
 
-	auto prm = parameters.get();
+	cout << vec1.at(0)->value << " " << endl;
 
-	prm->at(0) = 10;
+	auto vec2 = vec1;
 
-	auto prm2 = parameters.get();
+	vec2.at(0)->value = 1;
 
-	prm2->at(0) = 50;
-
-	cout << prm->at(0) << " " << prm2->at(0) << endl;
+	cout << vec1.at(0)->value << " " << vec1.at(0)->value << endl;
 
 	return 0;
 }

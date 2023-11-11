@@ -199,7 +199,8 @@ namespace dxna::graphics {
 
 	class EffectTechnique {
 	public:
-		EffectTechnique(std::string const& name,
+		EffectTechnique(			
+			std::string const& name,
 			std::shared_ptr<EffectPassCollection> const& passes,
 			std::shared_ptr<EffectAnnotationCollection> const& annotations) :
 			Passes(passes), Annotations(annotations), Name(name) {}
@@ -219,6 +220,10 @@ namespace dxna::graphics {
 
 		constexpr size_t Count() const { return _techniques.size(); }
 
+		EffectTechniquePtr At(size_t index) {
+			return _techniques[index];
+		}
+
 		EffectTechniquePtr operator[](size_t index) { return _techniques[index]; }
 
 		EffectTechniquePtr operator[](std::string name) {
@@ -235,15 +240,32 @@ namespace dxna::graphics {
 
 	class ConstantBuffer : public GraphicsResource {
 	public:
-		ConstantBuffer(GraphicsDevicePtr device, intcs const& sizeInBytes,
-			vectorptr<intcs> const& parameterIndexes, vectorptr<intcs> const& parameterOffsets,
-			std::string const& name);
+		ConstantBuffer(GraphicsDevicePtr device,
+			intcs const& sizeInBytes,
+			vectorptr<intcs> const& parameterIndexes,
+			vectorptr<intcs> const& parameterOffsets,
+			std::string const& name) {
+			
+			Device(device);
+			_buffer = std::vector<bytecs>(sizeInBytes);
+			_parameters = parameterIndexes;
+			_offsets = parameterOffsets;
+			_name = name;
 
-		void Clear();
+			PlatformInitialize();
+		}
+
+		void Clear() {
+			PlatformClear();
+		}
+
 		void PlatformInitialize() {
 			//TODO: remover
 		}
-		void PlatformClear();
+		
+		void PlatformClear() {
+			//TODO: remover
+		}
 
 	private:
 		//void SetData(int offset, int rows, int columns, object data);
@@ -296,46 +318,79 @@ namespace dxna::graphics {
 			intcs HeaderSize;
 		};
 
-		EffectParameterCollectionPtr Parameters;
-		EffectTechniqueCollectionPtr Techniques;
-		EffectTechniquePtr CurrentTechnique;
-		std::vector<ConstantBufferPtr> ConstantBuffers;
-
-	protected:
-
 	private:
 		MGFXHeader ReadHeader(std::vector<bytecs> const& effectCode, intcs index);
 
-		void ReadEffect(cs::BinaryReaderPtr& reader) {
+		void ReadEffect(cs::BinaryReader& reader) {
 			ConstantBuffers.clear();
 
-			const auto size = (intcs)reader->ReadInt32();
+			const auto size = (intcs)reader.ReadInt32();
 			ConstantBuffers.resize(size);
 
 			for (size_t c = 0; c < ConstantBuffers.size(); ++c) {
-				const auto name = reader->ReadString();
-				const auto sizeInBytes = (intcs)reader->ReadInt16();
+				const auto name = reader.ReadString();
+				const auto sizeInBytes = (intcs)reader.ReadInt16();
 
-				auto parameters = std::make_shared<std::vector<intcs>>((intcs)reader->ReadInt32());
-				auto offsets = std::make_shared<std::vector<intcs>>(parameters->size());
+				auto parameters = std::make_shared<std::vector<intcs>>((intcs)reader.ReadInt32());
+				auto offsets = std::make_shared<std::vector<intcs>>(parameters->size());				
 
 				for (size_t i = 0; i < parameters->size(); ++i) {
 					auto prm = parameters.get();
 					auto ofs = offsets.get();
 
-					prm->at(i) = (intcs)reader->ReadInt32();
-					ofs->at(i) = (intcs)reader->ReadUInt16();
+					prm->at(i) = (intcs)reader.ReadInt32();
+					ofs->at(i) = (intcs)reader.ReadUInt16();
 				}
 
-				//ConstantBuffers[c] = std::make_shared<ConstantBuffer>(GraphicsDevice(), sizeInBytes, parameters, offsets, name);
+				ConstantBuffers[c] = std::make_shared<ConstantBuffer>(
+					this->Device(),
+					sizeInBytes,
+					parameters,
+					offsets,
+					name);
+			}			
+
+			_shaders = NewShaderArray((intcs)reader.ReadInt32());
+
+			for (size_t s = 0; s < _shaders.size(); s++)
+				_shaders[s] = NewShader(Device(), reader);
+
+			Parameters = ReadParameters(reader);
+
+			auto techniques = NewEffectTechniqueArray((intcs)reader.ReadInt32());
+
+			for (size_t t = 0; t < techniques.size(); t++) {
+				const auto name = reader.ReadString();
+				auto annotations = ReadAnnotations(reader);
+				auto passes = ReadPasses(reader, *this, _shaders);
+
+				techniques[t] = NewEffectTechnique(name, passes, annotations);
 			}
+
+			Techniques = NewEffectTechniqueCollection(techniques);
+			CurrentTechnique = Techniques->At(0);
 		}
 
-		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader);
-		static EffectPassCollection ReadPasses(cs::BinaryReader& reader,
-			Effect const& effect, std::vector<Shader> const& shaders);
-		static EffectParameterCollection ReadParameters(cs::BinaryReader& reader);
+		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader) {
+			return nullptr;
+		}
 
+		static EffectPassCollectionPtr ReadPasses(cs::BinaryReader& reader,
+			Effect const& effect, std::vector<ShaderPtr> const& shaders) {
+			return nullptr;
+		}
+
+		static EffectParameterCollectionPtr ReadParameters(cs::BinaryReader& reader) {
+			return nullptr;
+		}
+
+	public:
+		EffectParameterCollectionPtr Parameters;
+		EffectTechniqueCollectionPtr Techniques;
+		EffectTechniquePtr CurrentTechnique;
+		std::vector<ConstantBufferPtr> ConstantBuffers;
+
+	private:
 		std::vector<ShaderPtr> _shaders;
 		bool _isClone{ true };
 	};

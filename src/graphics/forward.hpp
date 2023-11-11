@@ -2,6 +2,7 @@
 #define DXNA_GRAPHICS_FORWARD_HPP
 
 #include <memory>
+#include "../cs/cs.hpp"
 
 namespace dxna::graphics {
 	class GraphicsResource;
@@ -45,6 +46,33 @@ namespace dxna::graphics {
 	using EffectPassCollectionPtr			= std::shared_ptr<EffectPassCollection>;
 	using EffectTechniqueCollectionPtr		= std::shared_ptr<EffectTechniqueCollection>;
 	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;
+
+	//Obtém um novo ponteiro para Shader
+	static ShaderPtr NewShader(GraphicsDevicePtr const& device, cs::BinaryReader& reader) {
+		return std::make_shared<Shader>(device, reader);
+	}
+
+	//Obtém um novo ponteiro para EffectTechnique
+	static EffectTechniquePtr NewEffectTechnique(std::string const& name,
+		std::shared_ptr<EffectPassCollection> const& passes,
+		std::shared_ptr<EffectAnnotationCollection> const& annotations) {
+		return std::make_shared<EffectTechnique>(name, passes, annotations);
+	}
+
+	//Obtém um novo ponteiro para EffectTechniqueCollection
+	static EffectTechniqueCollectionPtr NewEffectTechniqueCollection(std::vector<EffectTechniquePtr> const& techniques) {
+		return std::make_shared<EffectTechniqueCollection>(techniques);
+	}
+
+	//Obtém um vetor de ponteiros de Shader
+	static std::vector<ShaderPtr> NewShaderArray(size_t count) {
+		return std::vector<ShaderPtr>(count);
+	}
+
+	//Obtém um vetor de ponteiros de EffectTechnique
+	static std::vector<EffectTechniquePtr> NewEffectTechniqueArray(size_t count) {
+		return std::vector<EffectTechniquePtr>(count);
+	}
 }
 
 
