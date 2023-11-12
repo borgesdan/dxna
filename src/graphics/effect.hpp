@@ -13,6 +13,7 @@
 #include "states.hpp"
 #include "../types.hpp"
 #include "forward.hpp"
+#include "texture.hpp"
 
 namespace dxna::graphics {
 	class Texture2D;
@@ -66,7 +67,7 @@ namespace dxna::graphics {
 			}
 
 			return nullptr;
-		}
+		}		
 
 		std::vector<EffectAnnotationPtr> _annotations;
 	};	
@@ -80,29 +81,33 @@ namespace dxna::graphics {
 			intcs rowCount,
 			intcs columnCount,
 			std::string const& semantic,
-			std::shared_ptr<EffectAnnotationCollection> const& annotations,
-			std::shared_ptr<EffectParameterCollection> const& elements,
-			std::shared_ptr<EffectParameterCollection> const& structMembers);
+			EffectAnnotationCollectionPtr const& annotations,
+			EffectParameterCollectionPtr const& elements,
+			EffectParameterCollectionPtr const& structMembers,
+			anyptr const& data) {
+			//TODO: implementar
+		}
 
-		virtual std::string GetDataValueString();
-		virtual bool GetValueBoolean();
-		virtual intcs GetValueInt32();
-		virtual std::vector<intcs> GetValueInt32Array();
-		virtual Matrix GetValueMatrix();
-		virtual std::vector<Matrix> GetValueMatrixArray();
-		virtual Quaternion GetValueQuaternion();
-		virtual float GetValueSingle();
-		virtual std::vector<float> GetValueSingleArray();
-		virtual std::string GetValueString();
-		virtual std::shared_ptr<Texture2D> GetValueTexture2D();
-		virtual std::shared_ptr<Texture3D> GetValueTexture3D();
-		virtual std::shared_ptr<TextureCube> GetValueTextureCube();
-		virtual Vector2 GetValueVector2();
-		virtual std::vector<Vector2> GetValueVector2Array();
-		virtual Vector3 GetValueVector3();
-		virtual std::vector<Vector3> GetValueVector3Array();
-		virtual Vector4 GetValueVector4();
-		virtual std::vector<Vector4> GetValueVector4Array();
+		//TODO: implementar
+		virtual std::string GetDataValueString() { return std::string(); }
+		virtual bool GetValueBoolean() { return false; }
+		virtual intcs GetValueInt32() { return 0; }
+		virtual std::vector<intcs> GetValueInt32Array() { return std::vector<intcs>(); }
+		virtual Matrix GetValueMatrix() { return Matrix(); }
+		virtual std::vector<Matrix> GetValueMatrixArray() { return std::vector<Matrix>(); }
+		virtual Quaternion GetValueQuaternion() { return Quaternion(); }
+		virtual float GetValueSingle() { return 0; }
+		virtual std::vector<float> GetValueSingleArray() { return std::vector<float>(); }
+		virtual std::string GetValueString() { return std::string(); }
+		virtual std::shared_ptr<Texture2D> GetValueTexture2D() { return New<Texture2D>(); }
+		virtual std::shared_ptr<Texture3D> GetValueTexture3D() { return New<Texture3D>(); }
+		virtual std::shared_ptr<TextureCube> GetValueTextureCube() { return New<TextureCube>(); }
+		virtual Vector2 GetValueVector2() { return Vector2(); }
+		virtual std::vector<Vector2> GetValueVector2Array() { return std::vector<Vector2>(); }
+		virtual Vector3 GetValueVector3() { return Vector3(); }
+		virtual std::vector<Vector3> GetValueVector3Array() { return std::vector<Vector3>(); }
+		virtual Vector4 GetValueVector4() { return Vector4(); }
+		virtual std::vector<Vector4> GetValueVector4Array() { return std::vector<Vector4>(); }
 
 		static ulongcs NextStateKey;
 
@@ -117,7 +122,7 @@ namespace dxna::graphics {
 		std::shared_ptr<EffectParameterCollection> StructMembers;
 		std::shared_ptr<EffectAnnotationCollection> Annotations;
 
-		std::any Value;
+		std::any Data;
 	};	
 
 	class EffectParameterCollection {
@@ -147,20 +152,22 @@ namespace dxna::graphics {
 	class EffectPass {
 	public:
 		EffectPass(
-			std::shared_ptr<Effect> effect,
+			EffectPtr const& effect,
 			std::string const& name,
-			std::shared_ptr<Shader> pixelShader,
-			std::shared_ptr<Shader> vertexShader,
-			std::shared_ptr<BlendState> blendState,
-			std::shared_ptr<DepthStencilState> depthStencilState,
-			std::shared_ptr<RasterizerState> rasterizerState) :
+			ShaderPtr const& vertexShader,
+			ShaderPtr const& pixelShader,
+			BlendStatePtr const& blendState,
+			DepthStencilStatePtr const& depthStencilState,
+			RasterizerStatePtr const& rasterizerState,
+			EffectAnnotationCollectionPtr const& annotations) :
 			_effect(effect), Name(name), _pixelShader(pixelShader),
 			_vertexShader(vertexShader), _blendState(blendState),
-			_depthStencilState(depthStencilState), _rasterizerState(rasterizerState) {
+			_depthStencilState(depthStencilState), _rasterizerState(rasterizerState),
+			Annotations(annotations){
 		}
 
 		std::string Name;
-		std::shared_ptr<EffectAnnotationCollection> Annotations;
+		EffectAnnotationCollectionPtr Annotations;
 
 		void Apply();
 
@@ -299,10 +306,13 @@ namespace dxna::graphics {
 		intcs _valid;
 	};	
 
-	class Effect : public GraphicsResource {
+	class Effect : public GraphicsResource, public std::enable_shared_from_this<Effect> {
 	public:
 		Effect(GraphicsDevicePtr const& graphicsDevice);
-		Effect(GraphicsDevicePtr const& graphicsDevice, std::vector<bytecs> const& effectCode, intcs index, intcs count);
+		Effect(GraphicsDevicePtr const& graphicsDevice, 
+			std::vector<bytecs> const& effectCode,
+			intcs index, 
+			intcs count);
 
 		struct MGFXHeader {
 			static constexpr intcs MGFXSignature() {
@@ -316,25 +326,19 @@ namespace dxna::graphics {
 			intcs Profile;
 			intcs EffectKey;
 			intcs HeaderSize;
-		};
+		};	
 
 	private:
 		MGFXHeader ReadHeader(std::vector<bytecs> const& effectCode, intcs index);
 
 		void ReadEffect(cs::BinaryReader& reader);
 
-		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader) {
-			return nullptr;
-		}
+		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader);
 
 		static EffectPassCollectionPtr ReadPasses(cs::BinaryReader& reader,
-			Effect const& effect, std::vector<ShaderPtr> const& shaders) {
-			return nullptr;
-		}
+			EffectPtr const& effect, std::vector<ShaderPtr> const& shaders);
 
-		static EffectParameterCollectionPtr ReadParameters(cs::BinaryReader& reader) {
-			return nullptr;
-		}
+		static EffectParameterCollectionPtr ReadParameters(cs::BinaryReader& reader);
 
 	public:
 		EffectParameterCollectionPtr Parameters;
