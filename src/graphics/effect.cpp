@@ -4,8 +4,8 @@ namespace dxna::graphics {
     void Effect::ReadEffect(cs::BinaryReader& reader) {
 
 		ConstantBuffers.clear();
-
-		const auto bufferSize = (intcs)reader.ReadInt32();
+		
+		const auto bufferSize = (intcs)reader.ReadInt32();		
 
 		ConstantBuffers.resize(bufferSize);
 
@@ -24,32 +24,27 @@ namespace dxna::graphics {
 				ofs->at(i) = (intcs)reader.ReadUInt16();
 			}
 
-			ConstantBuffers[c] = std::make_shared<ConstantBuffer>(
-				this->Device(),
-				sizeInBytes,
-				parameters,
-				offsets,
-				name);
+			ConstantBuffers[c] = New<ConstantBuffer>(this->Device(), sizeInBytes, parameters, offsets, name);
 		}
 
-		_shaders = NewShaderArray((intcs)reader.ReadInt32());
+		_shaders = NewArray<Shader>((intcs)reader.ReadInt32());
 
 		for (size_t s = 0; s < _shaders.size(); s++)
-			_shaders[s] = NewShader(Device(), reader);
+			_shaders[s] = New<Shader>(Device(), reader);
 
 		Parameters = ReadParameters(reader);
 
-		auto techniques = NewEffectTechniqueArray((intcs)reader.ReadInt32());
+		auto techniques = NewArray<EffectTechnique>((intcs)reader.ReadInt32());
 
 		for (size_t t = 0; t < techniques.size(); t++) {
 			const auto name = reader.ReadString();
 			auto annotations = ReadAnnotations(reader);
 			auto passes = ReadPasses(reader, *this, _shaders);
 
-			techniques[t] = NewEffectTechnique(name, passes, annotations);
+			techniques[t] = New<EffectTechnique>(name, passes, annotations);
 		}
 
-		Techniques = NewEffectTechniqueCollection(techniques);
+		Techniques = New<EffectTechniqueCollection>(techniques);
 		CurrentTechnique = Techniques->At(0);
     }
 }

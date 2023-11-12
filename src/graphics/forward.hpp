@@ -45,25 +45,7 @@ namespace dxna::graphics {
 	using EffectParameterCollectionPtr		= std::shared_ptr<EffectParameterCollection>;
 	using EffectPassCollectionPtr			= std::shared_ptr<EffectPassCollection>;
 	using EffectTechniqueCollectionPtr		= std::shared_ptr<EffectTechniqueCollection>;
-	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;
-
-	//Obtém um novo ponteiro para Shader
-	ShaderPtr NewShader(GraphicsDevicePtr const& device, cs::BinaryReader& reader);
-
-	//Obtém um novo ponteiro para EffectTechnique
-	EffectTechniquePtr NewEffectTechnique(std::string const& name,
-		std::shared_ptr<EffectPassCollection> const& passes,
-		std::shared_ptr<EffectAnnotationCollection> const& annotations);
-
-	//Obtém um novo ponteiro para EffectTechniqueCollection
-	EffectTechniqueCollectionPtr NewEffectTechniqueCollection(std::vector<EffectTechniquePtr> const& techniques);
-
-	//Obtém um vetor de ponteiros de Shader
-	std::vector<ShaderPtr> NewShaderArray(size_t count);
-
-	//Obtém um vetor de ponteiros de EffectTechnique
-	std::vector<EffectTechniquePtr> NewEffectTechniqueArray(size_t count);
+	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;	
 }
-
 
 #endif
