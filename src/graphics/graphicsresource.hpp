@@ -2,11 +2,13 @@
 #define DXNA_GRAPHICS_GRAPHICSRESOURCE_HPP
 
 #include <string>
+#include <memory>
+#include "../structs.hpp"
 #include "../cs/cstypes.hpp"
 #include "enumerations.hpp"
-#include "../structs.hpp"
-#include <memory>
 #include "forward.hpp"
+#include "../helpers.hpp"
+#include "../types.hpp"
 
 namespace dxna::graphics {	
 

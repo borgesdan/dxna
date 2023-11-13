@@ -17,8 +17,8 @@ namespace dxna {
 			return (*least_significant_address == 0x01) ? Endianness::Little : Endianness::Big;
 		}
 
-		static constexpr bool IsLittleEndiannes() { return GetEndianness() == Endianness::Little; }
-		static constexpr bool IsBigEndiannes() { return GetEndianness() == Endianness::Big; }
+		static constexpr bool IsLittleEndian() { return GetEndianness() == Endianness::Little; }
+		static constexpr bool IsBigEndian() { return GetEndianness() == Endianness::Big; }
 	};
 }
 
