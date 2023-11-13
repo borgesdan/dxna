@@ -47,14 +47,47 @@ namespace dxna::graphics {
 
 			return nullptr;
 		}
-		
+
 		vectorptr<EffectAnnotation> _annotations;
 	};
 
 	class EffectParameter {
 	public:
+		EffectParameter() = default;
+
+		EffectParameter(
+			EffectParameterClass class_,
+			EffectParameterType type,
+			std::string name,
+			intcs rowCount,
+			intcs columnCount,
+			std::string semantic,
+			EffectAnnotationCollectionPtr const& annotations,
+			EffectParameterCollectionPtr const& elements,
+			EffectParameterCollectionPtr const& structMembers,
+			anyptr const& data) :
+			ParameterClass(class_), ParameterType(type), Name(name),
+			RowCount(rowCount), ColumnCount(columnCount), Semantic(semantic),
+			Annotations(annotations), Elements(elements), StructureMembers(structMembers),
+			Data(data), StateKey(NextStateKey++) {
+
+		}
+
+		static ulongcs NextStateKey;
+
 		std::string Name;
-	};	
+		std::string Semantic;
+		EffectParameterClass ParameterClass{ EffectParameterClass::Scalar };
+		EffectParameterType ParameterType{ EffectParameterType::Void };
+		intcs RowCount{ 0 };
+		intcs ColumnCount{ 0 };
+		EffectParameterCollectionPtr Elements;
+		EffectParameterCollectionPtr StructureMembers;
+		EffectAnnotationCollectionPtr Annotations;
+		//Representa um object
+		anyptr Data;
+		ulongcs StateKey{ 0 };
+	};
 
 	class EffectParameterCollection {
 	public:
@@ -78,9 +111,9 @@ namespace dxna::graphics {
 
 		EffectParameter* operator[](size_t index) { return &_parameters->at(index); }
 
-		EffectParameter* operator[](std::string const& name) { 
-			const auto contains = _indexLookup->contains(name);	
-			
+		EffectParameter* operator[](std::string const& name) {
+			const auto contains = _indexLookup->contains(name);
+
 			if (contains) {
 				const auto index = _indexLookup->at(name);
 				return &_parameters->at(index);
