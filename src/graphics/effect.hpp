@@ -190,6 +190,50 @@ namespace dxna::graphics {
 		vectorptr<EffectPass> _passes;
 	};
 
+	class EffectTechnique {
+	public:
+		EffectTechnique() = default;
+
+		EffectTechnique(
+			std::string const& name,
+			EffectPassCollectionPtr const& passes,
+			EffectAnnotationCollectionPtr const& annotations) :
+		Passes(passes), Annotations(annotations), Name(name){
+		}
+
+		EffectPassCollectionPtr Passes;
+		EffectAnnotationCollectionPtr Annotations;
+		std::string Name;
+	};
+
+	class EffectTechniqueCollection {
+	public:
+		EffectTechniqueCollection() = default;
+
+		EffectTechniqueCollection(vectorptr<EffectTechnique> const& techniques) :
+			_techniques(techniques) {
+		}
+
+		constexpr size_t Count() { return _techniques->size(); }
+
+		EffectTechnique* At(size_t index) { return &_techniques->at(index); }
+
+		EffectTechnique* operator[](size_t index) { return &_techniques->at(index); }
+
+		EffectTechnique* operator[](std::string const& name) {
+			for (size_t i = 0; i < _techniques->size(); ++i) {
+				auto a = _techniques->at(i);
+
+				if (a.Name == name)
+					return &a;
+			}
+
+			return nullptr;
+		}
+
+		vectorptr<EffectTechnique> _techniques;
+	};
+
 	class Effect : public GraphicsResource {
 	public:
 		struct MGFXHeader {
