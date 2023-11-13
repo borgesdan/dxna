@@ -4,24 +4,57 @@
 #include "graphicsresource.hpp"
 
 namespace dxna::graphics {
-	class EffectParameter {
+	class EffectAnnotation {
 	public:
-		constexpr EffectParameter() = default;
+		constexpr EffectAnnotation() = default;
 
-		constexpr EffectParameter(EffectParameterClass const& class_,
+		constexpr EffectAnnotation(EffectParameterClass const& class_,
 			EffectParameterType const& type, std::string const& name,
 			intcs rowCount, intcs columnCount, std::string const& semantic) :
-			ParameterClass(class_),	ParameterType(type), Name(name),
-			RowCount(rowCount),	ColumnCount(columnCount), Semantic(semantic){
+			ParameterClass(class_), ParameterType(type), Name(name),
+			RowCount(rowCount), ColumnCount(columnCount), Semantic(semantic) {
 		}
 
-		EffectParameterClass ParameterClass{EffectParameterClass::Scalar};
-		EffectParameterType ParameterType{EffectParameterType::Void};
+		EffectParameterClass ParameterClass{ EffectParameterClass::Scalar };
+		EffectParameterType ParameterType{ EffectParameterType::Void };
 		std::string Name;
-		intcs RowCount{0};
-		intcs ColumnCount{0};
+		intcs RowCount{ 0 };
+		intcs ColumnCount{ 0 };
 		std::string Semantic;
 	};
+
+	class EffectAnnotationCollection {
+	public:
+		EffectAnnotationCollection() = default;
+
+		EffectAnnotationCollection(vectorptr<EffectAnnotation> const& annotations) :
+			_annotations(annotations) {
+		}
+
+		constexpr size_t Count() { return _annotations->size(); }
+
+		EffectAnnotation* At(size_t index) { return &_annotations->at(index); }
+
+		EffectAnnotation* operator[](size_t index) { return &_annotations->at(index); }
+
+		EffectAnnotation* operator[](std::string const& name) {
+			for (size_t i = 0; i < _annotations->size(); ++i) {
+				auto a = _annotations->at(i);
+
+				if (a.Name == name)
+					return &a;
+			}
+
+			return nullptr;
+		}
+		
+		vectorptr<EffectAnnotation> _annotations;
+	};
+
+	class EffectParameter {
+	public:
+		std::string Name;
+	};	
 
 	class EffectParameterCollection {
 	public:
@@ -61,6 +94,7 @@ namespace dxna::graphics {
 	};
 
 	class Effect : public GraphicsResource {
+	public:
 		struct MGFXHeader {
 			static constexpr intcs MGFXSignature() { return dxna::Enviroment::IsLittleEndian() ? 0x5846474D : 0x4D474658; }
 			static constexpr intcs MGFXVersion = 10;
@@ -70,7 +104,14 @@ namespace dxna::graphics {
 			intcs Profile{ 0 };
 			intcs EffectKey{ 0 };
 			intcs HeaderSize{ 0 };
+
+
 		};
+
+		//Campos públicos
+	public:
+		EffectParameterCollectionPtr Parameters;
+
 	};
 }
 
