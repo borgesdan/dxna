@@ -3,12 +3,13 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "../structs.hpp"
+#include "../helpers.hpp"
+#include "../types.hpp"
 #include "../cs/cstypes.hpp"
 #include "enumerations.hpp"
 #include "forward.hpp"
-#include "../helpers.hpp"
-#include "../types.hpp"
 
 namespace dxna::graphics {	
 

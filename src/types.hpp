@@ -2,6 +2,7 @@
 #define DXNA_TYPES_HPP
 
 #include <vector>
+#include <map>
 #include <memory>
 #include <utility>
 #include <any>
@@ -10,6 +11,10 @@ namespace dxna {
 	//Define um ponteiro para um vetor de um tipo definido.
 	template <typename T>
 	using vectorptr = std::shared_ptr<std::vector<T>>;
+
+	//Define um ponteiro para um mapa de um tipo definido.
+	template <typename T1, typename T2>
+	using mapptr = std::shared_ptr<std::map<T1, T2>>;
 
 	//Define um pontiero para um tipo aceito em std::any
 	using anyptr = std::shared_ptr<std::any>;

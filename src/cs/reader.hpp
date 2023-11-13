@@ -253,7 +253,7 @@ namespace cs {
 
 		std::string ReadString() {
 			int num = 0;
-			int val1;
+			int val1 = 0;
 			
 			if (val1 <= 0)
 				std::string();
