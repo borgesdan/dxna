@@ -18,6 +18,8 @@ namespace dxna::graphics {
 	struct DepthStencilState;
 	struct RasterizerState;
 
+	class SamplerStateCollection;
+
 	class Effect;
 	class EffectAnnotation;
 	class EffectParameter;
@@ -30,6 +32,8 @@ namespace dxna::graphics {
 	class EffectTechniqueCollection;
 	class ConstantBufferCollection;
 
+	class TextureCollection;
+
 	using GraphicsResourcePtr				= std::shared_ptr<GraphicsResource>;
 	using GraphicsDevicePtr					= std::shared_ptr<GraphicsDevice>;
 	using SamplerInfoPtr					= std::shared_ptr<SamplerInfo>;
@@ -40,6 +44,7 @@ namespace dxna::graphics {
 	using BlendStatePtr						= std::shared_ptr<BlendState>;
 	using DepthStencilStatePtr				= std::shared_ptr<DepthStencilState>;
 	using RasterizerStatePtr				= std::shared_ptr<RasterizerState>;
+	using SamplerStateCollectionPtr			= std::shared_ptr<SamplerStateCollection>;
 	using EffectPtr							= std::shared_ptr<Effect>;
 	using EffectAnnotationPtr				= std::shared_ptr<EffectAnnotation>;
 	using EffectParameterPtr				= std::shared_ptr<EffectParameter>;
@@ -51,6 +56,7 @@ namespace dxna::graphics {
 	using EffectPassCollectionPtr			= std::shared_ptr<EffectPassCollection>;
 	using EffectTechniqueCollectionPtr		= std::shared_ptr<EffectTechniqueCollection>;
 	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;	
+	using TextureCollectionPtr				= std::shared_ptr<TextureCollection>;	
 }
 
 #endif

@@ -1,12 +1,8 @@
 #ifndef DXNA_GRAPHICS_SHADERS_HPP
 #define DXNA_GRAPHICS_SHADERS_HPP
 
-#include "../cs/cs.hpp"
-#include "./enumerations.hpp"
-#include <string>
-#include <vector>
-#include "states.hpp"
 #include "graphicsresource.hpp"
+#include "states.hpp"
 
 namespace dxna::graphics {
 	struct SamplerInfo {

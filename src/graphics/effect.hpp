@@ -126,6 +126,42 @@ namespace dxna::graphics {
 		vectorptr<EffectParameter> _parameters;
 	};
 
+	class EffectPass {
+	public:
+		EffectPass() = default;
+
+		EffectPass(
+			EffectPtr const& effect,
+			std::string const& name,
+			ShaderPtr const& vertexShader,
+			ShaderPtr const& pixelShader,
+			BlendStatePtr const& blendState,
+			DepthStencilStatePtr const& depthStencilState,
+			RasterizerStatePtr const& rasterizerState,
+			EffectAnnotationCollectionPtr const& annotations) :
+			_effect(effect), Name(name), _vertexShader(vertexShader),
+			_pixelShader(pixelShader), _blendState(blendState),
+			_depthStencilState(depthStencilState), _rasterizerState(rasterizerState),
+			Annotations(annotations) {
+		}
+
+		//TODO
+		void Apply();
+
+		EffectPtr _effect;
+		ShaderPtr _pixelShader;
+		ShaderPtr _vertexShader;
+		BlendStatePtr _blendState;
+		DepthStencilStatePtr _depthStencilState;
+		RasterizerStatePtr _rasterizerState;
+		std::string Name;
+		EffectAnnotationCollectionPtr Annotations;
+
+	private:
+		//TODO
+		void SetShaderSamplers(ShaderPtr const& shader, TextureCollectionPtr const& textures, SamplerStateCollection const& samplerStates);
+	};
+
 	class Effect : public GraphicsResource {
 	public:
 		struct MGFXHeader {
