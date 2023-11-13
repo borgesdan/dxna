@@ -1,5 +1,5 @@
-#ifndef CS_TIMESPAN_HPP
-#define CS_TIMESPAN_HPP
+#ifndef DXNA_CS_TIMESPAN_HPP
+#define DXNA_CS_TIMESPAN_HPP
 
 #include <limits>
 #include <cstdint>

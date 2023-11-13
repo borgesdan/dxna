@@ -3,11 +3,13 @@
 #
 
 # Add source to this project's executable.
-add_executable (dxna WIN32 
+# Usar dxna WIN32
+add_executable (dxna  
 "main.cpp"
 "game.cpp"
 "input/keyboard.cpp"
 "gamewindow.cpp"
+"structs.cpp"
 "cs/cs.cpp"
 "input/mouse.cpp"
 "input/gamepad.cpp"
@@ -16,6 +18,10 @@ add_executable (dxna WIN32
 "platforms/windows/wgamewindow.cpp"
 "platforms/windows/wgamewindow.cpp"
 "platforms/windows/winput.cpp"
+"graphics/graphics.cpp"
+ "graphics/shader.cpp"
+ 
+ 
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
