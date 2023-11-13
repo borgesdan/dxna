@@ -7,6 +7,9 @@
 namespace dxna::graphics {
 	class GraphicsResource;
 	class GraphicsDevice;
+	
+	struct SamplerInfo;
+	struct VertexAttribute;
 	class Shader;
 
 	struct SamplerState;
@@ -29,6 +32,8 @@ namespace dxna::graphics {
 
 	using GraphicsResourcePtr				= std::shared_ptr<GraphicsResource>;
 	using GraphicsDevicePtr					= std::shared_ptr<GraphicsDevice>;
+	using SamplerInfoPtr					= std::shared_ptr<SamplerInfo>;
+	using VertexAttributePtr				= std::shared_ptr<VertexAttribute>;
 	using ShaderPtr							= std::shared_ptr<Shader>;
 	using SamplerStatePtr					= std::shared_ptr<SamplerState>;
 	using TargetBlendStatePtr				= std::shared_ptr<TargetBlendState>;

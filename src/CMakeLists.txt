@@ -20,8 +20,8 @@ add_executable (dxna
 "platforms/windows/winput.cpp"
 "graphics/graphics.cpp"
  "graphics/shader.cpp"
- "graphics/effect.cpp"
- "graphics/forward.cpp"
+ 
+ 
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

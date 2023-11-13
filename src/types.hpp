@@ -18,13 +18,7 @@ namespace dxna {
 	template <class _Ty, class... _Types>
 	std::shared_ptr<_Ty> New(_Types&&... _Args) {
 		return std::make_shared<_Ty>(std::forward<_Types>(_Args)...);
-	}
-
-	//Inicializa um vetor para ponteiros de um tipo definido.
-	template <class _Ty>
-	std::vector<std::shared_ptr<_Ty>> NewArray(size_t count) {
-		return std::vector<std::shared_ptr<_Ty>>(count);
-	}
+	}	
 
 	//Inicializa um novo ponteiro para um vetor
 	template <class _Ty, class... _Types>
