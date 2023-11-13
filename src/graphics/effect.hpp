@@ -162,6 +162,34 @@ namespace dxna::graphics {
 		void SetShaderSamplers(ShaderPtr const& shader, TextureCollectionPtr const& textures, SamplerStateCollection const& samplerStates);
 	};
 
+	class EffectPassCollection {
+	public:
+		EffectPassCollection() = default;
+
+		EffectPassCollection(vectorptr<EffectPass> const& passes) :
+			_passes(passes) {
+		}
+
+		constexpr size_t Count() { return _passes->size(); }
+
+		EffectPass* At(size_t index) { return &_passes->at(index); }
+
+		EffectPass* operator[](size_t index) { return &_passes->at(index); }
+
+		EffectPass* operator[](std::string const& name) {
+			for (size_t i = 0; i < _passes->size(); ++i) {
+				auto a = _passes->at(i);
+
+				if (a.Name == name)
+					return &a;
+			}
+
+			return nullptr;
+		}
+
+		vectorptr<EffectPass> _passes;
+	};
+
 	class Effect : public GraphicsResource {
 	public:
 		struct MGFXHeader {
