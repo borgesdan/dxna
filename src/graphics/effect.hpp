@@ -245,14 +245,16 @@ namespace dxna::graphics {
 			intcs Profile{ 0 };
 			intcs EffectKey{ 0 };
 			intcs HeaderSize{ 0 };
-
-
 		};
 
 		//Campos públicos
 	public:
 		EffectParameterCollectionPtr Parameters;
-
+		EffectTechniqueCollectionPtr Techniques;
+		EffectTechnique* CurrentTechnique;
+		
+	private:
+		vectorptr<Shader> _shaders;
 	};
 }
 
