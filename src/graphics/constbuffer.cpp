@@ -92,4 +92,22 @@ namespace dxna::graphics {
 
 		_stateKey = EffectParameter::NextStateKey;
 	}
+	
+	void ConstantBufferCollection::Clear() {
+		_buffers->clear();
+		_isclear = true;
+	}
+
+	void ConstantBufferCollection::SetConstantBuffers(GraphicsDevice& device) {
+		if (_isclear)
+			return;
+		
+		for (size_t i = 0; i < _buffers->size(); i++) {
+			auto buffer = &_buffers->at(i);
+
+			if (!buffer->IsEmpty()) {
+				buffer->PlatformApply(device, _stage, i);
+			}
+		}
+	}
 }

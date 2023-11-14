@@ -6,14 +6,16 @@
 namespace dxna::graphics {
 	class ConstantBuffer : public GraphicsResource {
 	public:
+		ConstantBuffer() = default;
+
 		ConstantBuffer(GraphicsDevicePtr const& device, intcs sizeInBytes,
 			vectorptr<intcs> const& parametersIndexes,
-			vectorptr<intcs> const& parameterOffsets):
+			vectorptr<intcs> const& parameterOffsets) :
 			_parameters(parametersIndexes), _offsets(parameterOffsets)
 		{
 			_buffer = NewVectorPtr<bytecs>(sizeInBytes);
-			Device(device);	
-			
+			Device(device);
+
 			PlatformInitialize();
 		}
 
@@ -29,16 +31,62 @@ namespace dxna::graphics {
 			//TODO: implementar
 		}
 
+		constexpr bool operator==(const ConstantBuffer& other) const {
+			return _buffer == other._buffer
+				&& _parameters == other._parameters
+				&& _offsets == other._offsets
+				&& _stateKey == other._stateKey;
+		}
+
+		constexpr bool IsEmpty() const {
+			return _buffer == nullptr || _buffer->empty();
+		}
+
+		void PlatformApply(GraphicsDevice& device, ShaderStage state, int slot);
+
 	private:
 		void SetData(intcs offset, intcs rows, intcs columns, anyptr const& data, bool isarray = true);
 		intcs SetParameter(intcs offset, EffectParameter& param);
 		void Update(EffectParameterCollection& parameters);
 
 	private:
-		vectorptr<bytecs> _buffer;
-		vectorptr<intcs> _parameters;
-		vectorptr<intcs> _offsets;		
-		ulongcs _stateKey;		
+		vectorptr<bytecs> _buffer = nullptr;
+		vectorptr<intcs> _parameters = nullptr;
+		vectorptr<intcs> _offsets = nullptr;
+		ulongcs _stateKey{ 0 };
+	};
+
+	class ConstantBufferCollection {
+	public:
+		ConstantBufferCollection(ShaderStage stage, size_t maxBuffers) :
+			_stage(stage), _maxbuffers(maxBuffers),
+			_buffers(NewVectorPtr<ConstantBuffer>(maxBuffers)) {
+		}
+
+		ConstantBuffer* At(size_t index) { 
+			if(_isclear)
+				_buffers->resize(_maxbuffers);
+
+			return &_buffers->at(index); 
+		}
+
+		ConstantBuffer* operator[](size_t index) { 
+			if (_isclear)
+				_buffers->resize(_maxbuffers);
+
+			return &_buffers->at(index); 
+		}
+
+		void Clear();
+
+		//TODO #if WEB / OPENGL
+		void SetConstantBuffers(GraphicsDevice& device);
+
+	private:
+		vectorptr<ConstantBuffer> _buffers = nullptr;
+		ShaderStage _stage{ ShaderStage::Vertex };
+		size_t _maxbuffers{ 0 };
+		bool _isclear{ false };
 	};
 }
 

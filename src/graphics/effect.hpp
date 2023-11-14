@@ -2,6 +2,7 @@
 #define DXNA_GRAPHICS_EFFECT_HPP
 
 #include "graphicsresource.hpp"
+#include "constbuffer.hpp"
 
 namespace dxna::graphics {
 	class EffectAnnotation {
@@ -70,7 +71,6 @@ namespace dxna::graphics {
 			RowCount(rowCount), ColumnCount(columnCount), Semantic(semantic),
 			Annotations(annotations), Elements(elements), StructureMembers(structMembers),
 			Data(data), StateKey(NextStateKey++) {
-
 		}
 
 		static ulongcs NextStateKey;
@@ -249,10 +249,11 @@ namespace dxna::graphics {
 
 		//Campos públicos
 	public:
-		EffectParameterCollectionPtr Parameters;
-		EffectTechniqueCollectionPtr Techniques;
-		EffectTechnique* CurrentTechnique;
-		
+		EffectParameterCollectionPtr Parameters = nullptr;
+		EffectTechniqueCollectionPtr Techniques = nullptr;
+		EffectTechnique* CurrentTechnique = nullptr;
+		vectorptr<ConstantBuffer> ConstantBuffers = nullptr;		
+
 	private:
 		vectorptr<Shader> _shaders;
 	};
