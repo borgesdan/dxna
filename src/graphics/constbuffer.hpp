@@ -31,6 +31,8 @@ namespace dxna::graphics {
 
 	private:
 		void SetData(intcs offset, intcs rows, intcs columns, anyptr const& data, bool isarray = true);
+		intcs SetParameter(intcs offset, EffectParameter& param);
+		void Update(EffectParameterCollection& parameters);
 
 	private:
 		vectorptr<bytecs> _buffer;

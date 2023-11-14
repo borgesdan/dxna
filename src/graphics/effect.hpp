@@ -88,7 +88,7 @@ namespace dxna::graphics {
 		anyptr Data;
 		ulongcs StateKey{ 0 };
 	};
-
+	
 	class EffectParameterCollection {
 	public:
 		EffectParameterCollection() = default;
