@@ -28,28 +28,28 @@ namespace dxna::graphics {
 	public:
 		EffectAnnotationCollection() = default;
 
-		EffectAnnotationCollection(vectorptr<EffectAnnotation> const& annotations) :
+		EffectAnnotationCollection(vectorptr<EffectAnnotationPtr> const& annotations) :
 			_annotations(annotations) {
 		}
 
 		constexpr size_t Count() { return _annotations->size(); }
 
-		EffectAnnotation* At(size_t index) { return &_annotations->at(index); }
+		EffectAnnotationPtr At(size_t index) { return _annotations->at(index); }
 
-		EffectAnnotation* operator[](size_t index) { return &_annotations->at(index); }
+		EffectAnnotationPtr operator[](size_t index) { return _annotations->at(index); }
 
-		EffectAnnotation* operator[](std::string const& name) {
+		EffectAnnotationPtr operator[](std::string const& name) {
 			for (size_t i = 0; i < _annotations->size(); ++i) {
 				auto a = _annotations->at(i);
 
-				if (a.Name == name)
-					return &a;
+				if (a->Name == name)
+					return a;
 			}
 
 			return nullptr;
 		}
 
-		vectorptr<EffectAnnotation> _annotations;
+		vectorptr<EffectAnnotationPtr> _annotations;
 	};
 
 	class EffectParameter {
@@ -93,12 +93,12 @@ namespace dxna::graphics {
 	public:
 		EffectParameterCollection() = default;
 
-		EffectParameterCollection(vectorptr<EffectParameter> const& parameters) :
+		EffectParameterCollection(vectorptr<EffectParameterPtr> const& parameters) :
 			_parameters(parameters) {
 			_indexLookup = New<std::map<std::string, intcs>>();
 
 			for (size_t i = 0; i < _parameters->size(); ++i) {
-				const auto name = &_parameters->at(i).Name;
+				const auto name = &_parameters->at(i)->Name;
 
 				if (name->empty())
 					_indexLookup->emplace(*name, static_cast<intcs>(i));
@@ -107,23 +107,23 @@ namespace dxna::graphics {
 
 		constexpr size_t Count() { return _parameters->size(); }
 
-		EffectParameter* At(size_t index) { return &_parameters->at(index); }
+		EffectParameterPtr At(size_t index) { return _parameters->at(index); }
 
-		EffectParameter* operator[](size_t index) { return &_parameters->at(index); }
+		EffectParameterPtr operator[](size_t index) { return _parameters->at(index); }
 
-		EffectParameter* operator[](std::string const& name) {
+		EffectParameterPtr operator[](std::string const& name) {
 			const auto contains = _indexLookup->contains(name);
 
 			if (contains) {
 				const auto index = _indexLookup->at(name);
-				return &_parameters->at(index);
+				return _parameters->at(index);
 			}
 
 			return nullptr;
 		}
 
 		mapptr<std::string, intcs> _indexLookup;
-		vectorptr<EffectParameter> _parameters;
+		vectorptr<EffectParameterPtr> _parameters;
 	};
 
 	class EffectPass {
@@ -256,13 +256,11 @@ namespace dxna::graphics {
 		virtual void OnApply(){}
 
 	private:
-		void ReadEffect(cs::BinaryReader& reader) {
+		void ReadEffect(cs::BinaryReader& sreader) {
 
 		}
 
-		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader) {
-			return nullptr;
-		}
+		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader);
 
 		static EffectPassCollectionPtr ReadPasses(cs::BinaryReader& reader, EffectPtr const& effect, vectorptr<ShaderPtr> const& shaders);
 

@@ -7,12 +7,12 @@ namespace dxna::graphics {
 	ulongcs EffectParameter::NextStateKey = 0;
 
 	EffectParameterCollectionPtr Effect::ReadParameters(cs::BinaryReader& reader) {
-		const auto count = (intcs)reader.ReadInt32();
+		const auto count = reader.ReadInt32().Value();
 
 		if (count == 0)
 			return New<EffectParameterCollection>();
 
-		auto parameters = NewVector<EffectParameter>(count);
+		auto parameters = NewVector<EffectParameterPtr>(count);
 
 		for (size_t i = 0; i < count; ++i) {
 			const auto class_ = (EffectParameterClass)reader.ReadByte().Value();
@@ -36,7 +36,7 @@ namespace dxna::graphics {
 					for (size_t j = 0; j < buffer->size(); ++j)
 						buffer->at(j) = reader.ReadInt32().Value();
 
-					*data.get() = buffer;
+					*data = buffer;
 
 					break;
 				}
@@ -45,7 +45,7 @@ namespace dxna::graphics {
 					for (size_t j = 0; j < buffer->size(); ++j)
 						buffer->at(j) = reader.ReadSingle().Value();
 
-					*data.get() = buffer;
+					*data = buffer;
 					break;
 				}
 				default:
@@ -53,7 +53,7 @@ namespace dxna::graphics {
 				}
 			}
 
-			parameters->at(i) = EffectParameter(
+			parameters->at(i) = New<EffectParameter>(
 				class_, type, name, rowCount, columnCount, semantic,
 				annotations, elements, structMembers, data);
 		}
@@ -134,5 +134,16 @@ namespace dxna::graphics {
 		}
 
 		return New<EffectPassCollection>(passes);
+	}
+
+	EffectAnnotationCollectionPtr Effect::ReadAnnotations(cs::BinaryReader& reader) {
+		const auto count = reader.ReadInt32();
+		
+		if (count == 0)
+			return New<EffectAnnotationCollection>();
+
+		const auto annotations = NewVector<EffectAnnotationPtr>(count);
+
+		return New<EffectAnnotationCollection>(annotations);
 	}
 }
