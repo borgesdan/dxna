@@ -764,23 +764,23 @@ namespace dxna {
 		return plane1;
 	}
 
-	nfloat Plane::Intersects(Ray const& ray) const
+	nullfloat Plane::Intersects(Ray const& ray) const
 	{
 		float num1 = (Normal.X * ray.Direction.X + Normal.Y * ray.Direction.Y + Normal.Z * ray.Direction.Z);
 
 		if (std::abs(num1) < 9.9999997473787516E-06)
-			return nfloat();
+			return nullfloat();
 
 		float num2 = (Normal.X * ray.Position.X + Normal.Y * ray.Position.Y + Normal.Z * ray.Position.Z);
 		float num3 = (-D - num2) / num1;
 
 		if (num3 < 0.0F) {
 			if (num3 < -9.9999997473787516E-06)
-				return nfloat();
+				return nullfloat();
 
 			num3 = 0.0f;
 		}
-		return nfloat(num3);
+		return num3;
 	}
 
 	float Plane::PerpendicularDistance(Vector3 const& point, Plane const& plane) {
@@ -848,14 +848,14 @@ namespace dxna {
 		return reflection;
 	}
 
-	nfloat dxna::BoundingBox::Intersects(Ray const& ray) const
+	nullfloat dxna::BoundingBox::Intersects(Ray const& ray) const
 	{
 		float num1 = 0.0f;
 		float num2 = FloatMaxValue;
 		
 		if (std::abs(ray.Direction.X) < 9.9999999747524271E-07)	{
 			if (ray.Position.X < Min.X || ray.Position.X > Max.X)
-				return nfloat();
+				return nullfloat();
 		}
 		else {
 			float num3 = 1.0f / ray.Direction.X;
@@ -872,13 +872,13 @@ namespace dxna {
 			num2 = MathHelper::Min(num5, num2);
 
 			if (num1 > num2)
-				return nfloat();
+				return nullfloat();
 		}
 		
 		if (std::abs(ray.Direction.Y) < 9.9999999747524271E-07)
 		{
 			if (ray.Position.Y < Min.Y || ray.Position.Y > Max.Y)
-				return nfloat();
+				return nullfloat();
 		}
 		else {
 			float num7 = 1.0f / ray.Direction.Y;
@@ -895,12 +895,12 @@ namespace dxna {
 			num2 = MathHelper::Min(num9, num2);
 			
 			if (num1 > num2)
-				return nfloat();
+				return nullfloat();
 		}
 
 		if (std::abs(ray.Direction.Z) < 9.9999999747524271E-07) 	{
 			if (ray.Position.Z < Min.Z || ray.Position.Z > Max.Z)
-				return nfloat();
+				return nullfloat();
 		}
 		else
 		{
@@ -919,12 +919,12 @@ namespace dxna {
 			float num15 = MathHelper::Min(num13, num2);
 
 			if (num1 > num15)
-				return nfloat();
+				return nullfloat();
 		}
-		return nfloat(num1);
+		return num1;
 	}
 
-	nfloat BoundingSphere::Intersects(Ray const& ray) const {
+	nullfloat BoundingSphere::Intersects(Ray const& ray) const {
 		float num1 = Center.X - ray.Position.X;
 		float num2 = Center.Y - ray.Position.Y;
 		float num3 = Center.Z - ray.Position.Z;
@@ -932,21 +932,21 @@ namespace dxna {
 		float num5 = Radius * Radius;
 
 		if (num4 <= num5)
-			return nfloat(0.0f);
+			return 0.0f;
 
 		float num6 = (num1 * ray.Direction.X + num2 * ray.Direction.Y + num3 * ray.Direction.Z);
 
 		if (num6 < 0.0)
-			return nfloat();
+			return nullfloat();
 
 		float num7 = num4 - num6 * num6;
 		
 		if (num7 >  num5)
-			return nfloat();
+			return nullfloat();
 
 		float num8 = std::sqrt(num5 - num7);
 
-		return nfloat(num6 - num8);
+		return num6 - num8;
 	}
 
 	BoundingSphere dxna::BoundingSphere::CreateFromFrustum(BoundingFrustum const& frustum) {

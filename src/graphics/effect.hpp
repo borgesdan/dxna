@@ -166,28 +166,28 @@ namespace dxna::graphics {
 	public:
 		EffectPassCollection() = default;
 
-		EffectPassCollection(vectorptr<EffectPass> const& passes) :
+		EffectPassCollection(vectorptr<EffectPassPtr> const& passes) :
 			_passes(passes) {
 		}
 
 		constexpr size_t Count() { return _passes->size(); }
 
-		EffectPass* At(size_t index) { return &_passes->at(index); }
+		EffectPassPtr At(size_t index) { return _passes->at(index); }
 
-		EffectPass* operator[](size_t index) { return &_passes->at(index); }
+		EffectPassPtr operator[](size_t index) { return _passes->at(index); }
 
-		EffectPass* operator[](std::string const& name) {
+		EffectPassPtr operator[](std::string const& name) {
 			for (size_t i = 0; i < _passes->size(); ++i) {
 				auto a = _passes->at(i);
 
-				if (a.Name == name)
-					return &a;
+				if (a->Name == name)
+					return a;
 			}
 
 			return nullptr;
 		}
 
-		vectorptr<EffectPass> _passes;
+		vectorptr<EffectPassPtr> _passes;
 	};
 
 	class EffectTechnique {
@@ -246,6 +246,27 @@ namespace dxna::graphics {
 			intcs EffectKey{ 0 };
 			intcs HeaderSize{ 0 };
 		};
+
+		virtual void GraphicsDeviceResetting() override {
+			for (size_t i = 0; i < ConstantBuffers->size(); i++)
+				ConstantBuffers->at(i).Clear();
+		}
+
+	protected:
+		virtual void OnApply(){}
+
+	private:
+		void ReadEffect(cs::BinaryReader& reader) {
+
+		}
+
+		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader) {
+			return nullptr;
+		}
+
+		static EffectPassCollectionPtr ReadPasses(cs::BinaryReader& reader, EffectPtr const& effect, vectorptr<ShaderPtr> const& shaders);
+
+		static EffectParameterCollectionPtr ReadParameters(cs::BinaryReader& reader);
 
 		//Campos públicos
 	public:

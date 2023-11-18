@@ -27,17 +27,17 @@ namespace cs {
 	};
 }
 
-using nfloat	= cs::Nullable<float>;
-using ndouble	= cs::Nullable<double>;
-using nsbytecs	= cs::Nullable<sbytecs>;
-using nbytecs	= cs::Nullable<bytecs>;
-using nshortcs	= cs::Nullable<shortcs>;
-using nushortcs = cs::Nullable<ushortcs>;
-using nintcs	= cs::Nullable<intcs>;
-using nuintcs	= cs::Nullable<uintcs>;
-using nlongcs	= cs::Nullable<longcs>;
-using nulongcs	= cs::Nullable<ulongcs>;
-using nbool		= cs::Nullable<bool>;
-using ncharcs	= cs::Nullable<charcs>;
+using nullfloat		= cs::Nullable<float>;
+using nulldouble	= cs::Nullable<double>;
+using nullsbytecs	= cs::Nullable<sbytecs>;
+using nullbytecs	= cs::Nullable<bytecs>;
+using nullshortcs	= cs::Nullable<shortcs>;
+using nullushortcs	= cs::Nullable<ushortcs>;
+using nullintcs		= cs::Nullable<intcs>;
+using nulluintcs	= cs::Nullable<uintcs>;
+using nulllongcs	= cs::Nullable<longcs>;
+using nullulongcs	= cs::Nullable<ulongcs>;
+using nullbool		= cs::Nullable<bool>;
+using nullcharcs	= cs::Nullable<charcs>;
 
 #endif

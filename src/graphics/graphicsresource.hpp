@@ -32,7 +32,7 @@ namespace dxna::graphics {
 		}
 
 	protected:
-		virtual void GraphicsDeviceReseting() {}
+		virtual void GraphicsDeviceResetting() {}
 	
 	public:
 		std::string Name;

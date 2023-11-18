@@ -13,7 +13,7 @@ namespace dxna::graphics {
 			vectorptr<intcs> const& parameterOffsets) :
 			_parameters(parametersIndexes), _offsets(parameterOffsets)
 		{
-			_buffer = NewVectorPtr<bytecs>(sizeInBytes);
+			_buffer = NewVector<bytecs>(sizeInBytes);
 			Device(device);
 
 			PlatformInitialize();
@@ -31,18 +31,20 @@ namespace dxna::graphics {
 			//TODO: implementar
 		}
 
-		constexpr bool operator==(const ConstantBuffer& other) const {
+		bool operator==(const ConstantBuffer& other) const {
 			return _buffer == other._buffer
 				&& _parameters == other._parameters
 				&& _offsets == other._offsets
 				&& _stateKey == other._stateKey;
 		}
 
-		constexpr bool IsEmpty() const {
+		bool IsEmpty() const {
 			return _buffer == nullptr || _buffer->empty();
 		}
 
-		void PlatformApply(GraphicsDevice& device, ShaderStage state, int slot);
+		void PlatformApply(GraphicsDevice& device, ShaderStage state, int slot) {
+			//TODO
+		}
 
 	private:
 		void SetData(intcs offset, intcs rows, intcs columns, anyptr const& data, bool isarray = true);
@@ -60,7 +62,7 @@ namespace dxna::graphics {
 	public:
 		ConstantBufferCollection(ShaderStage stage, size_t maxBuffers) :
 			_stage(stage), _maxbuffers(maxBuffers),
-			_buffers(NewVectorPtr<ConstantBuffer>(maxBuffers)) {
+			_buffers(NewVector<ConstantBuffer>(maxBuffers)) {
 		}
 
 		ConstantBuffer* At(size_t index) { 

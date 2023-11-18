@@ -19,6 +19,7 @@ namespace dxna {
 	//Define um pontiero para um tipo aceito em std::any
 	using anyptr = std::shared_ptr<std::any>;
 
+	//Converte um objeto any para um tipo definido.
 	template <class T>
 	T AnyTo(std::any const& a) {
 		return std::any_cast<T>(a);
@@ -32,7 +33,7 @@ namespace dxna {
 
 	//Inicializa um novo ponteiro para um vetor
 	template <class _Ty, class... _Types>
-	vectorptr<_Ty> NewVectorPtr(_Types&&... _Args) {
+	vectorptr<_Ty> NewVector(_Types&&... _Args) {
 		return std::make_shared<std::vector<_Ty>>(std::forward<_Types>(_Args)...);
 	}
 }

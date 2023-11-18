@@ -15,8 +15,8 @@ using namespace std;
 using namespace cs;
 
 int main() {
-	auto alfa = NewVectorPtr<bytecs>(10);
-	auto omega = NewVectorPtr<bytecs>(10);
+	auto alfa = NewVector<bytecs>(10);
+	auto omega = NewVector<bytecs>(10);
 
 	auto alfasize = alfa->size();
 	auto omegasize = omega->size();

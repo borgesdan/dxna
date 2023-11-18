@@ -1703,7 +1703,7 @@ namespace dxna {
 		static constexpr BoundingBox CreateFromSphere(BoundingSphere const& sphere);
 		constexpr bool Intersects(BoundingFrustum const& frustum);
 		constexpr PlaneIntersectionType Intersects(Plane const& plane);
-		nfloat Intersects(Ray const& ray) const;
+		nullfloat Intersects(Ray const& ray) const;
 	};
 
 	struct BoundingSphere {
@@ -1764,7 +1764,7 @@ namespace dxna {
 		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const;
 		constexpr bool Intersects(BoundingFrustum const& frustum) const;
 		constexpr PlaneIntersectionType Intersects(Plane const& plane) const;
-		nfloat Intersects(Ray const& ray) const;
+		nullfloat Intersects(Ray const& ray) const;
 		static BoundingSphere CreateFromFrustum(BoundingFrustum const& frustum);
 	};
 
@@ -1898,7 +1898,7 @@ namespace dxna {
 			return PlaneIntersectionType::Intersecting;
 		}
 
-		nfloat Intersects(Ray const& ray) const;
+		nullfloat Intersects(Ray const& ray) const;
 
 	public:
 		static constexpr float ClassifyPoint(Vector3 const& point, Plane const& plane) {
@@ -2058,7 +2058,7 @@ namespace dxna {
 			return result;
 		}
 
-		constexpr nfloat Intersects(Ray const& ray) const;
+		constexpr nullfloat Intersects(Ray const& ray) const;
 
 	public:
 		static constexpr int PlaneCount = 6;
@@ -2195,19 +2195,19 @@ namespace dxna {
 			return Position == other.Position && Direction == other.Direction;
 		}
 
-		nfloat Intersects(BoundingBox const& box) const {
+		nullfloat Intersects(BoundingBox const& box) const {
 			return box.Intersects(*this);
 		}
 
-		nfloat Intersects(BoundingFrustum const& frustum) const {
+		nullfloat Intersects(BoundingFrustum const& frustum) const {
 			frustum.Intersects(*this);
 		}
 
-		nfloat Intersects(Plane const& plane) {
+		nullfloat Intersects(Plane const& plane) {
 			plane.Intersects(*this);
 		}
 
-		nfloat Intersects(BoundingSphere const& sphere) const {
+		nullfloat Intersects(BoundingSphere const& sphere) const {
 			sphere.Intersects(*this);
 		}
 	};
@@ -3365,13 +3365,13 @@ namespace dxna {
 		return matrix;
 	}
 
-	constexpr nfloat BoundingFrustum::Intersects(Ray const& ray) const
+	constexpr nullfloat BoundingFrustum::Intersects(Ray const& ray) const
 	{
 		ContainmentType result1 = Contains(ray.Position);
-		auto result = nfloat();
+		auto result = nullfloat();
 
 		if (result1 == ContainmentType::Contains) {
-			return nfloat(0.0f);
+			return 0.0f;
 		}
 		else {
 			float num1 = FloatMinValue;
@@ -3415,7 +3415,7 @@ namespace dxna {
 			if (num4 < 0.0)
 				return result;
 
-			result = nfloat(num4);
+			result = num4;
 		}
 
 		return result;
