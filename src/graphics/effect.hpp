@@ -210,31 +210,31 @@ namespace dxna::graphics {
 	public:
 		EffectTechniqueCollection() = default;
 
-		EffectTechniqueCollection(vectorptr<EffectTechnique> const& techniques) :
+		EffectTechniqueCollection(vectorptr<EffectTechniquePtr> const& techniques) :
 			_techniques(techniques) {
 		}
 
 		constexpr size_t Count() { return _techniques->size(); }
 
-		EffectTechnique* At(size_t index) { return &_techniques->at(index); }
+		EffectTechniquePtr At(size_t index) { return _techniques->at(index); }
 
-		EffectTechnique* operator[](size_t index) { return &_techniques->at(index); }
+		EffectTechniquePtr operator[](size_t index) { return _techniques->at(index); }
 
-		EffectTechnique* operator[](std::string const& name) {
+		EffectTechniquePtr operator[](std::string const& name) {
 			for (size_t i = 0; i < _techniques->size(); ++i) {
 				auto a = _techniques->at(i);
 
-				if (a.Name == name)
-					return &a;
+				if (a->Name == name)
+					return a;
 			}
 
 			return nullptr;
 		}
 
-		vectorptr<EffectTechnique> _techniques;
+		vectorptr<EffectTechniquePtr> _techniques;
 	};
 
-	class Effect : public GraphicsResource {
+	class Effect : public GraphicsResource, public std::enable_shared_from_this<Effect> {
 	public:
 		struct MGFXHeader {
 			static constexpr intcs MGFXSignature() { return dxna::Enviroment::IsLittleEndian() ? 0x5846474D : 0x4D474658; }
@@ -249,16 +249,14 @@ namespace dxna::graphics {
 
 		virtual void GraphicsDeviceResetting() override {
 			for (size_t i = 0; i < ConstantBuffers->size(); i++)
-				ConstantBuffers->at(i).Clear();
+				ConstantBuffers->at(i)->Clear();
 		}
 
 	protected:
 		virtual void OnApply(){}
 
 	private:
-		void ReadEffect(cs::BinaryReader& sreader) {
-
-		}
+		void ReadEffect(cs::BinaryReader& sreader);
 
 		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader);
 
@@ -270,11 +268,11 @@ namespace dxna::graphics {
 	public:
 		EffectParameterCollectionPtr Parameters = nullptr;
 		EffectTechniqueCollectionPtr Techniques = nullptr;
-		EffectTechnique* CurrentTechnique = nullptr;
-		vectorptr<ConstantBuffer> ConstantBuffers = nullptr;		
+		EffectTechniquePtr CurrentTechnique = nullptr;
+		vectorptr<ConstantBufferPtr> ConstantBuffers = nullptr;		
 
 	private:
-		vectorptr<Shader> _shaders;
+		vectorptr<ShaderPtr> _shaders;
 	};
 }
 

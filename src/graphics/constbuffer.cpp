@@ -103,7 +103,7 @@ namespace dxna::graphics {
 			return;
 		
 		for (size_t i = 0; i < _buffers->size(); i++) {
-			auto buffer = &_buffers->at(i);
+			auto buffer = _buffers->at(i);
 
 			if (!buffer->IsEmpty()) {
 				buffer->PlatformApply(device, _stage, i);

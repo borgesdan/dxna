@@ -146,4 +146,44 @@ namespace dxna::graphics {
 
 		return New<EffectAnnotationCollection>(annotations);
 	}
+
+	void Effect::ReadEffect(cs::BinaryReader& reader) {
+		ConstantBuffers = NewVector<ConstantBufferPtr>(reader.ReadInt32().Value());
+
+		for (size_t c = 0; c < ConstantBuffers->size(); c++) {
+			const auto name = reader.ReadString();
+			const auto sizeInBytes = (intcs)reader.ReadInt16();
+			auto parameters = NewVector<intcs>(reader.ReadInt32().Value());
+			auto offsets = NewVector<intcs>(parameters->size());
+
+			for (size_t i = 0; i < parameters->size(); i++)	{
+				parameters->at(i) = reader.ReadInt32().Value();
+				offsets->at(i) = (intcs)reader.ReadUInt16();
+			}
+
+			ConstantBuffers->at(c) = New<ConstantBuffer>(Device(),
+				sizeInBytes,
+				parameters,
+				offsets,
+				name);
+		}
+
+		_shaders = NewVector<ShaderPtr>(reader.ReadInt32().Value());
+
+		Parameters = ReadParameters(reader);
+
+		auto techniques = NewVector<EffectTechniquePtr>(reader.ReadInt32().Value());
+
+		for (size_t t = 0; t < techniques->size(); ++t) {
+			const auto name = reader.ReadString();
+			const auto annotations = ReadAnnotations(reader);
+			const auto passes = ReadPasses(reader, this->shared_from_this(), _shaders);
+
+			techniques->at(t) = New<EffectTechnique>(name, passes, annotations);
+		}
+
+		Techniques = New<EffectTechniqueCollection>(techniques);
+
+		CurrentTechnique = Techniques->At(0);
+	}
 }

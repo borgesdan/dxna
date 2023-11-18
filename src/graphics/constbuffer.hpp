@@ -10,9 +10,9 @@ namespace dxna::graphics {
 
 		ConstantBuffer(GraphicsDevicePtr const& device, intcs sizeInBytes,
 			vectorptr<intcs> const& parametersIndexes,
-			vectorptr<intcs> const& parameterOffsets) :
-			_parameters(parametersIndexes), _offsets(parameterOffsets)
-		{
+			vectorptr<intcs> const& parameterOffsets,
+			std::string name) :
+			_parameters(parametersIndexes), _offsets(parameterOffsets), _name(name)	{
 			_buffer = NewVector<bytecs>(sizeInBytes);
 			Device(device);
 
@@ -56,27 +56,28 @@ namespace dxna::graphics {
 		vectorptr<intcs> _parameters = nullptr;
 		vectorptr<intcs> _offsets = nullptr;
 		ulongcs _stateKey{ 0 };
+		std::string _name;
 	};
 
 	class ConstantBufferCollection {
 	public:
 		ConstantBufferCollection(ShaderStage stage, size_t maxBuffers) :
 			_stage(stage), _maxbuffers(maxBuffers),
-			_buffers(NewVector<ConstantBuffer>(maxBuffers)) {
+			_buffers(NewVector<ConstantBufferPtr>(maxBuffers)) {
 		}
 
-		ConstantBuffer* At(size_t index) { 
+		ConstantBufferPtr At(size_t index) { 
 			if(_isclear)
 				_buffers->resize(_maxbuffers);
 
-			return &_buffers->at(index); 
+			return _buffers->at(index); 
 		}
 
-		ConstantBuffer* operator[](size_t index) { 
+		ConstantBufferPtr operator[](size_t index) { 
 			if (_isclear)
 				_buffers->resize(_maxbuffers);
 
-			return &_buffers->at(index); 
+			return _buffers->at(index); 
 		}
 
 		void Clear();
@@ -85,7 +86,7 @@ namespace dxna::graphics {
 		void SetConstantBuffers(GraphicsDevice& device);
 
 	private:
-		vectorptr<ConstantBuffer> _buffers = nullptr;
+		vectorptr<ConstantBufferPtr> _buffers = nullptr;
 		ShaderStage _stage{ ShaderStage::Vertex };
 		size_t _maxbuffers{ 0 };
 		bool _isclear{ false };
