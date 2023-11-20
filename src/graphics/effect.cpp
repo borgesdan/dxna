@@ -6,6 +6,17 @@ using namespace cs;
 namespace dxna::graphics {
 	ulongcs EffectParameter::NextStateKey = 0;
 
+	Effect::Effect(GraphicsDevicePtr const& graphicsDevice,
+		vectorptr<bytecs> const& effectCode, intcs index, intcs count) {
+		auto header = ReadHeader(effectCode, index);
+		auto effectKey = header.EffectKey;
+		auto headerSize = header.HeaderSize;
+
+		EffectPtr cloneSource = nullptr;
+
+		//TODO
+	}
+
 	EffectParameterCollectionPtr Effect::ReadParameters(cs::BinaryReader& reader) {
 		const auto count = reader.ReadInt32().Value();
 

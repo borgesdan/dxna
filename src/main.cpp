@@ -14,13 +14,21 @@ using namespace dxna;
 using namespace std;
 using namespace cs;
 
+class Shibica {
+	Shibica(int i) {
+		value = i;
+	}
+
+		int value = 0;
+};
+
 int main() {
-	auto ptr1 = New<intcs>(5);
-	auto ptr2 = ptr1;
+	auto bit = BitConveter::GetBytes(ShortMaxValue);
 
-	*ptr2 = 6;
+	for (size_t i = 0; i < 2; ++i)
+		cout << (int)bit[i] << endl;
 
-	cout << ptr1 << " " << *ptr1 << endl << ptr2 << " " << *ptr2 << endl;
+	delete[] bit;
 
 	return 0;
 }

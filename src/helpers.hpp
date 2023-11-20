@@ -18,7 +18,6 @@ namespace dxna {
 		}
 
 		static constexpr bool IsLittleEndian() { return GetEndianness() == Endianness::Little; }
-		static constexpr bool IsBigEndian() { return GetEndianness() == Endianness::Big; }
 	};
 }
 

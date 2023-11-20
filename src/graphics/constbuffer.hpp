@@ -42,7 +42,7 @@ namespace dxna::graphics {
 			return _buffer == nullptr || _buffer->empty();
 		}
 
-		void PlatformApply(GraphicsDevice& device, ShaderStage state, int slot) {
+		void PlatformApply(GraphicsDevice& device, ShaderStage state, intcs slot) {
 			//TODO
 		}
 
@@ -80,7 +80,10 @@ namespace dxna::graphics {
 			return _buffers->at(index); 
 		}
 
-		void Clear();
+		void Clear() {
+			_buffers->clear();
+			_isclear = true;
+		}
 
 		//TODO #if WEB / OPENGL
 		void SetConstantBuffers(GraphicsDevice& device);

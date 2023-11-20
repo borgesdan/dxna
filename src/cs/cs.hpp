@@ -5,3 +5,4 @@
 #include "stream.hpp"
 #include "reader.hpp"
 #include "buffer.hpp"
+#include "bitconverter.hpp"

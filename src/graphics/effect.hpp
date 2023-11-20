@@ -5,6 +5,11 @@
 #include "constbuffer.hpp"
 
 namespace dxna::graphics {
+
+	//--------------------------------------------------------------------------------//
+	//								EffectAnnotation								  //
+	//--------------------------------------------------------------------------------//
+
 	class EffectAnnotation {
 	public:
 		constexpr EffectAnnotation() = default;
@@ -51,6 +56,10 @@ namespace dxna::graphics {
 
 		vectorptr<EffectAnnotationPtr> _annotations;
 	};
+
+	//--------------------------------------------------------------------------------//
+	//								EffectParameter									  //
+	//--------------------------------------------------------------------------------//
 
 	class EffectParameter {
 	public:
@@ -126,6 +135,10 @@ namespace dxna::graphics {
 		vectorptr<EffectParameterPtr> _parameters;
 	};
 
+	//--------------------------------------------------------------------------------//
+	//								EffectPass										  //
+	//--------------------------------------------------------------------------------//
+
 	class EffectPass {
 	public:
 		EffectPass() = default;
@@ -190,6 +203,10 @@ namespace dxna::graphics {
 		vectorptr<EffectPassPtr> _passes;
 	};
 
+	//--------------------------------------------------------------------------------//
+	//								EffectTechnique									  //
+	//--------------------------------------------------------------------------------//
+
 	class EffectTechnique {
 	public:
 		EffectTechnique() = default;
@@ -234,6 +251,10 @@ namespace dxna::graphics {
 		vectorptr<EffectTechniquePtr> _techniques;
 	};
 
+	//--------------------------------------------------------------------------------//
+	//								Effect											  //
+	//--------------------------------------------------------------------------------//
+
 	class Effect : public GraphicsResource, public std::enable_shared_from_this<Effect> {
 	public:
 		struct MGFXHeader {
@@ -247,6 +268,10 @@ namespace dxna::graphics {
 			intcs HeaderSize{ 0 };
 		};
 
+		Effect(GraphicsDevicePtr const& graphicsDevice,
+			vectorptr<bytecs> const& effectCode,
+			intcs index, intcs count);
+
 		virtual void GraphicsDeviceResetting() override {
 			for (size_t i = 0; i < ConstantBuffers->size(); i++)
 				ConstantBuffers->at(i)->Clear();
@@ -256,6 +281,10 @@ namespace dxna::graphics {
 		virtual void OnApply(){}
 
 	private:
+		MGFXHeader ReadHeader(vectorptr<bytecs> const& effectCode, intcs index) {
+			return MGFXHeader();
+		}
+
 		void ReadEffect(cs::BinaryReader& sreader);
 
 		static EffectAnnotationCollectionPtr ReadAnnotations(cs::BinaryReader& reader);
