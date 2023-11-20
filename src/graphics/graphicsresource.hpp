@@ -2,10 +2,12 @@
 #define DXNA_GRAPHICS_GRAPHICSRESOURCE_HPP
 
 #include <string>
-#include "../cs/cstypes.hpp"
-#include "enumerations.hpp"
-#include "../structs.hpp"
 #include <memory>
+#include <vector>
+#include "../structs.hpp"
+#include "../types.hpp"
+#include "../cs/cs.hpp"
+#include "enumerations.hpp"
 #include "forward.hpp"
 
 namespace dxna::graphics {	
@@ -29,7 +31,7 @@ namespace dxna::graphics {
 		}
 
 	protected:
-		virtual void GraphicsDeviceReseting() {}
+		virtual void GraphicsDeviceResetting() {}
 	
 	public:
 		std::string Name;

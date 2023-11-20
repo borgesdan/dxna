@@ -5,3 +5,5 @@
 #include "graphicsdevice.hpp"
 #include "graphicsresource.hpp"
 #include "shader.hpp"
+#include "effect.hpp"
+#include "constbuffer.hpp"

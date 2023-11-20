@@ -82,19 +82,19 @@ namespace cs {
 			auto result = FillBuffer(1);
 
 			if (!result)
-				return nbool();
+				return nullbool();
 
 			return buffer[0] > 0;
 		}
 
 		Nullable<bytecs> ReadByte() {
 			if (stream == nullptr)
-				return nbytecs();
+				return nullbytecs();
 
 			intcs num = stream->ReadByte();
 
 			if (num == -1)
-				return nbytecs();
+				return nullbytecs();
 
 			return (bytecs)num;
 		}
@@ -103,7 +103,7 @@ namespace cs {
 			auto result = FillBuffer(1);
 
 			if (!result)
-				return nsbytecs();
+				return nullsbytecs();
 
 			return (sbytecs)buffer[0];
 		}
@@ -112,7 +112,7 @@ namespace cs {
 			intcs num = Read();
 
 			if (num == -1)
-				return ncharcs();
+				return nullcharcs();
 
 			return (charcs)num;
 		}
@@ -121,7 +121,7 @@ namespace cs {
 			auto result = FillBuffer(2);
 
 			if (!result)
-				return nshortcs();
+				return nullshortcs();
 
 			return (shortcs)((intcs)buffer[0] | (intcs)buffer[1] << 8);
 		}
@@ -130,7 +130,7 @@ namespace cs {
 			auto result = FillBuffer(2);
 
 			if (!result)
-				return nushortcs();
+				return nullushortcs();
 
 			return (ushortcs)((uintcs)buffer[0] | (uintcs)buffer[1] << 8);
 		}
@@ -139,7 +139,7 @@ namespace cs {
 			auto result = FillBuffer(4);
 
 			if (!result)
-				return nintcs();
+				return nullintcs();
 
 			return (intcs)buffer[0] 
 				| (intcs)buffer[1] << 8 
@@ -151,7 +151,7 @@ namespace cs {
 			auto result = FillBuffer(4);
 
 			if (!result)
-				return nuintcs();
+				return nulluintcs();
 
 			return (uintcs)((intcs)buffer[0]
 				| (intcs)buffer[1] << 8
@@ -163,7 +163,7 @@ namespace cs {
 			auto result = FillBuffer(8);
 
 			if (!result)
-				return nlongcs();
+				return nulllongcs();
 
 			return (longcs)((intcs)buffer[4] 
 				| (intcs)buffer[5] << 8
@@ -179,7 +179,7 @@ namespace cs {
 			auto result = FillBuffer(8);
 
 			if (!result)
-				return nulongcs();
+				return nullulongcs();
 
 			return (ulongcs)((intcs)buffer[4]
 				| (intcs)buffer[5] << 8
@@ -253,7 +253,7 @@ namespace cs {
 
 		std::string ReadString() {
 			int num = 0;
-			int val1;
+			int val1 = 0;
 			
 			if (val1 <= 0)
 				std::string();
