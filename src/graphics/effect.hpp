@@ -258,7 +258,7 @@ namespace dxna::graphics {
 	class Effect : public GraphicsResource, public std::enable_shared_from_this<Effect> {
 	public:
 		struct MGFXHeader {
-			static constexpr intcs MGFXSignature() { return dxna::Enviroment::IsLittleEndian() ? 0x5846474D : 0x4D474658; }
+			static constexpr intcs MGFXSignature() { return cs::BitConveter::IsLittleEndian() ? 0x5846474D : 0x4D474658; }
 			static constexpr intcs MGFXVersion = 10;
 
 			intcs Signature{ 0 };
