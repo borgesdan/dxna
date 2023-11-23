@@ -6,6 +6,7 @@
 #include <memory>
 #include <utility>
 #include <any>
+#include <initializer_list>
 
 namespace dxna {
 	//Define um ponteiro para um vetor de um tipo definido.
@@ -29,7 +30,7 @@ namespace dxna {
 	template <class _Ty, class... _Types>
 	std::shared_ptr<_Ty> New(_Types&&... _Args) {
 		return std::make_shared<_Ty>(std::forward<_Types>(_Args)...);
-	}	
+	}		
 
 	//Inicializa um novo ponteiro para um vetor
 	template <class _Ty, class... _Types>

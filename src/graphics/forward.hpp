@@ -32,6 +32,13 @@ namespace dxna::graphics {
 	class EffectTechniqueCollection;
 	class ConstantBufferCollection;
 
+	class IndexBuffer;
+	class DynamicIndexBuffer;
+	class IVertexType;
+	class VertexDeclaration;
+	class VertexDeclarationData;
+	class VertexBuffer;
+
 	class TextureCollection;
 
 	using GraphicsResourcePtr				= std::shared_ptr<GraphicsResource>;
@@ -55,7 +62,15 @@ namespace dxna::graphics {
 	using EffectParameterCollectionPtr		= std::shared_ptr<EffectParameterCollection>;
 	using EffectPassCollectionPtr			= std::shared_ptr<EffectPassCollection>;
 	using EffectTechniqueCollectionPtr		= std::shared_ptr<EffectTechniqueCollection>;
-	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;	
+	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;
+	
+	using IndexBufferPtr					= std::shared_ptr<IndexBuffer>;
+	using DynamicIndexBufferPtr				= std::shared_ptr<DynamicIndexBuffer>;
+	using IVertexTypePtr					= std::shared_ptr<IVertexType>;
+	using VertexDeclarationPtr				= std::shared_ptr<VertexDeclaration>;
+	using VertexDeclarationDataPtr			= std::shared_ptr<VertexDeclarationData>;
+	using VertexBufferPtr					= std::shared_ptr<VertexBuffer>;
+	
 	using TextureCollectionPtr				= std::shared_ptr<TextureCollection>;	
 }
 

@@ -9,26 +9,52 @@
 #include "cs/cs.hpp"
 #include "structs.hpp"
 #include "types.hpp"
+#include "graphics/graphics.hpp"
+#include "types.hpp"
+#include <initializer_list>
+		
 
 using namespace dxna;
+using namespace dxna::graphics;
 using namespace std;
 using namespace cs;
 
-class Shibica {
+class Shibica : public IVertexType {
+public:
+	Shibica() = default;
+
 	Shibica(int i) {
 		value = i;
 	}
+	
+	bool operator==(Shibica const& other) const {
+		return value == other.value;
+	}	
 
-		int value = 0;
+	int value = 0;
+
+	// Inherited via IVertexType
+	VertexDeclarationPtr GetVertexDeclaration() const override
+	{
+		//return New<dxna::graphics::VertexDeclaration>(0, nullptr);
+		return nullptr;
+	}
 };
 
-int main() {
-	auto bit = BitConveter::GetBytes(ShortMaxValue);
+using ShibicaPtr = std::shared_ptr<Shibica>;
 
-	for (size_t i = 0; i < 2; ++i)
-		cout << (int)bit[i] << endl;
+int main() {	
+	auto b = NewVector<Shibica>(initializer_list<Shibica>{Shibica(10), Shibica(20) });
 
-	delete[] bit;
+	for (size_t i = 0; i < b->size(); ++i) {
+		cout << b->at(i).value << endl;
+	}
+	
+	auto s = vector<Shibica>({ Shibica(1), Shibica(2) });
+
+	for (size_t i = 0; i < s.size(); ++i) {
+		cout << s.at(i).value << endl;
+	}
 
 	return 0;
 }

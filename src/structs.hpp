@@ -30,6 +30,13 @@ namespace dxna {
 		constexpr Point operator-() const { return Point(-X, -Y); }
 
 		constexpr bool operator==(Point const& other) const { return Equals(other); }
+
+		constexpr intcs GetHashCode() const {
+			auto hash = 17;
+			hash = hash * 23 + X;
+			hash = hash * 23 + Y;
+			return hash;
+		}
 	};
 
 	struct Rectangle {
@@ -122,6 +129,16 @@ namespace dxna {
 		constexpr bool operator==(Rectangle const& value2) const {
 			return Equals(value2);
 		}
+
+		constexpr intcs GetHashCode() const
+		{
+			auto hash = 17;
+			hash = hash * 23 + X;
+			hash = hash * 23 + Y;
+			hash = hash * 23 + Width;
+			hash = hash * 23 + Height;
+			return hash;
+		}
 	};
 
 	struct Vector2 {
@@ -144,6 +161,7 @@ namespace dxna {
 
 		constexpr bool Equals(Vector2 const& other) const { return X == other.X && Y == other.Y; }
 		constexpr float LengthSquared() const { return X * X + Y * Y; }
+		constexpr intcs GetHashCode() const { return (static_cast<intcs>(X) * 397) ^ static_cast<intcs>(Y); }
 
 		float Length() const;
 		void Normalize();
@@ -347,6 +365,13 @@ namespace dxna {
 
 		constexpr bool Equals(const Vector3& other) const { return X == other.X && Y == other.Y && Z == other.Z; }
 		constexpr float LengthSquared() const { return (X * X) + (Y * Y) + (Z * Z); }
+		
+		constexpr intcs GetHashCode() const {
+			auto hashCode = static_cast<intcs>(X) + 23;
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(Y);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(Z);
+			return hashCode;
+		}
 
 		static constexpr Vector3 Zero() { return Vector3(); };
 		static constexpr Vector3 One() { return Vector3(1.F, 1.F, 1.F); }
@@ -585,6 +610,14 @@ namespace dxna {
 				&& W == other.W;
 		}
 
+		constexpr intcs GetHashCode() const {
+			auto hashCode = static_cast<intcs>(X) + 23;
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(Y);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(Z);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(W);
+			return hashCode;
+		}
+
 		static constexpr Vector4 Zero() { return Vector4(); }
 		static constexpr Vector4 One() { return Vector4(1); }
 		static constexpr Vector4 UnitX() { return Vector4(1.0F, 0.0F, 0.0F, 0.0F); }
@@ -817,6 +850,26 @@ namespace dxna {
 		friend constexpr Matrix operator/(Matrix const& value1, Matrix const& value2) { return Matrix::Divide(value1, value2); }
 		friend constexpr Matrix operator/(Matrix const& value, float divider) { return Matrix::Divide(value, divider); }
 
+		constexpr intcs GetHashCode() const {
+			auto hashCode = static_cast<intcs>(M11) + 23;
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M12);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M13);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M14);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M21);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M22);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M23);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M24);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M31);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M32);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M33);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M34);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M41);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M42);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M43);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(M44);
+			
+			return hashCode;
+		}
 
 		constexpr Vector3 Up() const {
 			Vector3 up;
@@ -1472,6 +1525,14 @@ namespace dxna {
 
 		constexpr float LengthSquared() const {
 			return X * X + Y * Y + Z * Z + W * W;
+		}
+
+		constexpr intcs GetHashCode() const {
+			auto hashCode = static_cast<intcs>(X) + 23;
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(Y);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(Z);
+			hashCode = (hashCode * 397) ^ static_cast<intcs>(W);
+			return hashCode;
 		}
 
 		float Length() const;
@@ -2255,6 +2316,10 @@ namespace dxna {
 			_a <<= 24;
 
 			packedValue = static_cast<uintcs>(_r | _g | _b | _a);
+		}
+
+		constexpr intcs GetHashCode() const {			
+			return static_cast<intcs>(packedValue) * 397;
 		}
 
 		constexpr uintcs PackedValue() const { return packedValue; }

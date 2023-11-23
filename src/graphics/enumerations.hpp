@@ -146,6 +146,71 @@ namespace dxna::graphics {
         Texture3D,
         TextureCube
     };
+
+    enum class BufferUsage {
+        None,
+        WriteOnly
+    };
+
+    enum class IndexElementSize {
+        SixteenBits,
+        ThirtyTwoBits
+    };
+
+    enum class PrimitiveType {
+        TriangleList,
+        TriangleStrip,
+        LineList,
+        LineStrip,
+        PointList
+    };
+
+    enum class VertexElementFormat {
+        Single,
+        Vector2,
+        Vector3,
+        Vector4,
+        Color,
+        Byte4,
+        Short2,
+        Short4,
+        NormalizedShort2,
+        NormalizedShort4,
+        HalfVector2,
+        HalfVector4
+    };
+}
+
+namespace dxna::graphics {
+    inline constexpr intcs GetSize(VertexElementFormat elementFormat)
+    {
+        switch (elementFormat)
+        {
+        case VertexElementFormat::Single:
+        case VertexElementFormat::Color:
+        case VertexElementFormat::Byte4:
+        case VertexElementFormat::Short2:
+        case VertexElementFormat::HalfVector2:
+        case VertexElementFormat::NormalizedShort2:
+            return 4;
+
+        case VertexElementFormat::Vector2:
+        case VertexElementFormat::Short4:
+        case VertexElementFormat::NormalizedShort4:
+        case VertexElementFormat::HalfVector4:
+            return 8;
+
+        case VertexElementFormat::Vector3:
+            return 12;
+
+        case VertexElementFormat::Vector4:
+            return 16;
+
+        default:
+            return 0;
+        }
+    }
+
 }
 
 #endif
