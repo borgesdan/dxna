@@ -178,6 +178,8 @@ namespace dxna::graphics {
 				return err;
 
 			PlatformSetData(level, arraySlice, checkedRect, data->data(), data->size(), startIndex, elementCount);
+
+			return ValidadeDataError::ER_NONE;
 		}
 
 		template <typename T>
@@ -189,6 +191,8 @@ namespace dxna::graphics {
 				return err;
 
 			PlatformGetData(level, arraySlice, checkedRect, data->data(), data->size(), startIndex, elementCount);
+
+			return ValidadeDataError::ER_NONE;
 		}
 
 		vectorptr<Color> GetColorData();

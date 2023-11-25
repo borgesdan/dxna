@@ -1,9 +1,6 @@
 #include "vertex.hpp"
 
 namespace dxna::graphics {
-	std::map<VertexDeclarationData, VertexDeclarationPtr, VertexDeclarationDataCompare> VertexDeclaration::_vertexDeclarationCache
-		= std::map<VertexDeclarationData, VertexDeclarationPtr, VertexDeclarationDataCompare>();
-
 	VertexDeclarationPtr const VertexPosition::Declaration = New<VertexDeclaration>(
 		NewVector<VertexElement>(std::initializer_list<VertexElement>{
 		VertexElement(0, VertexElementFormat::Vector3, VertexElementUsage::Position, 0)
@@ -51,38 +48,9 @@ namespace dxna::graphics {
 
 		auto data = VertexDeclarationData(vertexStride, elements);
 
-		if (_vertexDeclarationCache.contains(data)) {
-			auto& vertexDeclaration = _vertexDeclarationCache[data];
-			_data = vertexDeclaration->_data;
-		}
-		else {
-			//TODO: deixar o array imutável?
-			data.Elements = NewVector<VertexElement>(elements->size());
-			std::copy(data.Elements->begin(), data.Elements->end(), elements->begin());
-
-			_data.Elements = elements;
-			_vertexDeclarationCache[data] = this->shared_from_this();
-		}
-	}
-
-	VertexDeclarationPtr VertexDeclaration::GetOrCreate(intcs vertexStride, vectorptr<VertexElement> const& elements)
-	{
-		if (elements == nullptr)
-			return nullptr;
-
-		auto data = VertexDeclarationData(vertexStride, elements);
-
-		if (_vertexDeclarationCache.contains(data))
-			return _vertexDeclarationCache[data];
-
-		auto vertexDeclaration = New<VertexDeclaration>(data);
-
-		//TODO: deixar o array imutável?
 		data.Elements = NewVector<VertexElement>(elements->size());
 		std::copy(data.Elements->begin(), data.Elements->end(), elements->begin());
 
-		_vertexDeclarationCache[data] = vertexDeclaration;
-
-		return vertexDeclaration;
-	}
+		_data.Elements = elements;
+	}	
 }

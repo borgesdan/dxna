@@ -141,6 +141,7 @@ namespace dxna::graphics {
 		}
 	};
 
+	//TODO: verificar função GetOrCreate
 	class VertexDeclaration : public std::enable_shared_from_this<VertexDeclaration> {
 	public:		
 		VertexDeclaration(vectorptr<VertexElement> const& elements) :
@@ -150,29 +151,7 @@ namespace dxna::graphics {
 		VertexDeclaration(intcs vertexStride, vectorptr<VertexElement> const& elements);
 
 		VertexDeclaration(VertexDeclarationData const& data) : _data(data) {
-		}
-
-		void Construct(intcs vertexStride, vectorptr<VertexElement> const& elements) {
-			if (elements == nullptr || elements->empty())
-				return; //TODO: lançar exceção?
-
-			auto data = VertexDeclarationData(vertexStride, elements);
-
-			if (_vertexDeclarationCache.contains(data)) {
-				auto& vertexDeclaration = _vertexDeclarationCache[data];
-				_data = vertexDeclaration->_data;
-			}
-			else {
-				//TODO: deixar o array imutável?
-				data.Elements = NewVector<VertexElement>(elements->size());
-				std::copy(data.Elements->begin(), data.Elements->end(), elements->begin());
-
-				_data.Elements = elements;
-				_vertexDeclarationCache[data] = this->shared_from_this();
-			}
-		}
-
-		static VertexDeclarationPtr GetOrCreate(intcs vertexStride, vectorptr<VertexElement> const& elements);
+		}						
 
 		vectorptr<VertexElement> InternalVertexElements() const noexcept {
 			return _data.Elements;
@@ -214,9 +193,7 @@ namespace dxna::graphics {
 			}
 
 			return max;
-		}
-
-		static std::map<VertexDeclarationData, VertexDeclarationPtr, VertexDeclarationDataCompare> _vertexDeclarationCache;
+		}		
 	};
 
 	struct VertexBufferBinding {
