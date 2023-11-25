@@ -9,6 +9,8 @@
 #include "../cs/cs.hpp"
 #include "enumerations.hpp"
 #include "forward.hpp"
+#include <cassert>
+#include "packedvector.hpp"
 
 namespace dxna::graphics {	
 

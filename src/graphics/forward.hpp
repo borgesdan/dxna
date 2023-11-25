@@ -38,6 +38,7 @@ namespace dxna::graphics {
 	class VertexDeclaration;
 	class VertexDeclarationData;
 	class VertexBuffer;
+	class VertexBufferBindings;
 
 	class TextureCollection;
 
@@ -70,6 +71,7 @@ namespace dxna::graphics {
 	using VertexDeclarationPtr				= std::shared_ptr<VertexDeclaration>;
 	using VertexDeclarationDataPtr			= std::shared_ptr<VertexDeclarationData>;
 	using VertexBufferPtr					= std::shared_ptr<VertexBuffer>;
+	using VertexBufferBindingsPtr			= std::shared_ptr<VertexBufferBindings>;
 	
 	using TextureCollectionPtr				= std::shared_ptr<TextureCollection>;	
 }

@@ -179,10 +179,56 @@ namespace dxna::graphics {
         HalfVector2,
         HalfVector4
     };
+
+    enum class SurfaceFormat
+    {
+        Color,
+        Bgr565,
+        Bgra5551,
+        Bgra4444,
+        Dxt1,
+        Dxt3,
+        Dxt5,
+        NormalizedByte2,
+        NormalizedByte4,
+        Rgba1010102,
+        Rg32,
+        Rgba64,
+        Alpha8,
+        Single,
+        Vector2,
+        Vector4,
+        HalfSingle,
+        HalfVector2,
+        HalfVector4,
+        HdrBlendable,
+        Bgr32 = 20,     // B8G8R8X8       
+        Bgra32 = 21,    // B8G8R8A8  
+        ColorSRgb = 30,
+        Bgr32SRgb = 31,
+        Bgra32SRgb = 32,
+        Dxt1SRgb = 33,
+        Dxt3SRgb = 34,
+        Dxt5SRgb = 35,
+        RgbPvrtc2Bpp = 50,
+        RgbPvrtc4Bpp = 51,
+        RgbaPvrtc2Bpp = 52,
+        RgbaPvrtc4Bpp = 53,
+        RgbEtc1 = 60,
+        Dxt1a = 70,
+        RgbaAtcExplicitAlpha = 80,
+        RgbaAtcInterpolatedAlpha = 81,
+        Rgb8Etc2 = 90,
+        Srgb8Etc2 = 91,
+        Rgb8A1Etc2 = 92,
+        Srgb8A1Etc2 = 93,
+        Rgba8Etc2 = 94,
+        SRgb8A8Etc2 = 95,
+    };
 }
 
 namespace dxna::graphics {
-    inline constexpr intcs GetSize(VertexElementFormat elementFormat)
+    inline constexpr intcs GetSize(VertexElementFormat const& elementFormat) noexcept
     {
         switch (elementFormat)
         {
@@ -211,6 +257,126 @@ namespace dxna::graphics {
         }
     }
 
+    inline constexpr intcs GetSize(SurfaceFormat const& surfaceFormat) noexcept {
+        switch (surfaceFormat)
+        {
+        case SurfaceFormat::Dxt1:
+        case SurfaceFormat::Dxt1SRgb:
+        case SurfaceFormat::Dxt1a:
+        case SurfaceFormat::RgbPvrtc2Bpp:
+        case SurfaceFormat::RgbaPvrtc2Bpp:
+        case SurfaceFormat::RgbPvrtc4Bpp:
+        case SurfaceFormat::RgbaPvrtc4Bpp:
+        case SurfaceFormat::RgbEtc1:
+        case SurfaceFormat::Rgb8Etc2:
+        case SurfaceFormat::Srgb8Etc2:
+        case SurfaceFormat::Rgb8A1Etc2:
+        case SurfaceFormat::Srgb8A1Etc2:
+            return 8;
+        case SurfaceFormat::Dxt3:
+        case SurfaceFormat::Dxt3SRgb:
+        case SurfaceFormat::Dxt5:
+        case SurfaceFormat::Dxt5SRgb:
+        case SurfaceFormat::RgbaAtcExplicitAlpha:
+        case SurfaceFormat::RgbaAtcInterpolatedAlpha:
+        case SurfaceFormat::Rgba8Etc2:
+        case SurfaceFormat::SRgb8A8Etc2:
+            return 16;
+        case SurfaceFormat::Alpha8:
+            return 1;
+        case SurfaceFormat::Bgr565:
+        case SurfaceFormat::Bgra4444:
+        case SurfaceFormat::Bgra5551:
+        case SurfaceFormat::HalfSingle:
+        case SurfaceFormat::NormalizedByte2:
+            return 2;
+        case SurfaceFormat::Color:
+        case SurfaceFormat::ColorSRgb:
+        case SurfaceFormat::Single:
+        case SurfaceFormat::Rg32:
+        case SurfaceFormat::HalfVector2:
+        case SurfaceFormat::NormalizedByte4:
+        case SurfaceFormat::Rgba1010102:
+        case SurfaceFormat::Bgra32:
+        case SurfaceFormat::Bgra32SRgb:
+        case SurfaceFormat::Bgr32:
+        case SurfaceFormat::Bgr32SRgb:
+            return 4;
+        case SurfaceFormat::HalfVector4:
+        case SurfaceFormat::Rgba64:
+        case SurfaceFormat::Vector2:
+            return 8;
+        case SurfaceFormat::Vector4:
+            return 16;
+        default:
+            return 0;
+        }
+    }
+
+    inline constexpr bool IsCompressedFormat(SurfaceFormat const& format) noexcept {
+        switch (format)
+        {
+        case SurfaceFormat::Dxt1:
+        case SurfaceFormat::Dxt1a:
+        case SurfaceFormat::Dxt1SRgb:
+        case SurfaceFormat::Dxt3:
+        case SurfaceFormat::Dxt3SRgb:
+        case SurfaceFormat::Dxt5:
+        case SurfaceFormat::Dxt5SRgb:
+        case SurfaceFormat::RgbaAtcExplicitAlpha:
+        case SurfaceFormat::RgbaAtcInterpolatedAlpha:
+        case SurfaceFormat::RgbaPvrtc2Bpp:
+        case SurfaceFormat::RgbaPvrtc4Bpp:
+        case SurfaceFormat::RgbEtc1:
+        case SurfaceFormat::Rgb8Etc2:
+        case SurfaceFormat::Srgb8Etc2:
+        case SurfaceFormat::Rgb8A1Etc2:
+        case SurfaceFormat::Srgb8A1Etc2:
+        case SurfaceFormat::Rgba8Etc2:
+        case SurfaceFormat::SRgb8A8Etc2:
+        case SurfaceFormat::RgbPvrtc2Bpp:
+        case SurfaceFormat::RgbPvrtc4Bpp:
+            return true;
+        }
+
+        return false;
+    }
+
+    inline void GetBlockSize(SurfaceFormat const& surfaceFormat, intcs& width, intcs& height) noexcept {
+        switch (surfaceFormat)
+        {
+        case SurfaceFormat::RgbPvrtc2Bpp:
+        case SurfaceFormat::RgbaPvrtc2Bpp:
+            width = 8;
+            height = 4;
+            break;
+        case SurfaceFormat::Dxt1:
+        case SurfaceFormat::Dxt1SRgb:
+        case SurfaceFormat::Dxt1a:
+        case SurfaceFormat::Dxt3:
+        case SurfaceFormat::Dxt3SRgb:
+        case SurfaceFormat::Dxt5:
+        case SurfaceFormat::Dxt5SRgb:
+        case SurfaceFormat::RgbPvrtc4Bpp:
+        case SurfaceFormat::RgbaPvrtc4Bpp:
+        case SurfaceFormat::RgbEtc1:
+        case SurfaceFormat::Rgb8Etc2:
+        case SurfaceFormat::Srgb8Etc2:
+        case SurfaceFormat::Rgb8A1Etc2:
+        case SurfaceFormat::Srgb8A1Etc2:
+        case SurfaceFormat::Rgba8Etc2:
+        case SurfaceFormat::SRgb8A8Etc2:
+        case SurfaceFormat::RgbaAtcExplicitAlpha:
+        case SurfaceFormat::RgbaAtcInterpolatedAlpha:
+            width = 4;
+            height = 4;
+            break;
+        default:
+            width = 1;
+            height = 1;
+            break;
+        }
+    }
 }
 
 #endif

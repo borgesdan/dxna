@@ -152,6 +152,26 @@ namespace dxna::graphics {
 		VertexDeclaration(VertexDeclarationData const& data) : _data(data) {
 		}
 
+		void Construct(intcs vertexStride, vectorptr<VertexElement> const& elements) {
+			if (elements == nullptr || elements->empty())
+				return; //TODO: lançar exceção?
+
+			auto data = VertexDeclarationData(vertexStride, elements);
+
+			if (_vertexDeclarationCache.contains(data)) {
+				auto& vertexDeclaration = _vertexDeclarationCache[data];
+				_data = vertexDeclaration->_data;
+			}
+			else {
+				//TODO: deixar o array imutável?
+				data.Elements = NewVector<VertexElement>(elements->size());
+				std::copy(data.Elements->begin(), data.Elements->end(), elements->begin());
+
+				_data.Elements = elements;
+				_vertexDeclarationCache[data] = this->shared_from_this();
+			}
+		}
+
 		static VertexDeclarationPtr GetOrCreate(intcs vertexStride, vectorptr<VertexElement> const& elements);
 
 		vectorptr<VertexElement> InternalVertexElements() const noexcept {

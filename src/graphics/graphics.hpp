@@ -8,3 +8,6 @@
 #include "effect.hpp"
 #include "constbuffer.hpp"
 #include "vertex.hpp"
+#include "texture.hpp"
+#include "rendertarget.hpp"
+#include "packedvector.hpp"

@@ -6,25 +6,23 @@
 
 namespace dxna {
 	struct MathHelper {
-		template <typename T>
-		static constexpr T Clamp(T value, T min, T max) {
+		static constexpr float Clamp(float value, float min, float max) noexcept {
 			value = value > max ? max : value;
 			value = value < min ? min : value;
 			return value;
 		}
-
-		template <typename T>
-		static constexpr float Lerp(T value1, T value2, float amount) {
+		
+		static constexpr float Lerp(float value1, float value2, float amount) noexcept {
 			return value1 + (value2 - value1) * amount;
 		}
 
-		static constexpr float Min(float value1, float value2) {
+		static constexpr float Min(float value1, float value2) noexcept {
 			return std::min(value1, value2);
 		}
 
-		static constexpr float Max(float value1, float value2) {
+		static constexpr float Max(float value1, float value2) noexcept {
 			return std::max(value1, value2);
-		}
+		}		
 	};
 }
 

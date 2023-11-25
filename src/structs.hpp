@@ -2278,6 +2278,10 @@ namespace dxna {
 
 		constexpr Color(uintcs packedValue) : packedValue(packedValue) {}
 
+		constexpr Color(Vector4 const& color) :
+			Color((intcs)(color.X * 255), (intcs)(color.Y * 255), (intcs)(color.Z * 255), (intcs)(color.W * 255)) {
+		}
+
 		constexpr Color(intcs r, intcs g, intcs b, intcs a = 255) {
 			if (((r | g | b | a) & -256) != 0) {
 				r = clamp(r);

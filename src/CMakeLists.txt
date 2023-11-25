@@ -23,7 +23,7 @@ add_executable (dxna
 "graphics/constbuffer.cpp" 
 "graphics/effect.cpp"
 "graphics/vertex.cpp"
-)
+ "graphics/texture.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET dxna PROPERTY CXX_STANDARD 20)
