@@ -52,11 +52,11 @@ namespace dxna {
 		return std::sqrt(num1 * num1 + num2 * num2 + num3 * num3);
 	}
 
-	float Vector4::Length() const {
+	float Vector4::Length() const noexcept {
 		return std::sqrt(LengthSquared());
 	}
 
-	float Vector4::Distance(Vector4 const& value1, Vector4 const& value2) {
+	float Vector4::Distance(Vector4 const& value1, Vector4 const& value2) noexcept {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
 		const auto num3 = value1.Z - value2.Z;
@@ -72,7 +72,7 @@ namespace dxna {
 		W *= num;
 	}
 
-	Vector4 Vector4::Normalize(Vector4 const& value) {
+	Vector4 Vector4::Normalize(Vector4 const& value) noexcept {
 		float num = 1.0F / std::sqrt(value.Length());
 		Vector4 vector;
 		vector.X *= num;

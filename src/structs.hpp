@@ -25,10 +25,10 @@ namespace dxna {
 		constexpr Point(int x, int y) noexcept : X(x), Y(y) {}
 
 		static constexpr Point Zero() noexcept { return Point(); }
-		
-		constexpr bool operator==(Point const& other) const noexcept = default;	
 
-		constexpr size_t GetHashCode() const noexcept {			
+		constexpr bool operator==(Point const& other) const noexcept = default;
+
+		constexpr size_t GetHashCode() const noexcept {
 			size_t seed = 0;
 			Hash::Combine(seed, X);
 			Hash::Combine(seed, Y);
@@ -56,8 +56,8 @@ namespace dxna {
 			return seed;
 		}
 
-		static constexpr Rectangle Empty() noexcept { 
-			return Rectangle(); 
+		static constexpr Rectangle Empty() noexcept {
+			return Rectangle();
 		}
 
 		constexpr intcs Left() const noexcept { return X; }
@@ -99,7 +99,7 @@ namespace dxna {
 
 		constexpr bool Intersects(Rectangle const& value) const noexcept {
 			return value.X < X + Width && X < value.X + value.Width && value.Y < Y + Height && Y < value.Y + value.Height;
-		}		
+		}
 
 		static constexpr Rectangle Intersect(Rectangle const& value1, Rectangle const& value2) noexcept {
 			const auto num1 = value1.X + value1.Width;
@@ -113,7 +113,7 @@ namespace dxna {
 
 			if (num7 > num5 && num8 > num6)
 				return Rectangle(num5, num6, num7 - num5, num8 - num6);
-			
+
 			return Rectangle::Empty();
 		}
 
@@ -157,7 +157,7 @@ namespace dxna {
 		friend constexpr Vector2 operator*(float scale, Vector2 const& value) noexcept { return Vector2::Multiply(value, scale); }
 		friend constexpr Vector2 operator/(Vector2 const& value1, Vector2 const& value2) noexcept { return Vector2::Divide(value1, value2); }
 		friend constexpr Vector2 operator/(Vector2 const& value, float divider) noexcept { return Vector2::Divide(value, divider); }
-		
+
 		constexpr float LengthSquared() const noexcept { return X * X + Y * Y; }
 
 		float Length() const noexcept;
@@ -323,21 +323,21 @@ namespace dxna {
 			size_t sourceLength,
 			size_t sourceIndex,
 			Matrix const& matrix,
-			Vector2* destinationArray, 
+			Vector2* destinationArray,
 			size_t destinationLength,
 			size_t destinationIndex,
-			size_t length) noexcept;		
+			size_t length);
 
 		static constexpr Error Transform(
 			Vector2* sourceArray,
-			size_t sourceIndex,			
+			size_t sourceIndex,
 			size_t sourceLength,
 			Quaternion const& rotation,
 			Vector2* destinationArray,
 			size_t destinationIndex,
 			size_t destinationLength,
-			size_t length) noexcept;
-		
+			size_t length);
+
 		static constexpr Error TransformNormal(
 			Vector2* sourceArray,
 			size_t sourceIndex,
@@ -346,7 +346,7 @@ namespace dxna {
 			Vector2* destinationArray,
 			size_t destinationIndex,
 			size_t destinationLength,
-			size_t length) noexcept ;
+			size_t length);
 	};
 
 	struct Vector3 {
@@ -354,20 +354,28 @@ namespace dxna {
 		float Y{ 0 };
 		float Z{ 0 };
 
-		constexpr Vector3() {}
-		constexpr Vector3(float x, float y, float z) : X(x), Y(y), Z(z) {}
-		constexpr Vector3(float value) : X(value), Y(value), Z(value) {}
-		constexpr Vector3(Vector2 const& value, float z) : X(value.X), Y(value.Y), Z(z) {}
+		constexpr Vector3() noexcept {}
+		constexpr Vector3(float x, float y, float z) noexcept : X(x), Y(y), Z(z) {}
+		constexpr Vector3(float value) noexcept : X(value), Y(value), Z(value) {}
+		constexpr Vector3(Vector2 const& value, float z) noexcept : X(value.X), Y(value.Y), Z(z) {}
 
-		constexpr Vector3 operator-() const { return Vector3::Negate(*this); }
-		constexpr bool operator==(Vector3 const& other) const { return Equals(other); }
-		friend constexpr Vector3 operator+(Vector3 const& value1, Vector3 const& value2) { return Vector3::Add(value1, value2); }
-		friend constexpr Vector3 operator-(Vector3 const& value1, Vector3 const& value2) { return Vector3::Subtract(value1, value2); }
-		friend constexpr Vector3 operator*(Vector3 const& value1, Vector3 const& value2) { return Vector3::Multiply(value1, value2); }
-		friend constexpr Vector3 operator*(Vector3 const& value, float scale) { return Vector3::Multiply(value, scale); }
-		friend constexpr Vector3 operator*(float scale, Vector3 const& value) { return Vector3::Multiply(value, scale); }
-		friend constexpr Vector3 operator/(Vector3 const& value1, Vector3 const& value2) { return Vector3::Divide(value1, value2); }
-		friend constexpr Vector3 operator/(Vector3 const& value, float divider) { return Vector3::Divide(value, divider); }
+		constexpr size_t GetHashCode() const noexcept {
+			size_t seed = 0;
+			Hash::Combine(seed, X);
+			Hash::Combine(seed, Y);
+			Hash::Combine(seed, Z);
+			return seed;
+		}
+
+		constexpr Vector3 operator-() const noexcept { return Vector3::Negate(*this); }
+		constexpr bool operator==(Vector3 const& other) const noexcept = default;
+		friend constexpr Vector3 operator+(Vector3 const& value1, Vector3 const& value2) noexcept { return Vector3::Add(value1, value2); }
+		friend constexpr Vector3 operator-(Vector3 const& value1, Vector3 const& value2) noexcept { return Vector3::Subtract(value1, value2); }
+		friend constexpr Vector3 operator*(Vector3 const& value1, Vector3 const& value2) noexcept { return Vector3::Multiply(value1, value2); }
+		friend constexpr Vector3 operator*(Vector3 const& value, float scale) noexcept { return Vector3::Multiply(value, scale); }
+		friend constexpr Vector3 operator*(float scale, Vector3 const& value) noexcept { return Vector3::Multiply(value, scale); }
+		friend constexpr Vector3 operator/(Vector3 const& value1, Vector3 const& value2) noexcept { return Vector3::Divide(value1, value2); }
+		friend constexpr Vector3 operator/(Vector3 const& value, float divider) noexcept { return Vector3::Divide(value, divider); }
 
 		constexpr Vector3 operator+=(Vector3 const& other) const { return Vector3::Add(*this, other); }
 		constexpr Vector3 operator-=(Vector3 const& other) const { return Vector3::Subtract(*this, other); }
@@ -567,15 +575,39 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Transform(Vector3 const& position, Matrix const& matrix);
-		static constexpr Vector3 TransformNormal(Vector3 const& normal, Matrix const& matrix);
-		static constexpr Vector3 Transform(Vector3 const& value, Quaternion const& rotation);
-		static constexpr void Transform(Vector3* sourceArray, Matrix const& matrix,
-			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
-		static constexpr void TransformNormal(Vector3* sourceArray, Matrix const& matrix,
-			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
-		static constexpr void Transform(Vector3* sourceArray, Quaternion const& rotation,
-			Vector3* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
+		static constexpr Vector3 Transform(Vector3 const& position, Matrix const& matrix) noexcept;
+		static constexpr Vector3 TransformNormal(Vector3 const& normal, Matrix const& matrix) noexcept;
+		static constexpr Vector3 Transform(Vector3 const& value, Quaternion const& rotation) noexcept;
+
+		static constexpr Error Transform(
+			Vector3* sourceArray,
+			size_t sourceLength,
+			size_t sourceIndex,
+			Matrix const& matrix,
+			Vector3* destinationArray,
+			size_t destinationLength,
+			size_t destinationIndex,
+			size_t length);
+
+		static constexpr Error Transform(
+			Vector3* sourceArray,
+			size_t sourceLength,
+			size_t sourceIndex,
+			Quaternion const& rotation,
+			Vector3* destinationArray,
+			size_t destinationLength,
+			size_t destinationIndex,
+			size_t length);
+
+		static constexpr Error TransformNormal(
+			Vector3* sourceArray,
+			size_t sourceLength,
+			size_t sourceIndex,
+			Matrix const& matrix,
+			Vector3* destinationArray,
+			size_t destinationLength,
+			size_t destinationIndex,
+			size_t length);
 	};
 
 	struct Vector4 {
@@ -595,7 +627,7 @@ namespace dxna {
 			X(value.X), Y(value.Y), Z(value.Z), W(w) {}
 
 		constexpr Vector4 operator-() const { return Vector4::Negate(*this); }
-		constexpr bool operator==(Vector4 const& other) const { return Equals(other); }
+		constexpr bool operator==(Vector4 const& other) const noexcept = default;
 		friend constexpr Vector4 operator+(Vector4 const& value1, Vector4 const& value2) { return Vector4::Add(value1, value2); }
 		friend constexpr Vector4 operator-(Vector4 const& value1, Vector4 const& value2) { return Vector4::Subtract(value1, value2); }
 		friend constexpr Vector4 operator*(Vector4 const& value1, Vector4 const& value2) { return Vector4::Multiply(value1, value2); }
@@ -604,31 +636,23 @@ namespace dxna {
 		friend constexpr Vector4 operator/(Vector4 const& value1, Vector4 const& value2) { return Vector4::Divide(value1, value2); }
 		friend constexpr Vector4 operator/(Vector4 const& value, float divider) { return Vector4::Divide(value, divider); }
 
-		float Length() const;
+		float Length() const noexcept;
 		void Normalize();
 
-		constexpr float LengthSquared() const {
+		constexpr float LengthSquared() const noexcept {
 			return (X * X) + (Y * Y) + (Z * Z) + (W * W);
 		}
 
-		constexpr bool Equals(Vector4 const& other) const {
-			return X == other.X
-				&& Y == other.Y
-				&& Z == other.Z
-				&& W == other.W;
-		}
+		static constexpr Vector4 Zero() noexcept { return Vector4(); }
+		static constexpr Vector4 One() noexcept { return Vector4(1); }
+		static constexpr Vector4 UnitX() noexcept { return Vector4(1.0F, 0.0F, 0.0F, 0.0F); }
+		static constexpr Vector4 UnitY() noexcept { return Vector4(0.0F, 1.0F, 0.0F, 0.0F); }
+		static constexpr Vector4 UnitZ() noexcept { return Vector4(0.0F, 0.0F, 1.0F, 0.0F); }
+		static constexpr Vector4 UnitW() noexcept { return Vector4(0.0F, 0.0F, 0.0F, 1.0F); }
 
-		static constexpr Vector4 Zero() { return Vector4(); }
-		static constexpr Vector4 One() { return Vector4(1); }
-		static constexpr Vector4 UnitX() { return Vector4(1.0F, 0.0F, 0.0F, 0.0F); }
-		static constexpr Vector4 UnitY() { return Vector4(0.0F, 1.0F, 0.0F, 0.0F); }
-		static constexpr Vector4 UnitZ() { return Vector4(0.0F, 0.0F, 1.0F, 0.0F); }
-		static constexpr Vector4 UnitW() { return Vector4(0.0F, 0.0F, 0.0F, 1.0F); }
+		static float Distance(Vector4 const& value1, Vector4 const& value2) noexcept;
 
-		static float Distance(Vector4 const& value1, Vector4 const& value2);
-
-		static constexpr float DistanceSquared(Vector4 value1, Vector4 value2)
-		{
+		static constexpr float DistanceSquared(Vector4 value1, Vector4 value2) noexcept {
 			const auto num1 = value1.X - value2.X;
 			const auto num2 = value1.Y - value2.Y;
 			const auto num3 = value1.Z - value2.Z;
@@ -636,11 +660,11 @@ namespace dxna {
 			return num1 * num1 + num2 * num2 + num3 * num3 + num4 * num4;
 		}
 
-		static constexpr float Dot(Vector4 vector1, Vector4 vector2) {
+		static constexpr float Dot(Vector4 vector1, Vector4 vector2) noexcept {
 			return vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z + vector1.W * vector2.W;
 		}
 
-		static constexpr Vector4 Min(Vector4 const& value1, Vector4 const& value2) {
+		static constexpr Vector4 Min(Vector4 const& value1, Vector4 const& value2) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X < value2.X ? value1.X : value2.X;
 			vector4.Y = value1.Y < value2.Y ? value1.Y : value2.Y;
@@ -649,7 +673,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Max(Vector4 const& value1, Vector4 const& value2) {
+		static constexpr Vector4 Max(Vector4 const& value1, Vector4 const& value2) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X > value2.X ? value1.X : value2.X;
 			vector4.Y = value1.Y > value2.Y ? value1.Y : value2.Y;
@@ -658,7 +682,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Clamp(Vector4 const& value1, Vector4 const& min, Vector4 const& max) {
+		static constexpr Vector4 Clamp(Vector4 const& value1, Vector4 const& min, Vector4 const& max) noexcept {
 			const auto x = value1.X;
 			const auto num1 = x > max.X ? max.X : x;
 			const auto num2 = num1 < min.X ? min.X : num1;
@@ -679,7 +703,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Lerp(Vector4 const& value1, Vector4 const& value2, float amount) {
+		static constexpr Vector4 Lerp(Vector4 const& value1, Vector4 const& value2, float amount) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X + (value2.X - value1.X) * amount;
 			vector4.Y = value1.Y + (value2.Y - value1.Y) * amount;
@@ -689,7 +713,7 @@ namespace dxna {
 		}
 
 		static constexpr Vector4 Barycentric(Vector4 const& value1, Vector4 const& value2,
-			Vector4 const& value3, float amount1, float amount2) {
+			Vector4 const& value3, float amount1, float amount2) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X + amount1 * (value2.X - value1.X) + amount2 * (value3.X - value1.X);
 			vector4.Y = value1.Y + amount1 * (value2.Y - value1.Y) + amount2 * (value3.Y - value1.Y);
@@ -698,7 +722,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 SmoothStep(Vector4 const& value1, Vector4 const& value2, float amount) {
+		static constexpr Vector4 SmoothStep(Vector4 const& value1, Vector4 const& value2, float amount) noexcept {
 			amount = amount > 1.0F ? 1.0F : (amount < 0.0F ? 0.0F : amount);
 			amount = amount * amount * (3.0F - 2.0F * amount);
 			Vector4 vector4;
@@ -710,7 +734,7 @@ namespace dxna {
 		}
 
 		static constexpr Vector4 CatmullRom(Vector4 const& value1, Vector4 const& value2, Vector4 const& value3,
-			Vector4 const& value4, float amount) {
+			Vector4 const& value4, float amount) noexcept {
 			const auto num1 = amount * amount;
 			const auto num2 = amount * num1;
 			Vector4 vector4;
@@ -722,7 +746,7 @@ namespace dxna {
 		}
 
 		static constexpr Vector4 Hermite(Vector4 const& value1, Vector4 const& tangent1, Vector4 const& value2,
-			Vector4 const& tangent2, float amount) {
+			Vector4 const& tangent2, float amount) noexcept {
 			const auto num1 = amount * amount;
 			const auto num2 = amount * num1;
 			const auto num3 = 2.0F * num2 - 3.0F * num1 + 1.0F;
@@ -737,9 +761,9 @@ namespace dxna {
 			return vector4;
 		}
 
-		static Vector4 Normalize(Vector4 const& value);
+		static Vector4 Normalize(Vector4 const& value) noexcept;
 
-		static constexpr Vector4 Negate(Vector4 const& value) {
+		static constexpr Vector4 Negate(Vector4 const& value) noexcept {
 			Vector4 vector4;
 			vector4.X = -value.X;
 			vector4.Y = -value.Y;
@@ -748,7 +772,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Add(Vector4 const& value1, Vector4 const& value2) {
+		static constexpr Vector4 Add(Vector4 const& value1, Vector4 const& value2) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X + value2.X;
 			vector4.Y = value1.Y + value2.Y;
@@ -757,7 +781,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Subtract(Vector4 const& value1, Vector4 const& value2) {
+		static constexpr Vector4 Subtract(Vector4 const& value1, Vector4 const& value2) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X - value2.X;
 			vector4.Y = value1.Y - value2.Y;
@@ -766,7 +790,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Multiply(Vector4 const& value1, Vector4 const& value2) {
+		static constexpr Vector4 Multiply(Vector4 const& value1, Vector4 const& value2) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X * value2.X;
 			vector4.Y = value1.Y * value2.Y;
@@ -775,7 +799,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Multiply(Vector4 const& value1, float scaleFactor) {
+		static constexpr Vector4 Multiply(Vector4 const& value1, float scaleFactor) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X * scaleFactor;
 			vector4.Y = value1.Y * scaleFactor;
@@ -784,7 +808,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Divide(Vector4 const& value1, Vector4 const& value2) {
+		static constexpr Vector4 Divide(Vector4 const& value1, Vector4 const& value2) noexcept {
 			Vector4 vector4;
 			vector4.X = value1.X / value2.X;
 			vector4.Y = value1.Y / value2.Y;
@@ -793,7 +817,7 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Divide(Vector4 const& value1, float divider) {
+		static constexpr Vector4 Divide(Vector4 const& value1, float divider) noexcept {
 			float num = 1.0F / divider;
 			Vector4 vector4;
 			vector4.X = value1.X * num;
@@ -2190,7 +2214,7 @@ namespace dxna {
 			_planes3.Normalize();
 			_planes4.Normalize();
 			_planes5.Normalize();
-		}		
+		}
 
 		Matrix_ _matrix;
 
@@ -2215,7 +2239,7 @@ namespace dxna {
 		Vector3 Position;
 		Vector3 Direction;
 
-		constexpr Ray() = default;		
+		constexpr Ray() = default;
 
 		constexpr Ray(const Vector3& Position, const Vector3& Direction)
 			: Position(Position), Direction(Direction) {}
@@ -2517,21 +2541,21 @@ namespace dxna {
 
 		constexpr CurveKey() = default;
 
-		CurveKey(float position, float value, float tangentIn = 0, float tangentOut = 0, CurveContinuity continuity = CurveContinuity::Smooth):
-			Position(position), Value(value), TangentIn(tangentIn), TangentOut(tangentOut), Continuity(continuity){}
+		CurveKey(float position, float value, float tangentIn = 0, float tangentOut = 0, CurveContinuity continuity = CurveContinuity::Smooth) :
+			Position(position), Value(value), TangentIn(tangentIn), TangentOut(tangentOut), Continuity(continuity) {}
 
 		constexpr bool operator==(CurveKey const& other) const {
 			return Equals(other);
 		}
 
-		constexpr bool Equals(const CurveKey& other) const	{
-			return Position == other.Position 
-				&& TangentIn == other.TangentIn 
-				&& TangentOut == other.TangentOut 
-				&& Value == other.Value 
+		constexpr bool Equals(const CurveKey& other) const {
+			return Position == other.Position
+				&& TangentIn == other.TangentIn
+				&& TangentOut == other.TangentOut
+				&& Value == other.Value
 				&& Continuity == other.Continuity;
 		}
-	};	
+	};
 
 	struct CurveKeyCollection {
 		constexpr CurveKey* operator[](size_t index) {
@@ -2547,7 +2571,7 @@ namespace dxna {
 
 			return keys[index];
 		}
-		
+
 		constexpr size_t Count() const { return keys.size(); }
 
 		constexpr CurveKey* Last() {
@@ -2575,7 +2599,7 @@ namespace dxna {
 		constexpr void Clear() {
 			keys.clear();
 		}
-	
+
 	private:
 		std::vector<CurveKey> keys;
 	};
@@ -2604,35 +2628,36 @@ namespace dxna {
 				{
 				case dxna::CurveLoopType::Constant:
 					return first->Value;
-				
+
 				case dxna::CurveLoopType::Cycle:
 					cycle = GetNumberOfCycle(position);
-					 virtualPos = position - (cycle * (last->Position - first->Position));
+					virtualPos = position - (cycle * (last->Position - first->Position));
 					return GetCurvePosition(virtualPos);
-				
+
 				case dxna::CurveLoopType::CycleOffset:
 					cycle = GetNumberOfCycle(position);
 					virtualPos = position - (cycle * (last->Position - first->Position));
 					return (GetCurvePosition(virtualPos) + cycle * (last->Value - first->Value));
-				
+
 				case dxna::CurveLoopType::Oscillate:
 					if (0 == std::fmod(static_cast<float>(cycle), 2.0f))
 						virtualPos = position - (cycle * (last->Position - first->Position));
 					else
-						virtualPos = last->Position - position + first->Position + (cycle * (last->Position - first->Position));					
-					
+						virtualPos = last->Position - position + first->Position + (cycle * (last->Position - first->Position));
+
 					return GetCurvePosition(virtualPos);
-				
+
 				case dxna::CurveLoopType::Linear:
 					return first->Value - first->TangentIn * (first->Position - position);
-				
+
 				default:
 					break;
-				}			
-			} else if (position > last->Position) {
+				}
+			}
+			else if (position > last->Position) {
 				auto cycle = 0;
 				auto virtualPos = 0.0F;
-				
+
 				switch (PostLoop)
 				{
 				case dxna::CurveLoopType::Constant:
@@ -2645,27 +2670,27 @@ namespace dxna {
 				case dxna::CurveLoopType::CycleOffset:
 					cycle = GetNumberOfCycle(position);
 					virtualPos = position - (cycle * (last->Position - first->Position));
-					return (GetCurvePosition(virtualPos) + cycle * (last->Value - first->Value));					
+					return (GetCurvePosition(virtualPos) + cycle * (last->Value - first->Value));
 				case dxna::CurveLoopType::Oscillate:
 					cycle = GetNumberOfCycle(position);
 					virtualPos = position - (cycle * (last->Position - first->Position));
-					
+
 					if (0 == std::fmod(static_cast<float>(cycle), 2.0f))
 						virtualPos = position - (cycle * (last->Position - first->Position));
 					else
 						virtualPos = last->Position - position + first->Position + (cycle * (last->Position - first->Position));
 
 					return GetCurvePosition(virtualPos);
-				
+
 				case dxna::CurveLoopType::Linear:
 					return last->Value + first->TangentOut * (position - last->Position);
-				
+
 				default:
 					break;
 				}
 			}
 		}
-		
+
 		constexpr void ComputeTangents(CurveTangent const& tangentInType, CurveTangent const& tangentOutType) {
 			for (size_t i = 0; i < Keys.Count(); ++i) {
 				ComputeTangent(i, tangentInType, tangentOutType);
@@ -2730,21 +2755,21 @@ namespace dxna {
 
 	public:
 		CurveLoopType PreLoop;
-		CurveLoopType PostLoop;	
+		CurveLoopType PostLoop;
 		CurveKeyCollection Keys;
 
 	private:
 		int GetNumberOfCycle(float position) {
 			float cycle = (position - Keys[0]->Position) / (Keys.Last()->Position - Keys[0]->Position);
-			
+
 			if (cycle < 0.0f)
 				cycle--;
 
 			return static_cast<int>(cycle);
 		}
 
-		float GetCurvePosition(float position) {			
-			auto prev = Keys[0];			
+		float GetCurvePosition(float position) {
+			auto prev = Keys[0];
 
 			for (size_t i = 1; i < Keys.Count(); ++i) {
 				const auto next = Keys[i];
@@ -2760,10 +2785,10 @@ namespace dxna {
 					const auto t = (position - prev->Position) / (next->Position - prev->Position);
 					const auto ts = t * t;
 					const auto tss = ts * t;
-					
+
 					return (2 * tss - 3 * ts + 1.0f) * prev->Value + (tss - 2 * ts + t) * prev->TangentOut + (3 * ts - 2 * tss) * next->Value + (tss - ts) * next->TangentIn;
 				}
-				
+
 				prev = next;
 			}
 
@@ -2811,7 +2836,7 @@ namespace dxna {
 		Vector2* destinationArray,
 		size_t destinationLength,
 		size_t destinationIndex,
-		size_t length) noexcept {
+		size_t length) {
 		if (sourceArray == nullptr)
 			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
 
@@ -2833,7 +2858,7 @@ namespace dxna {
 		}
 
 		return Error::NoError();
-	}	
+	}
 
 	constexpr Error Vector2::Transform(
 		Vector2* sourceArray,
@@ -2843,7 +2868,7 @@ namespace dxna {
 		Vector2* destinationArray,
 		size_t destinationIndex,
 		size_t destinationLength,
-		size_t length) noexcept {
+		size_t length) {
 
 		if (sourceArray == nullptr)
 			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
@@ -2870,7 +2895,7 @@ namespace dxna {
 		}
 
 		return Error::NoError();
-	}	
+	}
 
 	constexpr Error Vector2::TransformNormal(
 		Vector2* sourceArray,
@@ -2880,7 +2905,7 @@ namespace dxna {
 		Vector2* destinationArray,
 		size_t destinationIndex,
 		size_t destinationLength,
-		size_t length) noexcept {
+		size_t length) {
 
 		if (sourceArray == nullptr)
 			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
@@ -2906,8 +2931,9 @@ namespace dxna {
 	}
 }
 
+// ---------------------------------- Vector3 ----------------------------------//
 namespace dxna {
-	constexpr Vector3 dxna::Vector3::Transform(Vector3 const& position, Matrix const& matrix) {
+	constexpr Vector3 dxna::Vector3::Transform(Vector3 const& position, Matrix const& matrix) noexcept {
 		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
 		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
 		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
@@ -2918,8 +2944,7 @@ namespace dxna {
 		return vector3;
 	}
 
-	constexpr Vector3 Vector3::TransformNormal(Vector3 const& normal, Matrix const& matrix)
-	{
+	constexpr Vector3 Vector3::TransformNormal(Vector3 const& normal, Matrix const& matrix) noexcept {
 		const auto num1 = (normal.X * matrix.M11 + normal.Y * matrix.M21 + normal.Z * matrix.M31);
 		const auto num2 = (normal.X * matrix.M12 + normal.Y * matrix.M22 + normal.Z * matrix.M32);
 		const auto num3 = (normal.X * matrix.M13 + normal.Y * matrix.M23 + normal.Z * matrix.M33);
@@ -2930,8 +2955,7 @@ namespace dxna {
 		return vector3;
 	}
 
-	constexpr Vector3 Vector3::Transform(Vector3 const& value, Quaternion const& rotation)
-	{
+	constexpr Vector3 Vector3::Transform(Vector3 const& value, Quaternion const& rotation) noexcept {
 		const auto num1 = rotation.X + rotation.X;
 		const auto num2 = rotation.Y + rotation.Y;
 		const auto num3 = rotation.Z + rotation.Z;
@@ -2954,105 +2978,119 @@ namespace dxna {
 		return vector3;
 	}
 
-	constexpr void Vector3::Transform(Vector3* sourceArray, Matrix const& matrix, Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+	constexpr Error Vector3::Transform(
+		Vector3* sourceArray,
+		size_t sourceLength,
+		size_t sourceIndex,
+		Matrix const& matrix,
+		Vector3* destinationArray,
+		size_t destinationLength,
+		size_t destinationIndex,
+		size_t length) {
+
 		if (sourceArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
 
 		if (destinationArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
 
-		if (length < sourceIndex + length)
-			return;
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
 
-		if (length < destinationIndex + length)
-			return;
-		
-		for (; length > 0; --length)
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
+
+		for (size_t i = 0; i < length; i++)
 		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31) + matrix.M41;
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32) + matrix.M42;
-			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33) + matrix.M43;
-			++sourceIndex;
-			++destinationIndex;
+			const auto& position = sourceArray[sourceIndex + i];
+			destinationArray[destinationIndex + i] = Vector3(
+				(position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
+				(position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
+				(position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
 		}
+
+		return Error::NoError();
 	}
 
-	constexpr void Vector3::TransformNormal(Vector3* sourceArray, Matrix const& matrix, Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+	constexpr Error Vector3::TransformNormal(
+		Vector3* sourceArray,
+		size_t sourceLength,
+		size_t sourceIndex,
+		Matrix const& matrix,
+		Vector3* destinationArray,
+		size_t destinationLength,
+		size_t destinationIndex,
+		size_t length) {
+
 		if (sourceArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
 
 		if (destinationArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
 
-		if (length < sourceIndex + length)
-			return;
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
 
-		if (length < destinationIndex + length)
-			return;
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
 
-		for (; length > 0; --length)
+		for (size_t x = 0; x < length; x++)
 		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31);
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32);
-			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33);
-			++sourceIndex;
-			++destinationIndex;
+			const auto& normal = sourceArray[sourceIndex + x];
+
+			destinationArray[destinationIndex + x] =
+				Vector3(
+					(normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31),
+					(normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32),
+					(normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33));
 		}
+
+		return Error::NoError();
 	}
 
-	constexpr void Vector3::Transform(Vector3* sourceArray, Quaternion const& rotation, Vector3* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+	constexpr Error Vector3::Transform(
+		Vector3* sourceArray,
+		size_t sourceLength,
+		size_t sourceIndex,
+		Quaternion const& rotation,
+		Vector3* destinationArray,
+		size_t destinationLength,
+		size_t destinationIndex,
+		size_t length) {
+
 		if (sourceArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
 
 		if (destinationArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
 
-		if (length < sourceIndex + length)
-			return;
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
 
-		if (length < destinationIndex + length)
-			return;
-		
-		const auto num1 = rotation.X + rotation.X;
-		const auto num2 = rotation.Y + rotation.Y;
-		const auto num3 = rotation.Z + rotation.Z;
-		const auto num4 = rotation.W * num1;
-		const auto num5 = rotation.W * num2;
-		const auto num6 = rotation.W * num3;
-		const auto num7 = rotation.X * num1;
-		const auto num8 = rotation.X * num2;
-		const auto num9 = rotation.X * num3;
-		const auto num10 = rotation.Y * num2;
-		const auto num11 = rotation.Y * num3;
-		const auto num12 = rotation.Z * num3;
-		const auto num13 = 1.0f - num10 - num12;
-		const auto num14 = num8 - num6;
-		const auto num15 = num9 + num5;
-		const auto num16 = num8 + num6;
-		const auto num17 = 1.0f - num7 - num12;
-		const auto num18 = num11 - num4;
-		const auto num19 = num9 - num5;
-		const auto num20 = num11 + num4;
-		const auto num21 = 1.0f - num7 - num10;
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
 
-		for (; length > 0; --length)
+		for (size_t i = 0; i < length; i++)
 		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			destinationArray[destinationIndex].X = (x * num13 + y * num14 + z * num15);
-			destinationArray[destinationIndex].Y = (x * num16 + y * num17 + z * num18);
-			destinationArray[destinationIndex].Z = (x * num19 + y * num20 + z * num21);
-			++sourceIndex;
-			++destinationIndex;
+			const auto& position = sourceArray[sourceIndex + i];
+
+			const auto x = 2 * (rotation.Y * position.Z - rotation.Z * position.Y);
+			const auto y = 2 * (rotation.Z * position.X - rotation.X * position.Z);
+			const auto z = 2 * (rotation.X * position.Y - rotation.Y * position.X);
+
+			destinationArray[destinationIndex + i] =
+				Vector3(
+					position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
+					position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
+					position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
 		}
+
+		return Error::NoError();
 	}
+}
+
+namespace dxna {
+	
 
 	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const {
 		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
@@ -3070,11 +3108,11 @@ namespace dxna {
 		vector3_2.X = plane.Normal.X >= 0.0 ? Max.X : Min.X;
 		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
 		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
-		
+
 		if (plane.Normal.X * vector3_1.X + plane.Normal.Y * vector3_1.Y + plane.Normal.Z * vector3_1.Z + plane.D > 0.0)
 			return PlaneIntersectionType::Front;
-		
-		return plane.Normal.X * vector3_2.X + plane.Normal.Y * vector3_2.Y + plane.Normal.Z * vector3_2.Z + plane.D < 0.0 ? PlaneIntersectionType::Back: PlaneIntersectionType::Intersecting;
+
+		return plane.Normal.X * vector3_2.X + plane.Normal.Y * vector3_2.Y + plane.Normal.Z * vector3_2.Z + plane.D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
 	}
 
 	constexpr ContainmentType BoundingBox::Contains(BoundingFrustum const& frustum) const
@@ -3085,10 +3123,10 @@ namespace dxna {
 		for (size_t i = 0; i < frustum.CornerCount; ++i) {
 			const auto corner = frustum.getCorner(i);
 
-			if(Contains(corner) == ContainmentType::Disjoint)
+			if (Contains(corner) == ContainmentType::Disjoint)
 				return ContainmentType::Intersects;
 		}
-		
+
 		return ContainmentType::Contains;
 	}
 
@@ -3106,7 +3144,7 @@ namespace dxna {
 			|| Max.X - Min.X <= radius
 			|| Min.Y + radius > sphere.Center.Y
 			|| sphere.Center.Y > Max.Y - radius
-			|| Max.Y - Min.Y <= radius 
+			|| Max.Y - Min.Y <= radius
 			|| Min.Z + radius > sphere.Center.Z
 			|| sphere.Center.Z > Max.Z - radius
 			|| Max.X - Min.X <= radius ? ContainmentType::Intersects : ContainmentType::Contains;
@@ -3135,20 +3173,20 @@ namespace dxna {
 		vector3_1.X = plane.Normal.X >= 0.0 ? Min.X : Max.X;
 		vector3_1.Y = plane.Normal.Y >= 0.0 ? Min.Y : Max.Y;
 		vector3_1.Z = plane.Normal.Z >= 0.0 ? Min.Z : Max.Z;
-		
+
 		Vector3 vector3_2;
 		vector3_2.X = plane.Normal.X >= 0.0 ? Max.X : Min.X;
 		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
 		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
-		
+
 		if (plane.Normal.X * vector3_1.X + plane.Normal.Y * vector3_1.Y + plane.Normal.Z * vector3_1.Z + plane.D > 0.0)
 			return PlaneIntersectionType::Front;
 
-		return plane.Normal.X * vector3_2.X 
+		return plane.Normal.X * vector3_2.X
 			+ plane.Normal.Y * vector3_2.Y
 			+ plane.Normal.Z * vector3_2.Z
 			+ plane.D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
-	}	
+	}
 
 	constexpr Vector4 dxna::Vector4::Transform(Vector2 const& position, Matrix const& matrix)
 	{
@@ -3163,7 +3201,7 @@ namespace dxna {
 		vector4.W = num4;
 		return vector4;
 	}
-	
+
 	constexpr Vector4 Vector4::Transform(Vector3 const& position, Matrix const& matrix) {
 		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
 		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
@@ -3176,7 +3214,7 @@ namespace dxna {
 		vector4.W = num4;
 		return vector4;
 	}
-	
+
 	constexpr Vector4 Vector4::Transform(Vector4 const& vector, Matrix const& matrix)
 	{
 		float num1 = (vector.X * matrix.M11 + vector.Y * matrix.M21 + vector.Z * matrix.M31 + vector.W * matrix.M41);
@@ -3190,7 +3228,7 @@ namespace dxna {
 		vector4.W = num4;
 		return vector4;
 	}
-	
+
 	constexpr Vector4 Vector4::Transform(Vector2 const& value, Quaternion const& rotation)
 	{
 		float num1 = rotation.X + rotation.X;
@@ -3215,7 +3253,7 @@ namespace dxna {
 		vector4.W = 1.0f;
 		return vector4;
 	}
-	
+
 	constexpr Vector4 Vector4::Transform(Vector3 const& value, Quaternion const& rotation) {
 		float num1 = rotation.X + rotation.X;
 		float num2 = rotation.Y + rotation.Y;
@@ -3239,7 +3277,7 @@ namespace dxna {
 		vector4.W = 1.0f;
 		return vector4;
 	}
-	
+
 	constexpr Vector4 Vector4::Transform(Vector4 const& value, Quaternion const& rotation)
 	{
 		float num1 = rotation.X + rotation.X;
@@ -3264,7 +3302,7 @@ namespace dxna {
 		vector4.W = value.W;
 		return vector4;
 	}
-	
+
 	constexpr void Vector4::Transform(Vector4* sourceArray, Matrix const& matrix, Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
 		if (sourceArray == nullptr)
 			return;
@@ -3277,7 +3315,7 @@ namespace dxna {
 
 		if (length < destinationIndex + length)
 			return;
-		
+
 		for (; length > 0; --length)
 		{
 			float x = sourceArray[sourceIndex].X;
@@ -3292,8 +3330,8 @@ namespace dxna {
 			++destinationIndex;
 		}
 	}
-	
-	constexpr void Vector4::Transform(Vector4* sourceArray, Quaternion const& rotation, Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex){
+
+	constexpr void Vector4::Transform(Vector4* sourceArray, Quaternion const& rotation, Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
 		if (sourceArray == nullptr)
 			return;
 
@@ -3480,29 +3518,29 @@ namespace dxna {
 			return ContainmentType::Disjoint;
 
 		float num = Radius * Radius;
-		
+
 		for (size_t i = 0; i < frustum.CornerCount; ++i) {
 			const auto corner = frustum.getCorner(i);
-			
+
 			Vector3 vector3;
 			vector3.X = corner.X - Center.X;
 			vector3.Y = corner.Y - Center.Y;
 			vector3.Z = corner.Z - Center.Z;
-			
+
 			if (vector3.LengthSquared() > num)
 				return ContainmentType::Intersects;
 		}
 
 		return ContainmentType::Contains;
 	}
-	
+
 	constexpr bool BoundingSphere::Intersects(BoundingFrustum const& frustum) const {
 		return frustum.Intersects(*this);
 	}
-	
+
 	constexpr PlaneIntersectionType BoundingSphere::Intersects(Plane const& plane) const {
 		return plane.Intersects(*this);
-	}	
+	}
 
 	constexpr PlaneIntersectionType Plane::Intersects(BoundingFrustum const& frustum) const {
 		return frustum.Intersects(*this);
