@@ -1,12 +1,13 @@
 #ifndef DXNA_STRUCTS_HPP
 #define DXNA_STRUCTS_HPP
 
+#include <vector>
+#include <memory>
 #include "cs/cs.hpp"
 #include "enumerations.hpp"
 #include "mathhelper.hpp"
-#include <vector>
-#include <memory>
 #include "utility.hpp"
+#include "error.hpp"
 
 namespace dxna {
 	struct Matrix;
@@ -317,17 +318,35 @@ namespace dxna {
 		static constexpr Vector2 TransformNormal(Vector2 const& normal, Matrix const& matrix) noexcept;
 		static constexpr Vector2 Transform(Vector2 const& value, Quaternion const& rotation) noexcept;
 
-		static constexpr void Transform(Vector2* sourceArray, Matrix matrix,
-			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
-			size_t destinationIndex = 0);
+		static constexpr Error Transform(
+			Vector2* sourceArray,
+			size_t sourceLength,
+			size_t sourceIndex,
+			Matrix const& matrix,
+			Vector2* destinationArray, 
+			size_t destinationIndex,
+			size_t destinationLength,
+			size_t length) noexcept;
 
-		static constexpr void Transform(Vector2* sourceArray, Quaternion rotation,
-			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
-			size_t destinationIndex = 0);
+		static constexpr Error Transform(
+			Vector2* sourceArray,
+			size_t sourceIndex,			
+			size_t sourceLength,
+			Quaternion const& rotation,
+			Vector2* destinationArray,
+			size_t destinationIndex,
+			size_t destinationLength,
+			size_t length) noexcept;
 
-		static constexpr void TransformNormal(Vector2* sourceArray, Matrix const& matrix,
-			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
-			size_t destinationIndex = 0);
+		static constexpr Error TransformNormal(
+			Vector2* sourceArray,
+			size_t sourceIndex,
+			size_t sourceLength,
+			Matrix const& matrix,
+			Vector2* destinationArray,
+			size_t destinationIndex,
+			size_t destinationLength,
+			size_t length) noexcept ;
 	};
 
 	struct Vector3 {
@@ -2753,18 +2772,19 @@ namespace dxna {
 	};
 }
 
+// ---------------------------------- Vector2 ----------------------------------//
 namespace dxna {
 	constexpr Vector2 Vector2::Transform(Vector2 const& position, Matrix const& matrix) noexcept {
 		const auto num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
-		const auto num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;	
-		
+		const auto num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;
+
 		return Vector2(num1, num2);
 	}
 
 	constexpr Vector2 Vector2::TransformNormal(Vector2 const& normal, Matrix const& matrix) noexcept {
 		const auto num1 = (normal.X * matrix.M11 + normal.Y * matrix.M21);
 		const auto num2 = (normal.X * matrix.M12 + normal.Y * matrix.M22);
-		
+
 		return Vector2(num1, num2);
 	}
 
@@ -2779,95 +2799,114 @@ namespace dxna {
 		const auto num8 = rotation.Z * num3;
 		const auto num9 = (value.X * (1.0F - num7 - num8) + value.Y * (num6 - num4));
 		const auto num10 = (value.X * (num6 + num4) + value.Y * (1.0F - num5 - num8));
-		
+
 		return Vector2(num9, num10);
 	}
 
-	constexpr void Vector2::Transform(Vector2* sourceArray, Matrix matrix, Vector2* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+	constexpr Error Vector2::Transform(
+		Vector2* sourceArray,
+		size_t sourceLength,
+		size_t sourceIndex,
+		Matrix const& matrix,
+		Vector2* destinationArray,
+		size_t destinationIndex,
+		size_t destinationLength,
+		size_t length) noexcept {
 		if (sourceArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
 
 		if (destinationArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
 
-		if (length < sourceIndex + length)
-			return;
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
 
-		if (length < destinationIndex + length)
-			return;
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
 
-		for (; length > 0; --length) {
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21) + matrix.M41;
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22) + matrix.M42;
-			++sourceIndex;
-			++destinationIndex;
+		for (size_t x = 0; x < length; x++) {
+			const auto& position = sourceArray[sourceIndex + x];
+			auto destination = destinationArray[destinationIndex + x];
+			destination.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
+			destination.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
+			destinationArray[destinationIndex + x] = destination;
 		}
+
+		return Error::NoError();
 	}
 
-	constexpr void Vector2::Transform(Vector2* sourceArray, Quaternion rotation,
-		Vector2* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+	constexpr Error Vector2::Transform(
+		Vector2* sourceArray,
+		size_t sourceIndex,
+		size_t sourceLength,
+		Quaternion const& rotation,
+		Vector2* destinationArray,
+		size_t destinationIndex,
+		size_t destinationLength,
+		size_t length) noexcept {
+
 		if (sourceArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
 
 		if (destinationArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
 
-		if (length < sourceIndex + length)
-			return;
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
 
-		if (length < destinationIndex + length)
-			return;
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
 
-		const auto num1 = rotation.X + rotation.X;
-		const auto num2 = rotation.Y + rotation.Y;
-		const auto num3 = rotation.Z + rotation.Z;
-		const auto num4 = rotation.W * num3;
-		const auto num5 = rotation.X * num1;
-		const auto num6 = rotation.X * num2;
-		const auto num7 = rotation.Y * num2;
-		const auto num8 = rotation.Z * num3;
-		const auto num9 = 1.0f - num7 - num8;
-		const auto num10 = num6 - num4;
-		const auto num11 = num6 + num4;
-		const auto num12 = 1.0f - num5 - num8;
-		for (; length > 0; --length)
-		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			destinationArray[destinationIndex].X = (x * num9 + y * num10);
-			destinationArray[destinationIndex].Y = (x * num11 + y * num12);
-			++sourceIndex;
-			++destinationIndex;
+		for (size_t x = 0; x < length; x++) {
+			auto& position = sourceArray[sourceIndex + x];
+			auto destination = destinationArray[destinationIndex + x];
+
+			Vector2 v = Transform(position, rotation);
+
+			destination.X = v.X;
+			destination.Y = v.Y;
+
+			destinationArray[destinationIndex + x] = destination;
 		}
+
+		return Error::NoError();
 	}
 
-	constexpr void Vector2::TransformNormal(Vector2* sourceArray, Matrix const& matrix,
-		Vector2* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
+	constexpr Error Vector2::TransformNormal(
+		Vector2* sourceArray,
+		size_t sourceIndex,
+		size_t sourceLength,
+		Matrix const& matrix,
+		Vector2* destinationArray,
+		size_t destinationIndex,
+		size_t destinationLength,
+		size_t length) noexcept {
+
 		if (sourceArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
 
 		if (destinationArray == nullptr)
-			return;
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
 
-		if (length < sourceIndex + length)
-			return;
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
 
-		if (length < destinationIndex + length)
-			return;
-		
-		for (; length > 0; --length)
-		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21);
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22);
-			++sourceIndex;
-			++destinationIndex;
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
+
+		for (size_t i = 0; i < length; i++) {
+			const auto& normal = sourceArray[sourceIndex + i];
+
+			destinationArray[destinationIndex + i] = Vector2(
+				(normal.X * matrix.M11) + (normal.Y * matrix.M21),
+				(normal.X * matrix.M12) + (normal.Y * matrix.M22));
 		}
-	}
 
+		return Error::NoError();
+	}
+}
+
+namespace dxna {
 	constexpr Vector3 dxna::Vector3::Transform(Vector3 const& position, Matrix const& matrix) {
 		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
 		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
