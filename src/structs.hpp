@@ -324,9 +324,9 @@ namespace dxna {
 			size_t sourceIndex,
 			Matrix const& matrix,
 			Vector2* destinationArray, 
-			size_t destinationIndex,
 			size_t destinationLength,
-			size_t length) noexcept;
+			size_t destinationIndex,
+			size_t length) noexcept;		
 
 		static constexpr Error Transform(
 			Vector2* sourceArray,
@@ -337,7 +337,7 @@ namespace dxna {
 			size_t destinationIndex,
 			size_t destinationLength,
 			size_t length) noexcept;
-
+		
 		static constexpr Error TransformNormal(
 			Vector2* sourceArray,
 			size_t sourceIndex,
@@ -2809,8 +2809,8 @@ namespace dxna {
 		size_t sourceIndex,
 		Matrix const& matrix,
 		Vector2* destinationArray,
-		size_t destinationIndex,
 		size_t destinationLength,
+		size_t destinationIndex,
 		size_t length) noexcept {
 		if (sourceArray == nullptr)
 			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
@@ -2833,7 +2833,7 @@ namespace dxna {
 		}
 
 		return Error::NoError();
-	}
+	}	
 
 	constexpr Error Vector2::Transform(
 		Vector2* sourceArray,
@@ -2870,7 +2870,7 @@ namespace dxna {
 		}
 
 		return Error::NoError();
-	}
+	}	
 
 	constexpr Error Vector2::TransformNormal(
 		Vector2* sourceArray,
