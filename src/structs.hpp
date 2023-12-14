@@ -6,6 +6,7 @@
 #include "mathhelper.hpp"
 #include <vector>
 #include <memory>
+#include "utility.hpp"
 
 namespace dxna {
 	struct Matrix;
@@ -16,177 +17,190 @@ namespace dxna {
 	struct Ray;
 
 	struct Point {
-		intcs X{ 0 };
-		intcs Y{ 0 };
+		int X{ 0 };
+		int Y{ 0 };
 
-		constexpr Point() = default;
-		constexpr Point(intcs x, intcs y) :
-			X(x), Y(y) {}
+		constexpr Point() noexcept = default;
+		constexpr Point(int x, int y) noexcept : X(x), Y(y) {}
 
-		static constexpr Point Zero() { return Point(); }
+		static constexpr Point Zero() noexcept { return Point(); }
+		
+		constexpr bool operator==(Point const& other) const noexcept = default;	
 
-		bool constexpr Equals(Point const& other) const { return X == other.X && Y == other.Y; }
-
-		constexpr Point operator-() const { return Point(-X, -Y); }
-
-		constexpr bool operator==(Point const& other) const { return Equals(other); }
+		constexpr size_t GetHashCode() const noexcept {			
+			size_t seed = 0;
+			Hash::Combine(seed, X);
+			Hash::Combine(seed, Y);
+			return seed;
+		}
 	};
 
 	struct Rectangle {
-		intcs X{ 0 };
-		intcs Y{ 0 };
-		intcs Width{ 0 };
-		intcs Height{ 0 };
+		int X{ 0 };
+		int Y{ 0 };
+		int Width{ 0 };
+		int Height{ 0 };
 
-		constexpr Rectangle() = default;
+		constexpr Rectangle() noexcept = default;
 
-		constexpr Rectangle(intcs x, intcs y, intcs width, intcs height) :
+		constexpr Rectangle(int x, int y, int width, int height) noexcept :
 			X(x), Y(y), Width(width), Height(height) {}
 
-		static constexpr Rectangle Empty() { return Rectangle(0, 0, 0, 0); }
+		constexpr size_t GetHashCode() const noexcept {
+			size_t seed = 0;
+			Hash::Combine(seed, X);
+			Hash::Combine(seed, Y);
+			Hash::Combine(seed, Width);
+			Hash::Combine(seed, Height);
+			return seed;
+		}
 
-		constexpr intcs Left() const { return X; }
+		static constexpr Rectangle Empty() noexcept { 
+			return Rectangle(); 
+		}
 
-		constexpr intcs Right() const { return X + Width; }
+		constexpr intcs Left() const noexcept { return X; }
 
-		constexpr intcs Top() const { return Y; }
+		constexpr intcs Right() const noexcept { return X + Width; }
 
-		constexpr intcs Bottom() const { return Y + Height; }
+		constexpr intcs Top() const noexcept { return Y; }
 
-		constexpr void Offset(Point const& amount) {
+		constexpr intcs Bottom() const noexcept { return Y + Height; }
+
+		constexpr void Offset(Point const& amount) noexcept {
 			X += amount.X;
 			Y += amount.Y;
 		}
 
-		constexpr void Offset(intcs offsetX, intcs offsetY) {
+		constexpr void Offset(int offsetX, int offsetY) noexcept {
 			X += offsetX;
 			Y += offsetY;
 		}
 
-		constexpr void Inflate(intcs horizontalAmount, intcs verticalAmount) {
+		constexpr void Inflate(int horizontalAmount, int verticalAmount) noexcept {
 			X -= horizontalAmount;
 			Y -= verticalAmount;
 			Width += horizontalAmount * 2;
 			Height += verticalAmount * 2;
 		}
 
-		constexpr bool Contains(intcs x, intcs y) const {
+		constexpr bool Contains(int x, int y) const noexcept {
 			return X <= x && x < X + Width && Y <= y && y < Y + Height;
 		}
 
-		constexpr bool Contains(Point const& value) const {
+		constexpr bool Contains(Point const& value) const noexcept {
 			return X <= value.X && value.X < X + Width && Y <= value.Y && value.Y < Y + Height;
 		}
 
-		constexpr bool Contains(Rectangle const& value) const {
+		constexpr bool Contains(Rectangle const& value) const noexcept {
 			return X <= value.X && value.X + value.Width <= X + Width && Y <= value.Y && value.Y + value.Height <= Y + Height;
 		}
 
-		constexpr bool Intersects(Rectangle const& value) const {
+		constexpr bool Intersects(Rectangle const& value) const noexcept {
 			return value.X < X + Width && X < value.X + value.Width && value.Y < Y + Height && Y < value.Y + value.Height;
-		}
+		}		
 
-		constexpr bool Equals(Rectangle const& other) const {
-			return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
-		}
-
-		static constexpr Rectangle Intersect(Rectangle const& value1, Rectangle const& value2) {
-			intcs num1 = value1.X + value1.Width;
-			intcs num2 = value2.X + value2.Width;
-			intcs num3 = value1.Y + value1.Height;
-			intcs num4 = value2.Y + value2.Height;
-			intcs num5 = value1.X > value2.X ? value1.X : value2.X;
-			intcs num6 = value1.Y > value2.Y ? value1.Y : value2.Y;
-			intcs num7 = num1 < num2 ? num1 : num2;
-			intcs num8 = num3 < num4 ? num3 : num4;
+		static constexpr Rectangle Intersect(Rectangle const& value1, Rectangle const& value2) noexcept {
+			const auto num1 = value1.X + value1.Width;
+			const auto num2 = value2.X + value2.Width;
+			const auto num3 = value1.Y + value1.Height;
+			const auto num4 = value2.Y + value2.Height;
+			const auto num5 = value1.X > value2.X ? value1.X : value2.X;
+			const auto num6 = value1.Y > value2.Y ? value1.Y : value2.Y;
+			const auto num7 = num1 < num2 ? num1 : num2;
+			const auto num8 = num3 < num4 ? num3 : num4;
 
 			if (num7 > num5 && num8 > num6)
 				return Rectangle(num5, num6, num7 - num5, num8 - num6);
-			else
-				return Rectangle::Empty();
+			
+			return Rectangle::Empty();
 		}
 
-		static constexpr Rectangle Union(Rectangle const& value1, Rectangle const& value2) {
-			intcs num1 = value1.X + value1.Width;
-			intcs num2 = value2.X + value2.Width;
-			intcs num3 = value1.Y + value1.Height;
-			intcs num4 = value2.Y + value2.Height;
-			intcs num5 = value1.X < value2.X ? value1.X : value2.X;
-			intcs num6 = value1.Y < value2.Y ? value1.Y : value2.Y;
-			intcs num7 = num1 > num2 ? num1 : num2;
-			intcs num8 = num3 > num4 ? num3 : num4;
+		static constexpr Rectangle Union(Rectangle const& value1, Rectangle const& value2) noexcept {
+			const auto num1 = value1.X + value1.Width;
+			const auto num2 = value2.X + value2.Width;
+			const auto num3 = value1.Y + value1.Height;
+			const auto num4 = value2.Y + value2.Height;
+			const auto num5 = value1.X < value2.X ? value1.X : value2.X;
+			const auto num6 = value1.Y < value2.Y ? value1.Y : value2.Y;
+			const auto num7 = num1 > num2 ? num1 : num2;
+			const auto num8 = num3 > num4 ? num3 : num4;
 
 			return Rectangle(num5, num6, num7 - num5, num8 - num6);
 		}
 
-		constexpr bool operator==(Rectangle const& value2) const {
-			return Equals(value2);
-		}
+		constexpr bool operator==(Rectangle const& value2) const noexcept = default;
 	};
 
 	struct Vector2 {
 		float X{ 0 };
 		float Y{ 0 };
 
-		constexpr Vector2() = default;
-		constexpr Vector2(float x, float y) : X(x), Y(y) {}
-		constexpr Vector2(float value) : X(value), Y(value) {}
+		constexpr Vector2() noexcept = default;
+		constexpr Vector2(float x, float y) noexcept : X(x), Y(y) {}
+		constexpr Vector2(float value) noexcept : X(value), Y(value) {}
 
-		constexpr Vector2 operator-() const { return Vector2::Negate(*this); }
-		constexpr bool operator==(Vector2 const& other) const { return Equals(other); }
-		friend constexpr Vector2 operator+(Vector2 const& value1, Vector2 const& value2) { return Vector2::Add(value1, value2); }
-		friend constexpr Vector2 operator-(Vector2 const& value1, Vector2 const& value2) { return Vector2::Subtract(value1, value2); }
-		friend constexpr Vector2 operator*(Vector2 const& value1, Vector2 const& value2) { return Vector2::Multiply(value1, value2); }
-		friend constexpr Vector2 operator*(Vector2 const& value, float scale) { return Vector2::Multiply(value, scale); }
-		friend constexpr Vector2 operator*(float scale, Vector2 const& value) { return Vector2::Multiply(value, scale); }
-		friend constexpr Vector2 operator/(Vector2 const& value1, Vector2 const& value2) { return Vector2::Divide(value1, value2); }
-		friend constexpr Vector2 operator/(Vector2 const& value, float divider) { return Vector2::Divide(value, divider); }
+		constexpr size_t GetHashCode() const noexcept {
+			size_t seed = 0;
+			Hash::Combine(seed, X);
+			Hash::Combine(seed, Y);
+			return seed;
+		}
 
-		constexpr bool Equals(Vector2 const& other) const { return X == other.X && Y == other.Y; }
-		constexpr float LengthSquared() const { return X * X + Y * Y; }
+		constexpr Vector2 operator-() const noexcept { return Vector2::Negate(*this); }
+		constexpr bool operator==(Vector2 const& other) const noexcept = default;
+		friend constexpr Vector2 operator+(Vector2 const& value1, Vector2 const& value2) noexcept { return Vector2::Add(value1, value2); }
+		friend constexpr Vector2 operator-(Vector2 const& value1, Vector2 const& value2) noexcept { return Vector2::Subtract(value1, value2); }
+		friend constexpr Vector2 operator*(Vector2 const& value1, Vector2 const& value2) noexcept { return Vector2::Multiply(value1, value2); }
+		friend constexpr Vector2 operator*(Vector2 const& value, float scale) noexcept { return Vector2::Multiply(value, scale); }
+		friend constexpr Vector2 operator*(float scale, Vector2 const& value) noexcept { return Vector2::Multiply(value, scale); }
+		friend constexpr Vector2 operator/(Vector2 const& value1, Vector2 const& value2) noexcept { return Vector2::Divide(value1, value2); }
+		friend constexpr Vector2 operator/(Vector2 const& value, float divider) noexcept { return Vector2::Divide(value, divider); }
+		
+		constexpr float LengthSquared() const noexcept { return X * X + Y * Y; }
 
-		float Length() const;
-		void Normalize();
+		float Length() const noexcept;
+		void Normalize() noexcept;
 
-		static constexpr Vector2 Zero() { return Vector2(); }
-		static constexpr Vector2 One() { return Vector2(1.0); }
-		static constexpr Vector2 UnitX() { return Vector2(1.0, 0.0); }
-		static constexpr Vector2 UnitY() { return Vector2(0.0, 1.0); }
+		static constexpr Vector2 Zero() noexcept { return Vector2(); }
+		static constexpr Vector2 One() noexcept { return Vector2(1.0); }
+		static constexpr Vector2 UnitX() noexcept { return Vector2(1.0, 0.0); }
+		static constexpr Vector2 UnitY() noexcept { return Vector2(0.0, 1.0); }
 
-		static float Distance(Vector2 const& value1, Vector2 const& value2);
+		static float Distance(Vector2 const& value1, Vector2 const& value2) noexcept;
 
-		static constexpr float DistanceSquared(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr float DistanceSquared(Vector2 const& value1, Vector2 const& value2) noexcept {
 			const auto num1 = value1.X - value2.X;
 			const auto num2 = value1.Y - value2.Y;
 			return num1 * num1 + num2 * num2;
 		}
 
-		static constexpr float Dot(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr float Dot(Vector2 const& value1, Vector2 const& value2) noexcept {
 			return value1.X * value2.X + value1.Y * value2.Y;
 		}
 
-		static constexpr Vector2 lect(Vector2 const& vector, Vector2 const& normal) {
+		static constexpr Vector2 Reflect(Vector2 const& vector, Vector2 const& normal) noexcept {
 			const auto num = vector.X * normal.X + vector.Y * normal.Y;
 			return Vector2(
 				vector.X - 2.0F * num * normal.X,
 				vector.Y - 2.0F * num * normal.Y);
 		}
 
-		static constexpr Vector2 Min(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr Vector2 Min(Vector2 const& value1, Vector2 const& value2) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X < value2.X ? value1.X : value2.X;
 			vector2.Y = value1.Y < value2.Y ? value1.Y : value2.Y;
 			return vector2;
 		}
 
-		static constexpr Vector2 Max(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr Vector2 Max(Vector2 const& value1, Vector2 const& value2) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X > value2.X ? value1.X : value2.X;
 			vector2.Y = value1.Y > value2.Y ? value1.Y : value2.Y;
 			return vector2;
 		}
 
-		static constexpr Vector2 Clamp(Vector2 const& value1, Vector2 const& min, Vector2 const& max) {
+		static constexpr Vector2 Clamp(Vector2 const& value1, Vector2 const& min, Vector2 const& max) noexcept {
 			const auto x = value1.X;
 			const auto num1 = x > max.X ? max.X : x;
 			const auto num2 = num1 < min.X ? min.X : num1;
@@ -199,7 +213,7 @@ namespace dxna {
 			return vector2;
 		}
 
-		static constexpr Vector2 Lerp(Vector2 const& value1, Vector2 const& value2, float amount) {
+		static constexpr Vector2 Lerp(Vector2 const& value1, Vector2 const& value2, float amount) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X + (value2.X - value1.X) * amount;
 			vector2.Y = value1.Y + (value2.Y - value1.Y) * amount;
@@ -207,14 +221,14 @@ namespace dxna {
 		}
 
 		static constexpr Vector2 Barycentric(Vector2 const& value1, Vector2 const& value2, Vector2 const& value3,
-			float amount1, float amount2) {
+			float amount1, float amount2) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X + amount1 * (value2.X - value1.X) + amount2 * (value3.X - value1.X);
 			vector2.Y = value1.Y + amount1 * (value2.Y - value1.Y) + amount2 * (value3.Y - value1.Y);
 			return vector2;
 		}
 
-		static constexpr Vector2 SmoothStep(Vector2 const& value1, Vector2 const& value2, float amount) {
+		static constexpr Vector2 SmoothStep(Vector2 const& value1, Vector2 const& value2, float amount) noexcept {
 			amount = amount > 1.0 ? 1.0F : (amount < 0.0 ? 0.0F : amount);
 			amount = amount * amount * (3.0F - 2.0F * amount);
 			Vector2 vector2;
@@ -224,7 +238,7 @@ namespace dxna {
 		}
 
 		static constexpr Vector2 CatmullRom(Vector2 const& value1, Vector2 const& value2, Vector2 const& value3,
-			Vector2 const& value4, float amount) {
+			Vector2 const& value4, float amount) noexcept {
 			const auto num1 = amount * amount;
 			const auto num2 = amount * num1;
 			Vector2 vector2;
@@ -234,7 +248,7 @@ namespace dxna {
 		}
 
 		static constexpr Vector2 Hermite(Vector2 const& value1, Vector2 const& tangent1, Vector2 const& value2,
-			Vector2 const& tangent2, float amount) {
+			Vector2 const& tangent2, float amount) noexcept {
 			const auto num1 = amount * amount;
 			const auto num2 = amount * num1;
 			const auto num3 = (2.0F * num2 - 3.0F * num1 + 1.0F);
@@ -247,51 +261,51 @@ namespace dxna {
 			return vector2;
 		}
 
-		static Vector2 Normalize(Vector2 const& value);
+		static Vector2 Normalize(Vector2 const& value) noexcept;
 
-		static constexpr Vector2 Negate(Vector2 const& value) {
+		static constexpr Vector2 Negate(Vector2 const& value) noexcept {
 			Vector2 vector2;
 			vector2.X = -value.X;
 			vector2.Y = -value.Y;
 			return vector2;
 		}
 
-		static constexpr Vector2 Add(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr Vector2 Add(Vector2 const& value1, Vector2 const& value2) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X + value2.X;
 			vector2.Y = value1.Y + value2.Y;
 			return vector2;
 		}
 
-		static constexpr Vector2 Subtract(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr Vector2 Subtract(Vector2 const& value1, Vector2 const& value2) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X - value2.X;
 			vector2.Y = value1.Y - value2.Y;
 			return vector2;
 		}
 
-		static constexpr Vector2 Multiply(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr Vector2 Multiply(Vector2 const& value1, Vector2 const& value2) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X * value2.X;
 			vector2.Y = value1.Y * value2.Y;
 			return vector2;
 		}
 
-		static constexpr Vector2 Multiply(Vector2 const& value1, float scaleFactor) {
+		static constexpr Vector2 Multiply(Vector2 const& value1, float scaleFactor) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X * scaleFactor;
 			vector2.Y = value1.Y * scaleFactor;
 			return vector2;
 		}
 
-		static constexpr Vector2 Divide(Vector2 const& value1, Vector2 const& value2) {
+		static constexpr Vector2 Divide(Vector2 const& value1, Vector2 const& value2) noexcept {
 			Vector2 vector2;
 			vector2.X = value1.X / value2.X;
 			vector2.Y = value1.Y / value2.Y;
 			return vector2;
 		}
 
-		static constexpr Vector2 Divide(Vector2 const& value1, float divider) {
+		static constexpr Vector2 Divide(Vector2 const& value1, float divider) noexcept {
 			const auto num = 1.0F / divider;
 			Vector2 vector2;
 			vector2.X = value1.X * num;
@@ -299,9 +313,9 @@ namespace dxna {
 			return vector2;
 		}
 
-		static constexpr Vector2 Transform(Vector2 const& position, Matrix const& matrix);
-		static constexpr Vector2 TransformNormal(Vector2 const& normal, Matrix const& matrix);
-		static constexpr Vector2 Transform(Vector2 const& value, Quaternion const& rotation);
+		static constexpr Vector2 Transform(Vector2 const& position, Matrix const& matrix) noexcept;
+		static constexpr Vector2 TransformNormal(Vector2 const& normal, Matrix const& matrix) noexcept;
+		static constexpr Vector2 Transform(Vector2 const& value, Quaternion const& rotation) noexcept;
 
 		static constexpr void Transform(Vector2* sourceArray, Matrix matrix,
 			Vector2* destinationArray, size_t length, size_t sourceIndex = 0,
@@ -2740,21 +2754,21 @@ namespace dxna {
 }
 
 namespace dxna {
-	constexpr Vector2 Vector2::Transform(Vector2 const& position, Matrix const& matrix) {
+	constexpr Vector2 Vector2::Transform(Vector2 const& position, Matrix const& matrix) noexcept {
 		const auto num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
 		const auto num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;	
 		
 		return Vector2(num1, num2);
 	}
 
-	constexpr Vector2 Vector2::TransformNormal(Vector2 const& normal, Matrix const& matrix) {
+	constexpr Vector2 Vector2::TransformNormal(Vector2 const& normal, Matrix const& matrix) noexcept {
 		const auto num1 = (normal.X * matrix.M11 + normal.Y * matrix.M21);
 		const auto num2 = (normal.X * matrix.M12 + normal.Y * matrix.M22);
 		
 		return Vector2(num1, num2);
 	}
 
-	constexpr Vector2 Vector2::Transform(Vector2 const& value, Quaternion const& rotation) {
+	constexpr Vector2 Vector2::Transform(Vector2 const& value, Quaternion const& rotation) noexcept {
 		const auto num1 = rotation.X + rotation.X;
 		const auto num2 = rotation.Y + rotation.Y;
 		const auto num3 = rotation.Z + rotation.Z;

@@ -3,15 +3,15 @@
 #include <vector>
 
 namespace dxna {
-	float Vector2::Length() const { return std::sqrt(LengthSquared()); }
+	float Vector2::Length() const noexcept { return std::sqrt(LengthSquared()); }
 
-	void Vector2::Normalize() {
+	void Vector2::Normalize() noexcept {
 		const auto num = 1.0F / Length();
 		X *= num;
 		Y *= num;
 	}
 
-	Vector2 Vector2::Normalize(Vector2 const& value) {
+	Vector2 Vector2::Normalize(Vector2 const& value) noexcept {
 		float num = 1.0F / std::sqrt(value.Length());
 		Vector2 vector;
 		vector.X *= num;
@@ -20,7 +20,7 @@ namespace dxna {
 		return vector;
 	}
 
-	float Vector2::Distance(Vector2 const& value1, Vector2 const& value2) {
+	float Vector2::Distance(Vector2 const& value1, Vector2 const& value2) noexcept {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
 		return std::sqrt(num1 * num1 + num2 * num2);
