@@ -84,7 +84,7 @@ namespace dxna {
 	}
 
 	Matrix Matrix::CreateBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
-		Vector3 const& cameraUpVector, Vector3* const cameraForwardVector) {
+		Vector3 const& cameraUpVector, Vector3* const cameraForwardVector) noexcept {
 		Vector3 result1;
 		result1.X = objectPosition.X - cameraPosition.X;
 		result1.Y = objectPosition.Y - cameraPosition.Y;
@@ -123,7 +123,7 @@ namespace dxna {
 	}
 
 	Matrix Matrix::CreateConstrainedBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
-		Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector) {
+		Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector) noexcept {
 		Vector3 result1;
 		result1.X = objectPosition.X - cameraPosition.X;
 		result1.Y = objectPosition.Y - cameraPosition.Y;
@@ -188,7 +188,7 @@ namespace dxna {
 		return constrainedBillboard;
 	}
 
-	Matrix Matrix::CreateRotationX(float radians) {
+	Matrix Matrix::CreateRotationX(float radians) noexcept {
 		const auto num1 = std::cos(radians);
 		const auto num2 = std::sin(radians);
 		Matrix rotationX;
@@ -211,7 +211,7 @@ namespace dxna {
 		return rotationX;
 	}
 
-	Matrix Matrix::CreateRotationY(float radians) {
+	Matrix Matrix::CreateRotationY(float radians)  noexcept {
 		const auto num1 = std::cos(radians);
 		const auto num2 = std::sin(radians);
 		Matrix rotationY;
@@ -234,7 +234,7 @@ namespace dxna {
 		return rotationY;
 	}
 
-	Matrix Matrix::CreateRotationZ(float radians) {
+	Matrix Matrix::CreateRotationZ(float radians) noexcept {
 		const auto num1 = std::cos(radians);
 		const auto num2 = std::sin(radians);
 		Matrix rotationZ;
@@ -257,18 +257,18 @@ namespace dxna {
 		return rotationZ;
 	}
 
-	Matrix Matrix::CreateFromAxisAngle(Vector3 const& axis, float angle) {
-		float x = axis.X;
-		float y = axis.Y;
-		float z = axis.Z;
-		float num1 = std::sin(angle);
-		float num2 = std::cos(angle);
-		float num3 = x * x;
-		float num4 = y * y;
-		float num5 = z * z;
-		float num6 = x * y;
-		float num7 = x * z;
-		float num8 = y * z;
+	Matrix Matrix::CreateFromAxisAngle(Vector3 const& axis, float angle) noexcept {
+		const auto x = axis.X;
+		const auto y = axis.Y;
+		const auto z = axis.Z;
+		const auto num1 = std::sin(angle);
+		const auto num2 = std::cos(angle);
+		const auto num3 = x * x;
+		const auto num4 = y * y;
+		const auto num5 = z * z;
+		const auto num6 = x * y;
+		const auto num7 = x * z;
+		const auto num8 = y * z;
 
 		Matrix fromAxisAngle;
 		fromAxisAngle.M11 = num3 + num2 * (1.0f - num3);
@@ -290,7 +290,7 @@ namespace dxna {
 		return fromAxisAngle;
 	}
 
-	Matrix Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) {
+	Matrix Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) noexcept {
 		const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 		if (fieldOfView <= 0.0F || fieldOfView >= 3.1415927410125732)
@@ -320,7 +320,7 @@ namespace dxna {
 		return perspectiveFieldOfView;
 	}
 
-	Matrix Matrix::CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector) {
+	Matrix Matrix::CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector) noexcept {
 		Vector3 vector3_1 = Vector3::Normalize(cameraPosition - cameraTarget);
 		Vector3 vector3_2 = Vector3::Normalize(Vector3::Cross(cameraUpVector, vector3_1));
 		Vector3 vector1 = Vector3::Cross(vector3_1, vector3_2);
@@ -345,7 +345,7 @@ namespace dxna {
 		return lookAt;
 	}
 
-	Matrix Matrix::CreateWorld(Vector3 position, Vector3 forward, Vector3 up) {
+	Matrix Matrix::CreateWorld(Vector3 position, Vector3 forward, Vector3 up) noexcept {
 		Vector3 vector3_1 = Vector3::Normalize(-forward);
 		Vector3 vector2 = Vector3::Normalize(Vector3::Cross(up, vector3_1));
 		Vector3 vector3_2 = Vector3::Cross(vector3_1, vector2);
@@ -370,7 +370,7 @@ namespace dxna {
 		return world;
 	}
 
-	Matrix Matrix::CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+	Matrix Matrix::CreateFromYawPitchRoll(float yaw, float pitch, float roll) noexcept
 	{
 		const auto result = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
 		return CreateFromQuaternion(result);
@@ -788,14 +788,14 @@ namespace dxna {
 			/ std::sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
 	}
 
-	Matrix Matrix::CreateShadow(Vector3 const& lightDirection, Plane const& plane)
+	Matrix Matrix::CreateShadow(Vector3 const& lightDirection, Plane const& plane) noexcept
 	{
 		Plane result = Plane::Normalize(plane);
-		float num1 = (result.Normal.X * lightDirection.X + result.Normal.Y * lightDirection.Y + result.Normal.Z * lightDirection.Z);
-		float num2 = -result.Normal.X;
-		float num3 = -result.Normal.Y;
-		float num4 = -result.Normal.Z;
-		float num5 = -result.D;
+		const auto num1 = (result.Normal.X * lightDirection.X + result.Normal.Y * lightDirection.Y + result.Normal.Z * lightDirection.Z);
+		const auto num2 = -result.Normal.X;
+		const auto num3 = -result.Normal.Y;
+		const auto num4 = -result.Normal.Z;
+		const auto num5 = -result.D;
 
 		Matrix shadow;
 		shadow.M11 = num2 * lightDirection.X + num1;
@@ -817,17 +817,17 @@ namespace dxna {
 		return shadow;
 	}
 	
-	Matrix Matrix::CreateReflection(Plane const& original)
+	Matrix Matrix::CreateReflection(Plane const& original) noexcept
 	{
 		auto value = original;
-
 		value.Normalize();
-		float x = value.Normal.X;
-		float y = value.Normal.Y;
-		float z = value.Normal.Z;
-		float num1 = -2.f * x;
-		float num2 = -2.f * y;
-		float num3 = -2.f * z;
+
+		const auto x = value.Normal.X;
+		const auto y = value.Normal.Y;
+		const auto z = value.Normal.Z;
+		const auto num1 = -2.f * x;
+		const auto num2 = -2.f * y;
+		const auto num3 = -2.f * z;
 		Matrix reflection;
 		reflection.M11 = (num1 * x + 1.0F);
 		reflection.M12 = num2 * x;

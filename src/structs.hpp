@@ -867,24 +867,32 @@ namespace dxna {
 		float M43{ 0 };
 		float M44{ 0 };
 
-		constexpr Matrix() = default;
+		constexpr Matrix() noexcept = default;
 
-		constexpr Matrix(float M11, float M12, float M13, float M14, float M21, float M22, float M23, float M24, float M31, float M32, float M33, float M34, float M41, float M42, float M43, float M44)
-			: M11(M11), M12(M12), M13(M13), M14(M14), M21(M21), M22(M22), M23(M23), M24(M24), M31(M31), M32(M32), M33(M33), M34(M34), M41(M41), M42(M42), M43(M43), M44(M44) {
+		constexpr Matrix(
+			float M11, float M12, float M13, float M14,
+			float M21, float M22, float M23, float M24,
+			float M31, float M32, float M33, float M34,
+			float M41, float M42, float M43, float M44)
+			noexcept :
+			M11(M11), M12(M12), M13(M13), M14(M14),
+			M21(M21), M22(M22), M23(M23), M24(M24),
+			M31(M31), M32(M32), M33(M33), M34(M34),
+			M41(M41), M42(M42), M43(M43), M44(M44) {
 		}
 
-		constexpr Matrix operator-() const { return Matrix::Negate(*this); }
-		constexpr bool operator==(Matrix const& other) const { return Equals(other); }
-		friend constexpr Matrix operator+(Matrix const& value1, Matrix const& value2) { return Matrix::Add(value1, value2); }
-		friend constexpr Matrix operator-(Matrix const& value1, Matrix const& value2) { return Matrix::Subtract(value1, value2); }
-		friend constexpr Matrix operator*(Matrix const& value1, Matrix const& value2) { return Matrix::Multiply(value1, value2); }
-		friend constexpr Matrix operator*(Matrix const& value, float scale) { return Matrix::Multiply(value, scale); }
-		friend constexpr Matrix operator*(float scale, Matrix const& value) { return Matrix::Multiply(value, scale); }
-		friend constexpr Matrix operator/(Matrix const& value1, Matrix const& value2) { return Matrix::Divide(value1, value2); }
-		friend constexpr Matrix operator/(Matrix const& value, float divider) { return Matrix::Divide(value, divider); }
+		constexpr Matrix operator-() const noexcept { return Matrix::Negate(*this); }
+		constexpr bool operator==(Matrix const& other) const noexcept = default;
+		friend constexpr Matrix operator+(Matrix const& value1, Matrix const& value2) noexcept { return Matrix::Add(value1, value2); }
+		friend constexpr Matrix operator-(Matrix const& value1, Matrix const& value2) noexcept { return Matrix::Subtract(value1, value2); }
+		friend constexpr Matrix operator*(Matrix const& value1, Matrix const& value2) noexcept { return Matrix::Multiply(value1, value2); }
+		friend constexpr Matrix operator*(Matrix const& value, float scale) noexcept { return Matrix::Multiply(value, scale); }
+		friend constexpr Matrix operator*(float scale, Matrix const& value) noexcept { return Matrix::Multiply(value, scale); }
+		friend constexpr Matrix operator/(Matrix const& value1, Matrix const& value2) noexcept { return Matrix::Divide(value1, value2); }
+		friend constexpr Matrix operator/(Matrix const& value, float divider) noexcept { return Matrix::Divide(value, divider); }
 
 
-		constexpr Vector3 Up() const {
+		constexpr Vector3 Up() const noexcept {
 			Vector3 up;
 			up.X = M21;
 			up.Y = M22;
@@ -892,7 +900,7 @@ namespace dxna {
 			return up;
 		}
 
-		constexpr Vector3 Down() const {
+		constexpr Vector3 Down() const noexcept {
 			Vector3 down;
 			down.X = -M21;
 			down.Y = -M22;
@@ -900,7 +908,7 @@ namespace dxna {
 			return down;
 		}
 
-		constexpr Vector3 Right() const {
+		constexpr Vector3 Right() const noexcept {
 			Vector3 right;
 			right.X = M11;
 			right.Y = M12;
@@ -908,7 +916,7 @@ namespace dxna {
 			return right;
 		}
 
-		constexpr Vector3 Left() const {
+		constexpr Vector3 Left() const noexcept {
 			Vector3 left;
 			left.X = -M11;
 			left.Y = -M12;
@@ -916,7 +924,7 @@ namespace dxna {
 			return left;
 		}
 
-		constexpr Vector3 Forward() const {
+		constexpr Vector3 Forward() const noexcept {
 			Vector3 forward;
 			forward.X = -M31;
 			forward.Y = -M32;
@@ -924,7 +932,7 @@ namespace dxna {
 			return forward;
 		}
 
-		constexpr Vector3 Backward() const {
+		constexpr Vector3 Backward() const noexcept {
 			Vector3 backward;
 			backward.X = M31;
 			backward.Y = M32;
@@ -932,7 +940,7 @@ namespace dxna {
 			return backward;
 		}
 
-		constexpr Vector3 Translation() const {
+		constexpr Vector3 Translation() const noexcept {
 			Vector3 translation;
 			translation.X = M41;
 			translation.Y = M42;
@@ -940,94 +948,78 @@ namespace dxna {
 			return translation;
 		}
 
-		constexpr void Up(Vector3 const& value) {
+		constexpr void Up(Vector3 const& value) noexcept {
 			M21 = value.X;
 			M22 = value.Y;
 			M23 = value.Z;
 		}
 
-		constexpr void Down(Vector3 const& value) {
+		constexpr void Down(Vector3 const& value) noexcept {
 			M21 = -value.X;
 			M22 = -value.Y;
 			M23 = -value.Z;
 		}
 
-		constexpr void Right(Vector3 const& value) {
+		constexpr void Right(Vector3 const& value) noexcept {
 			M11 = value.X;
 			M12 = value.Y;
 			M13 = value.Z;
 		}
 
-		constexpr void Left(Vector3 const& value) {
+		constexpr void Left(Vector3 const& value) noexcept {
 			M11 = -value.X;
 			M12 = -value.Y;
 			M13 = -value.Z;
 		}
 
-		constexpr void Forward(Vector3 const& value) {
+		constexpr void Forward(Vector3 const& value) noexcept {
 			M31 = -value.X;
 			M32 = -value.Y;
 			M33 = -value.Z;
 		}
 
-		constexpr void Backward(Vector3 const& value) {
+		constexpr void Backward(Vector3 const& value) noexcept {
 			M31 = value.X;
 			M32 = value.Y;
 			M33 = value.Z;
 		}
 
-		constexpr void Translation(Vector3 const& value) {
+		constexpr void Translation(Vector3 const& value) noexcept {
 			M41 = value.X;
 			M42 = value.Y;
 			M43 = value.Z;
 		}
 
-		constexpr bool Equals(Matrix const& other) const {
-			return M11 == other.M11
-				&& M22 == other.M22
-				&& M33 == other.M33
-				&& M44 == other.M44
-				&& M12 == other.M12
-				&& M13 == other.M13
-				&& M14 == other.M14
-				&& M21 == other.M21
-				&& M23 == other.M23
-				&& M24 == other.M24
-				&& M31 == other.M31
-				&& M32 == other.M32
-				&& M34 == other.M34
-				&& M41 == other.M41
-				&& M42 == other.M42
-				&& M43 == other.M43;
+		constexpr float Determinant() const noexcept {
+			const auto m11 = M11;
+			const auto m12 = M12;
+			const auto m13 = M13;
+			const auto m14 = M14;
+			const auto m21 = M21;
+			const auto m22 = M22;
+			const auto m23 = M23;
+			const auto m24 = M24;
+			const auto m31 = M31;
+			const auto m32 = M32;
+			const auto m33 = M33;
+			const auto m34 = M34;
+			const auto m41 = M41;
+			const auto m42 = M42;
+			const auto m43 = M43;
+			const auto m44 = M44;
+			const auto num1 = m33 * m44 - m34 * m43;
+			const auto num2 = m32 * m44 - m34 * m42;
+			const auto num3 = m32 * m43 - m33 * m42;
+			const auto num4 = m31 * m44 - m34 * m41;
+			const auto num5 = m31 * m43 - m33 * m41;
+			const auto num6 = m31 * m42 - m32 * m41;
+			return (m11 * (m22 * num1 - m23 * num2 + m24 * num3) 
+				- m12 * (m21 * num1 - m23 * num4 + m24 * num5) 
+				+ m13 * (m21 * num2 - m22 * num4 + m24 * num6) 
+				- m14 * (m21 * num3 - m22 * num5 + m23 * num6));
 		}
 
-		constexpr float Determinant() const {
-			float m11 = M11;
-			float m12 = M12;
-			float m13 = M13;
-			float m14 = M14;
-			float m21 = M21;
-			float m22 = M22;
-			float m23 = M23;
-			float m24 = M24;
-			float m31 = M31;
-			float m32 = M32;
-			float m33 = M33;
-			float m34 = M34;
-			float m41 = M41;
-			float m42 = M42;
-			float m43 = M43;
-			float m44 = M44;
-			float num1 = m33 * m44 - m34 * m43;
-			float num2 = m32 * m44 - m34 * m42;
-			float num3 = m32 * m43 - m33 * m42;
-			float num4 = m31 * m44 - m34 * m41;
-			float num5 = m31 * m43 - m33 * m41;
-			float num6 = m31 * m42 - m32 * m41;
-			return (m11 * (m22 * num1 - m23 * num2 + m24 * num3) - m12 * (m21 * num1 - m23 * num4 + m24 * num5) + m13 * (m21 * num2 - m22 * num4 + m24 * num6) - m14 * (m21 * num3 - m22 * num5 + m23 * num6));
-		}
-
-		static constexpr Matrix Identity() {
+		static constexpr Matrix Identity() noexcept {
 			return Matrix(
 				1.0f, 0.0f, 0.0f, 0.0f,
 				0.0f, 1.0f, 0.0f, 0.0f,
@@ -1036,12 +1028,12 @@ namespace dxna {
 		}
 
 		static Matrix CreateBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
-			Vector3 const& cameraUpVector, Vector3* const cameraForwardVector = nullptr);
+			Vector3 const& cameraUpVector, Vector3* const cameraForwardVector = nullptr) noexcept;
 
 		static Matrix CreateConstrainedBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
-			Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector);
+			Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector) noexcept;
 
-		static constexpr Matrix CreateTranslation(Vector3 const& position) {
+		static constexpr Matrix CreateTranslation(Vector3 const& position) noexcept {
 			Matrix translation;
 			translation.M11 = 1.0f;
 			translation.M12 = 0.0f;
@@ -1062,7 +1054,7 @@ namespace dxna {
 			return translation;
 		}
 
-		static constexpr Matrix CreateTranslation(float xPosition, float yPosition, float zPosition) {
+		static constexpr Matrix CreateTranslation(float xPosition, float yPosition, float zPosition) noexcept {
 			Matrix translation;
 			translation.M11 = 1.0f;
 			translation.M12 = 0.0f;
@@ -1083,23 +1075,19 @@ namespace dxna {
 			return translation;
 		}
 
-		static constexpr Matrix CreateScale(float xScale, float yScale, float zScale) {
-			const auto num1 = xScale;
-			const auto num2 = yScale;
-			const auto num3 = zScale;
-
+		static constexpr Matrix CreateScale(float xScale, float yScale, float zScale) noexcept {
 			Matrix scale;
-			scale.M11 = num1;
+			scale.M11 = xScale;
 			scale.M12 = 0.0f;
 			scale.M13 = 0.0f;
 			scale.M14 = 0.0f;
 			scale.M21 = 0.0f;
-			scale.M22 = num2;
+			scale.M22 = yScale;
 			scale.M23 = 0.0f;
 			scale.M24 = 0.0f;
 			scale.M31 = 0.0f;
 			scale.M32 = 0.0f;
-			scale.M33 = num3;
+			scale.M33 = zScale;
 			scale.M34 = 0.0f;
 			scale.M41 = 0.0f;
 			scale.M42 = 0.0f;
@@ -1108,7 +1096,7 @@ namespace dxna {
 			return scale;
 		}
 
-		static constexpr Matrix CreateScale(Vector3 const& scales) {
+		static constexpr Matrix CreateScale(Vector3 const& scales) noexcept {
 			const auto x = scales.X;
 			const auto y = scales.Y;
 			const auto z = scales.Z;
@@ -1133,21 +1121,19 @@ namespace dxna {
 			return scale;
 		}
 
-		static constexpr Matrix CreateScale(float scale) {
-			const auto num = scale;
-
+		static constexpr Matrix CreateScale(float scale) noexcept {
 			Matrix scale1;
-			scale1.M11 = num;
+			scale1.M11 = scale;
 			scale1.M12 = 0.0f;
 			scale1.M13 = 0.0f;
 			scale1.M14 = 0.0f;
 			scale1.M21 = 0.0f;
-			scale1.M22 = num;
+			scale1.M22 = scale;
 			scale1.M23 = 0.0f;
 			scale1.M24 = 0.0f;
 			scale1.M31 = 0.0f;
 			scale1.M32 = 0.0f;
-			scale1.M33 = num;
+			scale1.M33 = scale;
 			scale1.M34 = 0.0f;
 			scale1.M41 = 0.0f;
 			scale1.M42 = 0.0f;
@@ -1156,13 +1142,13 @@ namespace dxna {
 			return scale1;
 		}
 
-		static Matrix CreateRotationX(float radians);
-		static Matrix CreateRotationY(float radians);
-		static Matrix CreateRotationZ(float radians);
-		static Matrix CreateFromAxisAngle(Vector3 const& axis, float angle);
-		static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance);
+		static Matrix CreateRotationX(float radians) noexcept;
+		static Matrix CreateRotationY(float radians) noexcept;
+		static Matrix CreateRotationZ(float radians) noexcept;
+		static Matrix CreateFromAxisAngle(Vector3 const& axis, float angle) noexcept;
+		static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) noexcept;
 
-		static constexpr Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance) {
+		static constexpr Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance) noexcept {
 			const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 			if (nearPlaneDistance <= 0.0F)
@@ -1188,7 +1174,7 @@ namespace dxna {
 		}
 
 		static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom,
-			float top, float nearPlaneDistance, float farPlaneDistance) {
+			float top, float nearPlaneDistance, float farPlaneDistance) noexcept {
 			const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 			if (nearPlaneDistance <= 0.0F)
@@ -1214,7 +1200,7 @@ namespace dxna {
 			return perspectiveOffCenter;
 		}
 
-		static constexpr Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane) {
+		static constexpr Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane) noexcept {
 			Matrix orthographic;
 			orthographic.M11 = 2.0f / width;
 			orthographic.M12 = orthographic.M13 = orthographic.M14 = 0.0f;
@@ -1229,7 +1215,7 @@ namespace dxna {
 		}
 
 		static constexpr Matrix CreateOrthographicOffCenter(float left, float right, float bottom,
-			float top, float zNearPlane, float zFarPlane) {
+			float top, float zNearPlane, float zFarPlane) noexcept {
 
 			Matrix orthographicOffCenter;
 			orthographicOffCenter.M11 = 2.0F / (right - left);
@@ -1245,10 +1231,10 @@ namespace dxna {
 			return orthographicOffCenter;
 		}
 
-		static Matrix CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector);
-		static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up);
+		static Matrix CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector) noexcept;
+		static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up) noexcept;
 
-		static constexpr Matrix Transpose(Matrix const& matrix) {
+		static constexpr Matrix Transpose(Matrix const& matrix) noexcept {
 			Matrix matrix1;
 			matrix1.M11 = matrix.M11;
 			matrix1.M12 = matrix.M21;
@@ -1269,34 +1255,34 @@ namespace dxna {
 			return matrix1;
 		}
 
-		static constexpr Matrix Invert(Matrix const& matrix) {
-			float m11 = matrix.M11;
-			float m12 = matrix.M12;
-			float m13 = matrix.M13;
-			float m14 = matrix.M14;
-			float m21 = matrix.M21;
-			float m22 = matrix.M22;
-			float m23 = matrix.M23;
-			float m24 = matrix.M24;
-			float m31 = matrix.M31;
-			float m32 = matrix.M32;
-			float m33 = matrix.M33;
-			float m34 = matrix.M34;
-			float m41 = matrix.M41;
-			float m42 = matrix.M42;
-			float m43 = matrix.M43;
-			float m44 = matrix.M44;
-			float num1 = (m33 * m44 - m34 * m43);
-			float num2 = (m32 * m44 - m34 * m42);
-			float num3 = (m32 * m43 - m33 * m42);
-			float num4 = (m31 * m44 - m34 * m41);
-			float num5 = (m31 * m43 - m33 * m41);
-			float num6 = (m31 * m42 - m32 * m41);
-			float num7 = (m22 * num1 - m23 * num2 + m24 * num3);
-			float num8 = -(m21 * num1 - m23 * num4 + m24 * num5);
-			float num9 = (m21 * num2 - m22 * num4 + m24 * num6);
-			float num10 = -(m21 * num3 - m22 * num5 + m23 * num6);
-			float num11 = (1.0F / (m11 * num7 + m12 * num8 + m13 * num9 + m14 * num10));
+		static constexpr Matrix Invert(Matrix const& matrix) noexcept {
+			const auto m11 = matrix.M11;
+			const auto m12 = matrix.M12;
+			const auto m13 = matrix.M13;
+			const auto m14 = matrix.M14;
+			const auto m21 = matrix.M21;
+			const auto m22 = matrix.M22;
+			const auto m23 = matrix.M23;
+			const auto m24 = matrix.M24;
+			const auto m31 = matrix.M31;
+			const auto m32 = matrix.M32;
+			const auto m33 = matrix.M33;
+			const auto m34 = matrix.M34;
+			const auto m41 = matrix.M41;
+			const auto m42 = matrix.M42;
+			const auto m43 = matrix.M43;
+			const auto m44 = matrix.M44;
+			const auto num1 = (m33 * m44 - m34 * m43);
+			const auto num2 = (m32 * m44 - m34 * m42);
+			const auto num3 = (m32 * m43 - m33 * m42);
+			const auto num4 = (m31 * m44 - m34 * m41);
+			const auto num5 = (m31 * m43 - m33 * m41);
+			const auto num6 = (m31 * m42 - m32 * m41);
+			const auto num7 = (m22 * num1 - m23 * num2 + m24 * num3);
+			const auto num8 = -(m21 * num1 - m23 * num4 + m24 * num5);
+			const auto num9 = (m21 * num2 - m22 * num4 + m24 * num6);
+			const auto num10 = -(m21 * num3 - m22 * num5 + m23 * num6);
+			const auto num11 = (1.0F / (m11 * num7 + m12 * num8 + m13 * num9 + m14 * num10));
 			Matrix matrix1;
 			matrix1.M11 = num7 * num11;
 			matrix1.M21 = num8 * num11;
@@ -1306,22 +1292,22 @@ namespace dxna {
 			matrix1.M22 = (m11 * num1 - m13 * num4 + m14 * num5) * num11;
 			matrix1.M32 = -(m11 * num2 - m12 * num4 + m14 * num6) * num11;
 			matrix1.M42 = (m11 * num3 - m12 * num5 + m13 * num6) * num11;
-			float num12 = (m23 * m44 - m24 * m43);
-			float num13 = (m22 * m44 - m24 * m42);
-			float num14 = (m22 * m43 - m23 * m42);
-			float num15 = (m21 * m44 - m24 * m41);
-			float num16 = (m21 * m43 - m23 * m41);
-			float num17 = (m21 * m42 - m22 * m41);
+			const auto num12 = (m23 * m44 - m24 * m43);
+			const auto num13 = (m22 * m44 - m24 * m42);
+			const auto num14 = (m22 * m43 - m23 * m42);
+			const auto num15 = (m21 * m44 - m24 * m41);
+			const auto num16 = (m21 * m43 - m23 * m41);
+			const auto num17 = (m21 * m42 - m22 * m41);
 			matrix1.M13 = (m12 * num12 - m13 * num13 + m14 * num14) * num11;
 			matrix1.M23 = -(m11 * num12 - m13 * num15 + m14 * num16) * num11;
 			matrix1.M33 = (m11 * num13 - m12 * num15 + m14 * num17) * num11;
 			matrix1.M43 = -(m11 * num14 - m12 * num16 + m13 * num17) * num11;
-			float num18 = (m23 * m34 - m24 * m33);
-			float num19 = (m22 * m34 - m24 * m32);
-			float num20 = (m22 * m33 - m23 * m32);
-			float num21 = (m21 * m34 - m24 * m31);
-			float num22 = (m21 * m33 - m23 * m31);
-			float num23 = (m21 * m32 - m22 * m31);
+			const auto num18 = (m23 * m34 - m24 * m33);
+			const auto num19 = (m22 * m34 - m24 * m32);
+			const auto num20 = (m22 * m33 - m23 * m32);
+			const auto num21 = (m21 * m34 - m24 * m31);
+			const auto num22 = (m21 * m33 - m23 * m31);
+			const auto num23 = (m21 * m32 - m22 * m31);
 			matrix1.M14 = -(m12 * num18 - m13 * num19 + m14 * num20) * num11;
 			matrix1.M24 = (m11 * num18 - m13 * num21 + m14 * num22) * num11;
 			matrix1.M34 = -(m11 * num19 - m12 * num21 + m14 * num23) * num11;
@@ -1329,7 +1315,7 @@ namespace dxna {
 			return matrix1;
 		}
 
-		static constexpr Matrix Lerp(Matrix const& matrix1, Matrix const& matrix2, float amount) {
+		static constexpr Matrix Lerp(Matrix const& matrix1, Matrix const& matrix2, float amount) noexcept {
 			Matrix matrix;
 			matrix.M11 = matrix1.M11 + (matrix2.M11 - matrix1.M11) * amount;
 			matrix.M12 = matrix1.M12 + (matrix2.M12 - matrix1.M12) * amount;
@@ -1350,7 +1336,7 @@ namespace dxna {
 			return matrix;
 		}
 
-		static constexpr Matrix Negate(Matrix const& matrix) {
+		static constexpr Matrix Negate(Matrix const& matrix) noexcept {
 			Matrix matrix1;
 			matrix1.M11 = -matrix.M11;
 			matrix1.M12 = -matrix.M12;
@@ -1371,7 +1357,7 @@ namespace dxna {
 			return matrix1;
 		}
 
-		static constexpr Matrix Add(Matrix const& matrix1, Matrix const& matrix2) {
+		static constexpr Matrix Add(Matrix const& matrix1, Matrix const& matrix2) noexcept {
 			Matrix matrix;
 			matrix.M11 = matrix1.M11 + matrix2.M11;
 			matrix.M12 = matrix1.M12 + matrix2.M12;
@@ -1392,7 +1378,7 @@ namespace dxna {
 			return matrix;
 		}
 
-		static constexpr Matrix Subtract(Matrix const& matrix1, Matrix const& matrix2) {
+		static constexpr Matrix Subtract(Matrix const& matrix1, Matrix const& matrix2) noexcept {
 			Matrix matrix;
 			matrix.M11 = matrix1.M11 - matrix2.M11;
 			matrix.M12 = matrix1.M12 - matrix2.M12;
@@ -1413,7 +1399,7 @@ namespace dxna {
 			return matrix;
 		}
 
-		static constexpr Matrix Multiply(Matrix const& matrix1, Matrix const& matrix2) {
+		static constexpr Matrix Multiply(Matrix const& matrix1, Matrix const& matrix2) noexcept {
 			Matrix matrix;
 			matrix.M11 = matrix1.M11 * matrix2.M11 + matrix1.M12 * matrix2.M21 + matrix1.M13 * matrix2.M31 + matrix1.M14 * matrix2.M41;
 			matrix.M12 = matrix1.M11 * matrix2.M12 + matrix1.M12 * matrix2.M22 + matrix1.M13 * matrix2.M32 + matrix1.M14 * matrix2.M42;
@@ -1434,7 +1420,7 @@ namespace dxna {
 			return matrix;
 		}
 
-		static constexpr Matrix Multiply(Matrix const& matrix1, float scaleFactor) {
+		static constexpr Matrix Multiply(Matrix const& matrix1, float scaleFactor) noexcept {
 			float num = scaleFactor;
 			Matrix matrix;
 			matrix.M11 = matrix1.M11 * num;
@@ -1456,7 +1442,7 @@ namespace dxna {
 			return matrix;
 		}
 
-		static constexpr Matrix Divide(Matrix const& matrix1, Matrix const& matrix2) {
+		static constexpr Matrix Divide(Matrix const& matrix1, Matrix const& matrix2) noexcept {
 			Matrix matrix;
 			matrix.M11 = matrix1.M11 / matrix2.M11;
 			matrix.M12 = matrix1.M12 / matrix2.M12;
@@ -1477,7 +1463,7 @@ namespace dxna {
 			return matrix;
 		}
 
-		static constexpr Matrix Divide(Matrix const& matrix1, float divider) {
+		static constexpr Matrix Divide(Matrix const& matrix1, float divider)  noexcept {
 			float num = 1.0f / divider;
 			Matrix matrix;
 			matrix.M11 = matrix1.M11 * num;
@@ -1499,11 +1485,11 @@ namespace dxna {
 			return matrix;
 		}
 
-		static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll);
-		static constexpr Matrix CreateFromQuaternion(Quaternion const& quaternion);
-		static Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane);
-		static Matrix CreateReflection(Plane const& value);
-		static constexpr Matrix Transform(Matrix const& value, Quaternion const& rotation);
+		static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll) noexcept;
+		static constexpr Matrix CreateFromQuaternion(Quaternion const& quaternion) noexcept;
+		static Matrix CreateShadow(Vector3 const& lightDirection, Plane const& plane) noexcept;
+		static Matrix CreateReflection(Plane const& value) noexcept;
+		static constexpr Matrix Transform(Matrix const& value, Quaternion const& rotation) noexcept;
 	};
 
 	struct Quaternion {
@@ -3328,17 +3314,17 @@ namespace dxna {
 			+ plane.D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
 	}	
 
-	constexpr Matrix dxna::Matrix::CreateFromQuaternion(Quaternion const& quaternion)
+	constexpr Matrix dxna::Matrix::CreateFromQuaternion(Quaternion const& quaternion) noexcept
 	{
-		float num1 = quaternion.X * quaternion.X;
-		float num2 = quaternion.Y * quaternion.Y;
-		float num3 = quaternion.Z * quaternion.Z;
-		float num4 = quaternion.X * quaternion.Y;
-		float num5 = quaternion.Z * quaternion.W;
-		float num6 = quaternion.Z * quaternion.X;
-		float num7 = quaternion.Y * quaternion.W;
-		float num8 = quaternion.Y * quaternion.Z;
-		float num9 = quaternion.X * quaternion.W;
+		const auto num1 = quaternion.X * quaternion.X;
+		const auto num2 = quaternion.Y * quaternion.Y;
+		const auto num3 = quaternion.Z * quaternion.Z;
+		const auto num4 = quaternion.X * quaternion.Y;
+		const auto num5 = quaternion.Z * quaternion.W;
+		const auto num6 = quaternion.Z * quaternion.X;
+		const auto num7 = quaternion.Y * quaternion.W;
+		const auto num8 = quaternion.Y * quaternion.Z;
+		const auto num9 = quaternion.X * quaternion.W;
 
 		Matrix result;
 		result.M11 = (1.0f - 2.0F * (num2 + num3));
@@ -3361,29 +3347,29 @@ namespace dxna {
 		return result;
 	}
 
-	constexpr Matrix dxna::Matrix::Transform(Matrix const& value, Quaternion const& rotation)
+	constexpr Matrix dxna::Matrix::Transform(Matrix const& value, Quaternion const& rotation) noexcept
 	{
-		float num1 = rotation.X + rotation.X;
-		float num2 = rotation.Y + rotation.Y;
-		float num3 = rotation.Z + rotation.Z;
-		float num4 = rotation.W * num1;
-		float num5 = rotation.W * num2;
-		float num6 = rotation.W * num3;
-		float num7 = rotation.X * num1;
-		float num8 = rotation.X * num2;
-		float num9 = rotation.X * num3;
-		float num10 = rotation.Y * num2;
-		float num11 = rotation.Y * num3;
-		float num12 = rotation.Z * num3;
-		float num13 = 1.0f - num10 - num12;
-		float num14 = num8 - num6;
-		float num15 = num9 + num5;
-		float num16 = num8 + num6;
-		float num17 = 1.0f - num7 - num12;
-		float num18 = num11 - num4;
-		float num19 = num9 - num5;
-		float num20 = num11 + num4;
-		float num21 = 1.0f - num7 - num10;
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num1;
+		const auto num5 = rotation.W * num2;
+		const auto num6 = rotation.W * num3;
+		const auto num7 = rotation.X * num1;
+		const auto num8 = rotation.X * num2;
+		const auto num9 = rotation.X * num3;
+		const auto num10 = rotation.Y * num2;
+		const auto num11 = rotation.Y * num3;
+		const auto num12 = rotation.Z * num3;
+		const auto num13 = 1.0f - num10 - num12;
+		const auto num14 = num8 - num6;
+		const auto num15 = num9 + num5;
+		const auto num16 = num8 + num6;
+		const auto num17 = 1.0f - num7 - num12;
+		const auto num18 = num11 - num4;
+		const auto num19 = num9 - num5;
+		const auto num20 = num11 + num4;
+		const auto num21 = 1.0f - num7 - num10;
 		Matrix matrix;
 		matrix.M11 = (value.M11 * num13 + value.M12 * num14 + value.M13 * num15);
 		matrix.M12 = (value.M11 * num16 + value.M12 * num17 + value.M13 * num18);

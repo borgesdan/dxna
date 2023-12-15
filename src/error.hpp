@@ -29,7 +29,7 @@ namespace dxna {
 
 		int Index { -1 };
 		ErrorCode Flag{ ErrorCode::NONE };
-	};
+	};	
 }
 
 #endif
