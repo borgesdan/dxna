@@ -17,6 +17,7 @@ namespace dxna {
 	struct BoundingFrustum;
 	struct Ray;
 	
+	// Describes a 2D-point.
 	struct Point {
 		int X{ 0 };
 		int Y{ 0 };
@@ -37,6 +38,7 @@ namespace dxna {
 		}
 	};
 	
+	// Describes a 2D-rectangle. 
 	struct Rectangle {
 		int X{ 0 };
 		int Y{ 0 };
@@ -137,6 +139,7 @@ namespace dxna {
 		constexpr bool operator==(Rectangle const& value2) const noexcept = default;
 	};
 
+	// Describes a 2D-vector.
 	struct Vector2 {
 		float X{ 0 };
 		float Y{ 0 };
@@ -343,6 +346,7 @@ namespace dxna {
 			size_t length);
 	};
 
+	// Describes a 3D-vector.
 	struct Vector3 {
 		float X{ 0 };
 		float Y{ 0 };
@@ -604,6 +608,7 @@ namespace dxna {
 			size_t length);
 	};
 
+	// Describes a 4D-vector.
 	struct Vector4 {
 		float X{ 0 };
 		float Y{ 0 };
@@ -853,6 +858,7 @@ namespace dxna {
 			size_t length) noexcept;
 	};
 
+	// Represents the right-handed 4x4 floating point matrix, which can store translation, scale and rotation information.
 	struct Matrix {
 		float M11{ 0 };
 		float M12{ 0 };
@@ -1498,49 +1504,40 @@ namespace dxna {
 		static constexpr Matrix Transform(Matrix const& value, Quaternion const& rotation) noexcept;
 	};
 
+	// An efficient mathematical representation for three dimensional rotations.
 	struct Quaternion {
 		float X{ 0 };
 		float Y{ 0 };
 		float Z{ 0 };
 		float W{ 0 };
 
-		constexpr Quaternion() = default;
+		constexpr Quaternion() noexcept = default;
 
-		constexpr Quaternion(float X, float Y, float Z, float W)
-			: X(X), Y(Y), Z(Z), W(W) {}
+		constexpr Quaternion(float X, float Y, float Z, float W) noexcept : X(X), Y(Y), Z(Z), W(W) {}
 
-		constexpr Quaternion(Vector3 const& vectorPart, float scalarPart)
+		constexpr Quaternion(Vector3 const& vectorPart, float scalarPart) noexcept 
 			: X(vectorPart.X), Y(vectorPart.Y), Z(vectorPart.Z), W(scalarPart) {}
 
-		constexpr Quaternion operator-() const { return Quaternion::Negate(*this); }
-		constexpr bool operator==(Quaternion const& other) const { return Equals(other); }
-		friend constexpr Quaternion operator+(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Add(value1, value2); }
-		friend constexpr Quaternion operator-(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Subtract(value1, value2); }
-		friend constexpr Quaternion operator*(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Multiply(value1, value2); }
-		friend constexpr Quaternion operator*(Quaternion const& value, float scale) { return Quaternion::Multiply(value, scale); }
-		friend constexpr Quaternion operator*(float scale, Quaternion const& value) { return Quaternion::Multiply(value, scale); }
-		friend constexpr Quaternion operator/(Quaternion const& value1, Quaternion const& value2) { return Quaternion::Divide(value1, value2); }
+		constexpr Quaternion operator-() const noexcept { return Quaternion::Negate(*this); }
+		constexpr bool operator==(Quaternion const& other) const noexcept = default;
+		friend constexpr Quaternion operator+(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Add(value1, value2); }
+		friend constexpr Quaternion operator-(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Subtract(value1, value2); }
+		friend constexpr Quaternion operator*(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Multiply(value1, value2); }
+		friend constexpr Quaternion operator*(Quaternion const& value, float scale) noexcept { return Quaternion::Multiply(value, scale); }
+		friend constexpr Quaternion operator*(float scale, Quaternion const& value) noexcept { return Quaternion::Multiply(value, scale); }
+		friend constexpr Quaternion operator/(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Divide(value1, value2); }		
 
-		constexpr bool Equals(Quaternion const& other) const {
-			return X == other.X
-				&& Y == other.Y
-				&& Z == other.Z
-				&& W == other.W;
-		}
+		constexpr float LengthSquared() const noexcept { return X * X + Y * Y + Z * Z + W * W; }
 
-		constexpr float LengthSquared() const {
-			return X * X + Y * Y + Z * Z + W * W;
-		}
+		float Length() const noexcept;
+		void Normalize() noexcept;
+		void Conjugate() noexcept;
 
-		float Length() const;
-		void Normalize();
-		void Conjugate();
+		static constexpr Quaternion Identity() noexcept { return Quaternion(0.0f, 0.0f, 0.0f, 1.0f); }
 
-		static constexpr Quaternion Identity() { return Quaternion(0.0f, 0.0f, 0.0f, 1.0f); }
+		static Quaternion Normalize(Quaternion const& quaternion) noexcept;
 
-		static Quaternion Normalize(Quaternion const& quaternion);
-
-		static constexpr Quaternion Conjugate(Quaternion const& value) {
+		static constexpr Quaternion Conjugate(Quaternion const& value) noexcept {
 			Quaternion quaternion;
 			quaternion.X = -value.X;
 			quaternion.Y = -value.Y;
@@ -1549,7 +1546,7 @@ namespace dxna {
 			return quaternion;
 		}
 
-		static constexpr Quaternion Inverse(Quaternion const& quaternion) {
+		static constexpr Quaternion Inverse(Quaternion const& quaternion) noexcept {
 			float num = 1.0f / quaternion.X * quaternion.X + quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z + quaternion.W * quaternion.W;
 			Quaternion quaternion1;
 			quaternion1.X = -quaternion.X * num;
@@ -1559,18 +1556,18 @@ namespace dxna {
 			return quaternion1;
 		}
 
-		static Quaternion CreateFromAxisAngle(Vector3 const& axis, float angle);
-		static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll);
-		static Quaternion CreateFromRotationMatrix(Matrix const& matrix);
+		static Quaternion CreateFromAxisAngle(Vector3 const& axis, float angle) noexcept;
+		static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll) noexcept;
+		static Quaternion CreateFromRotationMatrix(Matrix const& matrix) noexcept;
 
-		static constexpr float Dot(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+		static constexpr float Dot(Quaternion const& quaternion1, Quaternion const& quaternion2) noexcept {
 			return quaternion1.X * quaternion2.X + quaternion1.Y * quaternion2.Y + quaternion1.Z * quaternion2.Z + quaternion1.W * quaternion2.W;
 		}
 
-		static Quaternion Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount);
-		static Quaternion Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount);
+		static Quaternion Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) noexcept;
+		static Quaternion Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) noexcept;
 
-		static constexpr Quaternion Concatenate(Quaternion const& value1, Quaternion const& value2) {
+		static constexpr Quaternion Concatenate(Quaternion const& value1, Quaternion const& value2) noexcept {
 			const auto x1 = value2.X;
 			const auto y1 = value2.Y;
 			const auto z1 = value2.Z;
@@ -1591,7 +1588,7 @@ namespace dxna {
 			return quaternion;
 		}
 
-		static constexpr Quaternion Negate(Quaternion const& quaternion) {
+		static constexpr Quaternion Negate(Quaternion const& quaternion) noexcept {
 			Quaternion quaternion1;
 			quaternion1.X = -quaternion.X;
 			quaternion1.Y = -quaternion.Y;
@@ -1600,7 +1597,7 @@ namespace dxna {
 			return quaternion1;
 		}
 
-		static constexpr Quaternion Add(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+		static constexpr Quaternion Add(Quaternion const& quaternion1, Quaternion const& quaternion2) noexcept {
 			Quaternion quaternion;
 			quaternion.X = quaternion1.X + quaternion2.X;
 			quaternion.Y = quaternion1.Y + quaternion2.Y;
@@ -1609,7 +1606,7 @@ namespace dxna {
 			return quaternion;
 		}
 
-		static constexpr Quaternion Subtract(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+		static constexpr Quaternion Subtract(Quaternion const& quaternion1, Quaternion const& quaternion2) noexcept {
 			Quaternion quaternion;
 			quaternion.X = quaternion1.X - quaternion2.X;
 			quaternion.Y = quaternion1.Y - quaternion2.Y;
@@ -1618,7 +1615,7 @@ namespace dxna {
 			return quaternion;
 		}
 
-		static constexpr Quaternion Multiply(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+		static constexpr Quaternion Multiply(Quaternion const& quaternion1, Quaternion const& quaternion2) noexcept {
 			const auto x1 = quaternion1.X;
 			const auto y1 = quaternion1.Y;
 			const auto z1 = quaternion1.Z;
@@ -1639,7 +1636,7 @@ namespace dxna {
 			return quaternion;
 		}
 
-		static constexpr Quaternion Multiply(Quaternion const& quaternion1, float scaleFactor) {
+		static constexpr Quaternion Multiply(Quaternion const& quaternion1, float scaleFactor) noexcept {
 			Quaternion quaternion;
 			quaternion.X = quaternion1.X * scaleFactor;
 			quaternion.Y = quaternion1.Y * scaleFactor;
@@ -1648,7 +1645,7 @@ namespace dxna {
 			return quaternion;
 		}
 
-		static constexpr Quaternion Divide(Quaternion const& quaternion1, Quaternion const& quaternion2) {
+		static constexpr Quaternion Divide(Quaternion const& quaternion1, Quaternion const& quaternion2) noexcept {
 			const auto x = quaternion1.X;
 			const auto y = quaternion1.Y;
 			const auto z = quaternion1.Z;

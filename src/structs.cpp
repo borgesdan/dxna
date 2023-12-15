@@ -377,11 +377,11 @@ namespace dxna {
 		return CreateFromQuaternion(result);
 	}
 
-	float Quaternion::Length() const {
+	float Quaternion::Length() const noexcept {
 		return std::sqrt(LengthSquared());
 	}
 	
-	void Quaternion::Normalize() {
+	void Quaternion::Normalize() noexcept {
 		float num = 1.0F / Length();
 		X *= num;
 		Y *= num;
@@ -389,13 +389,13 @@ namespace dxna {
 		W *= num;
 	}
 
-	void Quaternion::Conjugate() {
+	void Quaternion::Conjugate() noexcept {
 		X = -X;
 		Y = -Y;
 		Z = -Z;
 	}
 
-	Quaternion Quaternion::Normalize(Quaternion const& quaternion) {
+	Quaternion Quaternion::Normalize(Quaternion const& quaternion) noexcept {
 		float num = 1.0f / quaternion.Length();
 		Quaternion quaternion1;
 		quaternion1.X = quaternion.X * num;
@@ -405,7 +405,7 @@ namespace dxna {
 		return quaternion1;
 	}
 
-	Quaternion Quaternion::CreateFromAxisAngle(Vector3 const& axis, float angle) {
+	Quaternion Quaternion::CreateFromAxisAngle(Vector3 const& axis, float angle) noexcept {
 		float num1 = angle * 0.5f;
 		float num2 = std::sin(num1);
 		float num3 = std::cos(num1);
@@ -418,7 +418,7 @@ namespace dxna {
 		return fromAxisAngle;
 	}
 
-	Quaternion Quaternion::CreateFromYawPitchRoll(float yaw, float pitch, float roll) {
+	Quaternion Quaternion::CreateFromYawPitchRoll(float yaw, float pitch, float roll) noexcept {
 		float num1 = roll * 0.5f;
 		float num2 = std::sin(num1);
 		float num3 = std::cos(num1);
@@ -437,7 +437,7 @@ namespace dxna {
 		return fromYawPitchRoll;
 	}
 
-	Quaternion Quaternion::CreateFromRotationMatrix(Matrix const& matrix) {
+	Quaternion Quaternion::CreateFromRotationMatrix(Matrix const& matrix) noexcept {
 		float num1 = matrix.M11 + matrix.M22 + matrix.M33;
 		Quaternion fromRotationMatrix;
 
@@ -476,7 +476,7 @@ namespace dxna {
 		return fromRotationMatrix;
 	}
 
-	Quaternion Quaternion::Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) {
+	Quaternion Quaternion::Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) noexcept {
 		float num1 = amount;
 		float d = quaternion1.X * quaternion2.X + quaternion1.Y * quaternion2.Y + quaternion1.Z * quaternion2.Z + quaternion1.W * quaternion2.W;
 		bool flag = false;
@@ -509,7 +509,7 @@ namespace dxna {
 		return quaternion;
 	}
 
-	Quaternion Quaternion::Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) {
+	Quaternion Quaternion::Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) noexcept {
 		float num1 = amount;
 		float num2 = 1.0f - num1;
 		Quaternion quaternion;
