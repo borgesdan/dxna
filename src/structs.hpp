@@ -337,16 +337,6 @@ namespace dxna {
 			size_t destinationIndex,
 			size_t destinationLength,
 			size_t length);
-
-		static constexpr Error TransformNormal(
-			Vector2 const* sourceArray,
-			size_t sourceIndex,
-			size_t sourceLength,
-			Matrix const& matrix,
-			Vector2* destinationArray,
-			size_t destinationIndex,
-			size_t destinationLength,
-			size_t length);
 	};
 
 	struct Vector3 {
@@ -2868,12 +2858,9 @@ namespace dxna {
 		if (destinationLength < destinationIndex + length)
 			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
 
-		for (size_t x = 0; x < length; x++) {
-			const auto& position = sourceArray[sourceIndex + x];
-			auto destination = destinationArray[destinationIndex + x];
-			destination.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
-			destination.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
-			destinationArray[destinationIndex + x] = destination;
+		for (size_t i = 0; i < length; ++i)	{
+			const auto& value = sourceArray[sourceIndex + i];
+			destinationArray[destinationIndex + i] = Transform(value, matrix);
 		}
 
 		return Error::NoError();
@@ -2901,49 +2888,10 @@ namespace dxna {
 		if (destinationLength < destinationIndex + length)
 			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
 
-		for (size_t x = 0; x < length; x++) {
-			auto& position = sourceArray[sourceIndex + x];
-			auto destination = destinationArray[destinationIndex + x];
-
-			Vector2 v = Transform(position, rotation);
-
-			destination.X = v.X;
-			destination.Y = v.Y;
-
-			destinationArray[destinationIndex + x] = destination;
-		}
-
-		return Error::NoError();
-	}
-
-	constexpr Error Vector2::TransformNormal(
-		Vector2 const* sourceArray,
-		size_t sourceIndex,
-		size_t sourceLength,
-		Matrix const& matrix,
-		Vector2* destinationArray,
-		size_t destinationIndex,
-		size_t destinationLength,
-		size_t length) {
-
-		if (sourceArray == nullptr)
-			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
-
-		if (destinationArray == nullptr)
-			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
-
-		if (sourceLength < sourceIndex + length)
-			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
-
-		if (destinationLength < destinationIndex + length)
-			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
-
-		for (size_t i = 0; i < length; i++) {
-			const auto& normal = sourceArray[sourceIndex + i];
-
-			destinationArray[destinationIndex + i] = Vector2(
-				(normal.X * matrix.M11) + (normal.Y * matrix.M21),
-				(normal.X * matrix.M12) + (normal.Y * matrix.M22));
+		for (size_t i = 0; i < length; i++)
+		{
+			const auto& value = sourceArray[sourceIndex + i];
+			destinationArray[destinationIndex + i] = Transform(value, rotation);
 		}
 
 		return Error::NoError();
@@ -3284,8 +3232,6 @@ namespace dxna {
 }
 
 namespace dxna {
-	
-
 	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const {
 		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
 		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
