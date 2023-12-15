@@ -290,20 +290,19 @@ namespace dxna {
 		return fromAxisAngle;
 	}
 
-	Matrix Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) noexcept {
+	Error Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, Matrix& result) noexcept {
 		const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
 		if (fieldOfView <= 0.0F || fieldOfView >= 3.1415927410125732)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_LE_ZERO_OR_GE_PI, 0);
 
 		if (nearPlaneDistance <= 0.0F)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 2);
 
 		if (farPlaneDistance <= 0.0F)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 3);
 
 		if (nearPlaneDistance >= farPlaneDistance)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_GREATER_OR_EQUAL_OTHER, 2);
 
 		const auto num1 = 1.0F / std::tan(fieldOfView * 0.5F);
 		const auto num2 = num1 / aspectRatio;
@@ -317,7 +316,9 @@ namespace dxna {
 		perspectiveFieldOfView.M34 = -1.0f;
 		perspectiveFieldOfView.M41 = perspectiveFieldOfView.M42 = perspectiveFieldOfView.M44 = 0.0f;
 		perspectiveFieldOfView.M43 = (nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance));
-		return perspectiveFieldOfView;
+
+		result = perspectiveFieldOfView;
+		return Error::NoError();
 	}
 
 	Matrix Matrix::CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector) noexcept {

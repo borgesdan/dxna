@@ -1146,19 +1146,17 @@ namespace dxna {
 		static Matrix CreateRotationY(float radians) noexcept;
 		static Matrix CreateRotationZ(float radians) noexcept;
 		static Matrix CreateFromAxisAngle(Vector3 const& axis, float angle) noexcept;
-		static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) noexcept;
+		static Error CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, Matrix& result) noexcept;
 
-		static constexpr Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance) noexcept {
-			const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
+		static constexpr Error CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance, Matrix& result) noexcept {
 			if (nearPlaneDistance <= 0.0F)
-				return zero;
+				return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 2);
 
 			if (farPlaneDistance <= 0.0F)
-				return zero;
+				return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 3);
 
 			if (nearPlaneDistance >= farPlaneDistance)
-				return zero;
+				return Error(ErrorCode::ARGUMENT_GREATER_OR_EQUAL_OTHER, 2);
 
 			Matrix perspective;
 			perspective.M11 = 2.0f * nearPlaneDistance / width;
@@ -1170,21 +1168,23 @@ namespace dxna {
 			perspective.M34 = -1.0f;
 			perspective.M41 = perspective.M42 = perspective.M44 = 0.0f;
 			perspective.M43 = nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-			return perspective;
+			
+			result = perspective;
+			return Error::NoError();
 		}
 
-		static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom,
-			float top, float nearPlaneDistance, float farPlaneDistance) noexcept {
+		static Error CreatePerspectiveOffCenter(float left, float right, float bottom,
+			float top, float nearPlaneDistance, float farPlaneDistance, Matrix& result) noexcept {
 			const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 			if (nearPlaneDistance <= 0.0F)
-				return zero;
+				return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 2);
 
 			if (farPlaneDistance <= 0.0F)
-				return zero;
+				return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 3);
 
 			if (nearPlaneDistance >= farPlaneDistance)
-				return zero;
+				return Error(ErrorCode::ARGUMENT_GREATER_OR_EQUAL_OTHER, 2);
 
 			Matrix perspectiveOffCenter;
 			perspectiveOffCenter.M11 = 2.0F * nearPlaneDistance / (right - left);
@@ -1197,7 +1197,9 @@ namespace dxna {
 			perspectiveOffCenter.M34 = -1.0f;
 			perspectiveOffCenter.M43 = nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
 			perspectiveOffCenter.M41 = perspectiveOffCenter.M42 = perspectiveOffCenter.M44 = 0.0f;
-			return perspectiveOffCenter;
+			
+			result = perspectiveOffCenter;
+			return Error::NoError();
 		}
 
 		static constexpr Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane) noexcept {
