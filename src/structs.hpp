@@ -319,7 +319,7 @@ namespace dxna {
 		static constexpr Vector2 Transform(Vector2 const& value, Quaternion const& rotation) noexcept;
 
 		static constexpr Error Transform(
-			Vector2* sourceArray,
+			Vector2 const* sourceArray,
 			size_t sourceLength,
 			size_t sourceIndex,
 			Matrix const& matrix,
@@ -329,7 +329,7 @@ namespace dxna {
 			size_t length);
 
 		static constexpr Error Transform(
-			Vector2* sourceArray,
+			Vector2 const* sourceArray,
 			size_t sourceIndex,
 			size_t sourceLength,
 			Quaternion const& rotation,
@@ -339,7 +339,7 @@ namespace dxna {
 			size_t length);
 
 		static constexpr Error TransformNormal(
-			Vector2* sourceArray,
+			Vector2 const* sourceArray,
 			size_t sourceIndex,
 			size_t sourceLength,
 			Matrix const& matrix,
@@ -580,7 +580,7 @@ namespace dxna {
 		static constexpr Vector3 Transform(Vector3 const& value, Quaternion const& rotation) noexcept;
 
 		static constexpr Error Transform(
-			Vector3* sourceArray,
+			Vector3 const* sourceArray,
 			size_t sourceLength,
 			size_t sourceIndex,
 			Matrix const& matrix,
@@ -590,7 +590,7 @@ namespace dxna {
 			size_t length);
 
 		static constexpr Error Transform(
-			Vector3* sourceArray,
+			Vector3 const* sourceArray,
 			size_t sourceLength,
 			size_t sourceIndex,
 			Quaternion const& rotation,
@@ -600,7 +600,7 @@ namespace dxna {
 			size_t length);
 
 		static constexpr Error TransformNormal(
-			Vector3* sourceArray,
+			Vector3 const* sourceArray,
 			size_t sourceLength,
 			size_t sourceIndex,
 			Matrix const& matrix,
@@ -616,33 +616,37 @@ namespace dxna {
 		float Z{ 0 };
 		float W{ 0 };
 
-		constexpr Vector4() = default;
-		constexpr Vector4(float value) :
-			X(value), Y(value), Z(value), W(value) {}
-		constexpr Vector4(float x, float y, float z, float w) :
-			X(x), Y(y), Z(z), W(w) {}
-		constexpr Vector4(Vector2 value, float z, float w) :
-			X(value.X), Y(value.Y), Z(z), W(w) {}
-		constexpr Vector4(Vector3 value, float w) :
-			X(value.X), Y(value.Y), Z(value.Z), W(w) {}
+		constexpr Vector4() noexcept = default;
+		constexpr Vector4(float value) noexcept : X(value), Y(value), Z(value), W(value) {}
+		constexpr Vector4(float x, float y, float z, float w) noexcept : X(x), Y(y), Z(z), W(w) {}
+		constexpr Vector4(Vector2 value, float z, float w) noexcept : X(value.X), Y(value.Y), Z(z), W(w) {}
+		constexpr Vector4(Vector3 value, float w) noexcept : X(value.X), Y(value.Y), Z(value.Z), W(w) {}
 
-		constexpr Vector4 operator-() const { return Vector4::Negate(*this); }
+		constexpr size_t GetHashCode() const noexcept {
+			size_t seed = 0;
+			Hash::Combine(seed, X);
+			Hash::Combine(seed, Y);
+			Hash::Combine(seed, Z);
+			Hash::Combine(seed, W);
+			return seed;
+		}
+
+		constexpr Vector4 operator-() const noexcept { return Vector4::Negate(*this); }
 		constexpr bool operator==(Vector4 const& other) const noexcept = default;
-		friend constexpr Vector4 operator+(Vector4 const& value1, Vector4 const& value2) { return Vector4::Add(value1, value2); }
-		friend constexpr Vector4 operator-(Vector4 const& value1, Vector4 const& value2) { return Vector4::Subtract(value1, value2); }
-		friend constexpr Vector4 operator*(Vector4 const& value1, Vector4 const& value2) { return Vector4::Multiply(value1, value2); }
-		friend constexpr Vector4 operator*(Vector4 const& value, float scale) { return Vector4::Multiply(value, scale); }
-		friend constexpr Vector4 operator*(float scale, Vector4 const& value) { return Vector4::Multiply(value, scale); }
-		friend constexpr Vector4 operator/(Vector4 const& value1, Vector4 const& value2) { return Vector4::Divide(value1, value2); }
-		friend constexpr Vector4 operator/(Vector4 const& value, float divider) { return Vector4::Divide(value, divider); }
+		friend constexpr Vector4 operator+(Vector4 const& value1, Vector4 const& value2) noexcept { return Vector4::Add(value1, value2); }
+		friend constexpr Vector4 operator-(Vector4 const& value1, Vector4 const& value2) noexcept { return Vector4::Subtract(value1, value2); }
+		friend constexpr Vector4 operator*(Vector4 const& value1, Vector4 const& value2) noexcept { return Vector4::Multiply(value1, value2); }
+		friend constexpr Vector4 operator*(Vector4 const& value, float scale) noexcept { return Vector4::Multiply(value, scale); }
+		friend constexpr Vector4 operator*(float scale, Vector4 const& value) noexcept { return Vector4::Multiply(value, scale); }
+		friend constexpr Vector4 operator/(Vector4 const& value1, Vector4 const& value2) noexcept { return Vector4::Divide(value1, value2); }
+		friend constexpr Vector4 operator/(Vector4 const& value, float divider) noexcept { return Vector4::Divide(value, divider); }
 
 		float Length() const noexcept;
-		void Normalize();
+		void Normalize() noexcept;
 
 		constexpr float LengthSquared() const noexcept {
 			return (X * X) + (Y * Y) + (Z * Z) + (W * W);
 		}
-
 		static constexpr Vector4 Zero() noexcept { return Vector4(); }
 		static constexpr Vector4 One() noexcept { return Vector4(1); }
 		static constexpr Vector4 UnitX() noexcept { return Vector4(1.0F, 0.0F, 0.0F, 0.0F); }
@@ -827,17 +831,32 @@ namespace dxna {
 			return vector4;
 		}
 
-		static constexpr Vector4 Transform(Vector2 const& position, Matrix const& matrix);
-		static constexpr Vector4 Transform(Vector3 const& position, Matrix const& matrix);
-		static constexpr Vector4 Transform(Vector4 const& vector, Matrix const& matrix);
-		static constexpr Vector4 Transform(Vector2 const& value, Quaternion const& rotation);
-		static constexpr Vector4 Transform(Vector3 const& position, Quaternion const& rotation);
-		static constexpr Vector4 Transform(Vector4 const& vector, Quaternion const& rotation);
+		static constexpr Vector4 Transform(Vector2 const& position, Matrix const& matrix) noexcept;
+		static constexpr Vector4 Transform(Vector3 const& position, Matrix const& matrix) noexcept;
+		static constexpr Vector4 Transform(Vector4 const& vector, Matrix const& matrix) noexcept;
+		static constexpr Vector4 Transform(Vector2 const& value, Quaternion const& rotation) noexcept;
+		static constexpr Vector4 Transform(Vector3 const& position, Quaternion const& rotation) noexcept;
+		static constexpr Vector4 Transform(Vector4 const& vector, Quaternion const& rotation) noexcept;
 
-		static constexpr void Transform(Vector4* sourceArray, Matrix const& matrix,
-			Vector4* destinationArray, size_t length, size_t sourceIndex = 0, size_t destinationIndex = 0);
-		static constexpr void Transform(Vector4* sourceArray, Quaternion const& rotation,
-			Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex);
+		static constexpr Error Transform(
+			Vector4* sourceArray,
+			size_t sourceLength,
+			size_t sourceIndex,
+			Matrix const& matrix,
+			Vector4* destinationArray,
+			size_t destinationLength,
+			size_t destinationIndex,
+			size_t length) noexcept;
+
+		static constexpr Error Transform(
+			Vector4* sourceArray,
+			size_t sourceLength,
+			size_t sourceIndex,
+			Quaternion const& rotation,
+			Vector4* destinationArray,
+			size_t destinationLength,
+			size_t destinationIndex,
+			size_t length) noexcept;
 	};
 
 	struct Matrix {
@@ -2829,7 +2848,7 @@ namespace dxna {
 	}
 
 	constexpr Error Vector2::Transform(
-		Vector2* sourceArray,
+		Vector2 const* sourceArray,
 		size_t sourceLength,
 		size_t sourceIndex,
 		Matrix const& matrix,
@@ -2861,7 +2880,7 @@ namespace dxna {
 	}
 
 	constexpr Error Vector2::Transform(
-		Vector2* sourceArray,
+		Vector2 const* sourceArray,
 		size_t sourceIndex,
 		size_t sourceLength,
 		Quaternion const& rotation,
@@ -2898,7 +2917,7 @@ namespace dxna {
 	}
 
 	constexpr Error Vector2::TransformNormal(
-		Vector2* sourceArray,
+		Vector2 const* sourceArray,
 		size_t sourceIndex,
 		size_t sourceLength,
 		Matrix const& matrix,
@@ -2979,7 +2998,7 @@ namespace dxna {
 	}
 
 	constexpr Error Vector3::Transform(
-		Vector3* sourceArray,
+		Vector3 const* sourceArray,
 		size_t sourceLength,
 		size_t sourceIndex,
 		Matrix const& matrix,
@@ -3013,7 +3032,7 @@ namespace dxna {
 	}
 
 	constexpr Error Vector3::TransformNormal(
-		Vector3* sourceArray,
+		Vector3 const* sourceArray,
 		size_t sourceLength,
 		size_t sourceIndex,
 		Matrix const& matrix,
@@ -3049,7 +3068,7 @@ namespace dxna {
 	}
 
 	constexpr Error Vector3::Transform(
-		Vector3* sourceArray,
+		Vector3 const* sourceArray,
 		size_t sourceLength,
 		size_t sourceIndex,
 		Quaternion const& rotation,
@@ -3083,6 +3102,181 @@ namespace dxna {
 					position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
 					position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
 					position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
+		}
+
+		return Error::NoError();
+	}
+}
+
+// ---------------------------------- Vector4 ----------------------------------//
+namespace dxna {
+	constexpr Vector4 dxna::Vector4::Transform(Vector2 const& position, Matrix const& matrix) noexcept
+	{
+		const auto num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
+		const auto num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;
+		const auto num3 = (position.X * matrix.M13 + position.Y * matrix.M23) + matrix.M43;
+		const auto num4 = (position.X * matrix.M14 + position.Y * matrix.M24) + matrix.M44;
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+
+	constexpr Vector4 Vector4::Transform(Vector3 const& position, Matrix const& matrix) noexcept {
+		const auto num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
+		const auto num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
+		const auto num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
+		const auto num4 = (position.X * matrix.M14 + position.Y * matrix.M24 + position.Z * matrix.M34) + matrix.M44;
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+
+	constexpr Vector4 Vector4::Transform(Vector4 const& vector, Matrix const& matrix) noexcept
+	{
+		const auto num1 = (vector.X * matrix.M11 + vector.Y * matrix.M21 + vector.Z * matrix.M31 + vector.W * matrix.M41);
+		const auto num2 = (vector.X * matrix.M12 + vector.Y * matrix.M22 + vector.Z * matrix.M32 + vector.W * matrix.M42);
+		const auto num3 = (vector.X * matrix.M13 + vector.Y * matrix.M23 + vector.Z * matrix.M33 + vector.W * matrix.M43);
+		const auto num4 = (vector.X * matrix.M14 + vector.Y * matrix.M24 + vector.Z * matrix.M34 + vector.W * matrix.M44);
+		Vector4 vector4;
+		vector4.X = num1;
+		vector4.Y = num2;
+		vector4.Z = num3;
+		vector4.W = num4;
+		return vector4;
+	}
+
+	constexpr Vector4 Vector4::Transform(Vector2 const& value, Quaternion const& rotation) noexcept
+	{
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num1;
+		const auto num5 = rotation.W * num2;
+		const auto num6 = rotation.W * num3;
+		const auto num7 = rotation.X * num1;
+		const auto num8 = rotation.X * num2;
+		const auto num9 = rotation.X * num3;
+		const auto num10 = rotation.Y * num2;
+		const auto num11 = rotation.Y * num3;
+		const auto num12 = rotation.Z * num3;
+		const auto num13 = (value.X * (1.0F - num10 - num12) + value.Y * (num8 - num6));
+		const auto num14 = (value.X * (num8 + num6) + value.Y * (1.0F - num7 - num12));
+		const auto num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4));
+		Vector4 vector4;
+		vector4.X = num13;
+		vector4.Y = num14;
+		vector4.Z = num15;
+		vector4.W = 1.0f;
+		return vector4;
+	}
+
+	constexpr Vector4 Vector4::Transform(Vector3 const& value, Quaternion const& rotation) noexcept {
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num1;
+		const auto num5 = rotation.W * num2;
+		const auto num6 = rotation.W * num3;
+		const auto num7 = rotation.X * num1;
+		const auto num8 = rotation.X * num2;
+		const auto num9 = rotation.X * num3;
+		const auto num10 = rotation.Y * num2;
+		const auto num11 = rotation.Y * num3;
+		const auto num12 = rotation.Z * num3;
+		const auto num13 = (value.X * (1.0F - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
+		const auto num14 = (value.X * (num8 + num6) + value.Y * (1.0F - num7 - num12) + value.Z * (num11 - num4));
+		const auto num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0F - num7 - num10));
+		Vector4 vector4;
+		vector4.X = num13;
+		vector4.Y = num14;
+		vector4.Z = num15;
+		vector4.W = 1.0f;
+		return vector4;
+	}
+
+	constexpr Vector4 Vector4::Transform(Vector4 const& value, Quaternion const& rotation) noexcept
+	{
+		const auto num1 = rotation.X + rotation.X;
+		const auto num2 = rotation.Y + rotation.Y;
+		const auto num3 = rotation.Z + rotation.Z;
+		const auto num4 = rotation.W * num1;
+		const auto num5 = rotation.W * num2;
+		const auto num6 = rotation.W * num3;
+		const auto num7 = rotation.X * num1;
+		const auto num8 = rotation.X * num2;
+		const auto num9 = rotation.X * num3;
+		const auto num10 = rotation.Y * num2;
+		const auto num11 = rotation.Y * num3;
+		const auto num12 = rotation.Z * num3;
+		const auto num13 = (value.X * (1.0F - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
+		const auto num14 = (value.X * (num8 + num6) + value.Y * (1.0F - num7 - num12) + value.Z * (num11 - num4));
+		const auto num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0F - num7 - num10));
+		Vector4 vector4;
+		vector4.X = num13;
+		vector4.Y = num14;
+		vector4.Z = num15;
+		vector4.W = value.W;
+		return vector4;
+	}
+
+	constexpr Error Vector4::Transform(
+		Vector4* sourceArray,
+		size_t sourceLength,
+		size_t sourceIndex,
+		Matrix const& matrix,
+		Vector4* destinationArray,
+		size_t destinationLength,
+		size_t destinationIndex,
+		size_t length) noexcept {
+		if (sourceArray == nullptr)
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
+
+		if (destinationArray == nullptr)
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
+
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
+
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 6);
+
+		for (size_t i = 0; i < length; ++i) {
+			const auto& value = sourceArray[sourceIndex + i];
+			destinationArray[destinationIndex + i] = Transform(value, matrix);
+		}
+
+		return Error::NoError();
+	}
+
+	constexpr Error Vector4::Transform(Vector4* sourceArray,
+		size_t sourceLength,
+		size_t sourceIndex,
+		Quaternion const& rotation,
+		Vector4* destinationArray,
+		size_t destinationLength,
+		size_t destinationIndex,
+		size_t length) noexcept {
+		if (sourceArray == nullptr)
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
+
+		if (destinationArray == nullptr)
+			return Error(ErrorCode::ARGUMENT_IS_NULL, 4);
+
+		if (sourceLength < sourceIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 2);
+
+		if (destinationLength < destinationIndex + length)
+			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 6);
+
+		for (size_t i = 0; i < length; ++i)	{
+			const auto& value = sourceArray[sourceIndex + i];
+			destinationArray[destinationIndex + i] = Transform(value, rotation);
 		}
 
 		return Error::NoError();
@@ -3186,199 +3380,7 @@ namespace dxna {
 			+ plane.Normal.Y * vector3_2.Y
 			+ plane.Normal.Z * vector3_2.Z
 			+ plane.D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
-	}
-
-	constexpr Vector4 dxna::Vector4::Transform(Vector2 const& position, Matrix const& matrix)
-	{
-		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
-		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22) + matrix.M42;
-		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23) + matrix.M43;
-		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24) + matrix.M44;
-		Vector4 vector4;
-		vector4.X = num1;
-		vector4.Y = num2;
-		vector4.Z = num3;
-		vector4.W = num4;
-		return vector4;
-	}
-
-	constexpr Vector4 Vector4::Transform(Vector3 const& position, Matrix const& matrix) {
-		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
-		float num2 = (position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32) + matrix.M42;
-		float num3 = (position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33) + matrix.M43;
-		float num4 = (position.X * matrix.M14 + position.Y * matrix.M24 + position.Z * matrix.M34) + matrix.M44;
-		Vector4 vector4;
-		vector4.X = num1;
-		vector4.Y = num2;
-		vector4.Z = num3;
-		vector4.W = num4;
-		return vector4;
-	}
-
-	constexpr Vector4 Vector4::Transform(Vector4 const& vector, Matrix const& matrix)
-	{
-		float num1 = (vector.X * matrix.M11 + vector.Y * matrix.M21 + vector.Z * matrix.M31 + vector.W * matrix.M41);
-		float num2 = (vector.X * matrix.M12 + vector.Y * matrix.M22 + vector.Z * matrix.M32 + vector.W * matrix.M42);
-		float num3 = (vector.X * matrix.M13 + vector.Y * matrix.M23 + vector.Z * matrix.M33 + vector.W * matrix.M43);
-		float num4 = (vector.X * matrix.M14 + vector.Y * matrix.M24 + vector.Z * matrix.M34 + vector.W * matrix.M44);
-		Vector4 vector4;
-		vector4.X = num1;
-		vector4.Y = num2;
-		vector4.Z = num3;
-		vector4.W = num4;
-		return vector4;
-	}
-
-	constexpr Vector4 Vector4::Transform(Vector2 const& value, Quaternion const& rotation)
-	{
-		float num1 = rotation.X + rotation.X;
-		float num2 = rotation.Y + rotation.Y;
-		float num3 = rotation.Z + rotation.Z;
-		float num4 = rotation.W * num1;
-		float num5 = rotation.W * num2;
-		float num6 = rotation.W * num3;
-		float num7 = rotation.X * num1;
-		float num8 = rotation.X * num2;
-		float num9 = rotation.X * num3;
-		float num10 = rotation.Y * num2;
-		float num11 = rotation.Y * num3;
-		float num12 = rotation.Z * num3;
-		float num13 = (value.X * (1.0F - num10 - num12) + value.Y * (num8 - num6));
-		float num14 = (value.X * (num8 + num6) + value.Y * (1.0F - num7 - num12));
-		float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4));
-		Vector4 vector4;
-		vector4.X = num13;
-		vector4.Y = num14;
-		vector4.Z = num15;
-		vector4.W = 1.0f;
-		return vector4;
-	}
-
-	constexpr Vector4 Vector4::Transform(Vector3 const& value, Quaternion const& rotation) {
-		float num1 = rotation.X + rotation.X;
-		float num2 = rotation.Y + rotation.Y;
-		float num3 = rotation.Z + rotation.Z;
-		float num4 = rotation.W * num1;
-		float num5 = rotation.W * num2;
-		float num6 = rotation.W * num3;
-		float num7 = rotation.X * num1;
-		float num8 = rotation.X * num2;
-		float num9 = rotation.X * num3;
-		float num10 = rotation.Y * num2;
-		float num11 = rotation.Y * num3;
-		float num12 = rotation.Z * num3;
-		float num13 = (value.X * (1.0F - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
-		float num14 = (value.X * (num8 + num6) + value.Y * (1.0F - num7 - num12) + value.Z * (num11 - num4));
-		float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0F - num7 - num10));
-		Vector4 vector4;
-		vector4.X = num13;
-		vector4.Y = num14;
-		vector4.Z = num15;
-		vector4.W = 1.0f;
-		return vector4;
-	}
-
-	constexpr Vector4 Vector4::Transform(Vector4 const& value, Quaternion const& rotation)
-	{
-		float num1 = rotation.X + rotation.X;
-		float num2 = rotation.Y + rotation.Y;
-		float num3 = rotation.Z + rotation.Z;
-		float num4 = rotation.W * num1;
-		float num5 = rotation.W * num2;
-		float num6 = rotation.W * num3;
-		float num7 = rotation.X * num1;
-		float num8 = rotation.X * num2;
-		float num9 = rotation.X * num3;
-		float num10 = rotation.Y * num2;
-		float num11 = rotation.Y * num3;
-		float num12 = rotation.Z * num3;
-		float num13 = (value.X * (1.0F - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
-		float num14 = (value.X * (num8 + num6) + value.Y * (1.0F - num7 - num12) + value.Z * (num11 - num4));
-		float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0F - num7 - num10));
-		Vector4 vector4;
-		vector4.X = num13;
-		vector4.Y = num14;
-		vector4.Z = num15;
-		vector4.W = value.W;
-		return vector4;
-	}
-
-	constexpr void Vector4::Transform(Vector4* sourceArray, Matrix const& matrix, Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
-		if (sourceArray == nullptr)
-			return;
-
-		if (destinationArray == nullptr)
-			return;
-
-		if (length < sourceIndex + length)
-			return;
-
-		if (length < destinationIndex + length)
-			return;
-
-		for (; length > 0; --length)
-		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			float w = sourceArray[sourceIndex].W;
-			destinationArray[destinationIndex].X = (x * matrix.M11 + y * matrix.M21 + z * matrix.M31 + w * matrix.M41);
-			destinationArray[destinationIndex].Y = (x * matrix.M12 + y * matrix.M22 + z * matrix.M32 + w * matrix.M42);
-			destinationArray[destinationIndex].Z = (x * matrix.M13 + y * matrix.M23 + z * matrix.M33 + w * matrix.M43);
-			destinationArray[destinationIndex].W = (x * matrix.M14 + y * matrix.M24 + z * matrix.M34 + w * matrix.M44);
-			++sourceIndex;
-			++destinationIndex;
-		}
-	}
-
-	constexpr void Vector4::Transform(Vector4* sourceArray, Quaternion const& rotation, Vector4* destinationArray, size_t length, size_t sourceIndex, size_t destinationIndex) {
-		if (sourceArray == nullptr)
-			return;
-
-		if (destinationArray == nullptr)
-			return;
-
-		if (length < sourceIndex + length)
-			return;
-
-		if (length < destinationIndex + length)
-			return;
-
-		float num1 = rotation.X + rotation.X;
-		float num2 = rotation.Y + rotation.Y;
-		float num3 = rotation.Z + rotation.Z;
-		float num4 = rotation.W * num1;
-		float num5 = rotation.W * num2;
-		float num6 = rotation.W * num3;
-		float num7 = rotation.X * num1;
-		float num8 = rotation.X * num2;
-		float num9 = rotation.X * num3;
-		float num10 = rotation.Y * num2;
-		float num11 = rotation.Y * num3;
-		float num12 = rotation.Z * num3;
-		float num13 = 1.0f - num10 - num12;
-		float num14 = num8 - num6;
-		float num15 = num9 + num5;
-		float num16 = num8 + num6;
-		float num17 = 1.0f - num7 - num12;
-		float num18 = num11 - num4;
-		float num19 = num9 - num5;
-		float num20 = num11 + num4;
-		float num21 = 1.0f - num7 - num10;
-		for (; length > 0; --length)
-		{
-			float x = sourceArray[sourceIndex].X;
-			float y = sourceArray[sourceIndex].Y;
-			float z = sourceArray[sourceIndex].Z;
-			float w = sourceArray[sourceIndex].W;
-			destinationArray[destinationIndex].X = (x * num13 + y * num14 + z * num15);
-			destinationArray[destinationIndex].Y = (x * num16 + y * num17 + z * num18);
-			destinationArray[destinationIndex].Z = (x * num19 + y * num20 + z * num21);
-			destinationArray[destinationIndex].W = w;
-			++sourceIndex;
-			++destinationIndex;
-		}
-	}
+	}	
 
 	constexpr Matrix dxna::Matrix::CreateFromQuaternion(Quaternion const& quaternion)
 	{

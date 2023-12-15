@@ -64,7 +64,7 @@ namespace dxna {
 		return std::sqrt(num1 * num1 + num2 * num2 + num3 * num3 + num4 * num4);
 	}
 
-	void Vector4::Normalize() {
+	void Vector4::Normalize() noexcept {
 		float num = 1.0F / std::sqrt(Length());
 		X *= num;
 		Y *= num;
