@@ -2,6 +2,7 @@
 // or project specific include files.
 
 #pragma once
+#include "curve.hpp"
 
 
 // TODO: Reference additional headers your program requires here.

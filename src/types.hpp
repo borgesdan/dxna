@@ -8,11 +8,11 @@
 #include <any>
 
 namespace dxna {
-	//Define um ponteiro para um vetor de um tipo definido.
+	//Define um ponteiro para um vetor.
 	template <typename T>
-	using vectorptr = std::shared_ptr<std::vector<T>>;
+	using vectorptr = std::shared_ptr<std::vector<T>>;	
 
-	//Define um ponteiro para um mapa de um tipo definido.
+	//Define um ponteiro para um mapa.
 	template <typename T1, typename T2>
 	using mapptr = std::shared_ptr<std::map<T1, T2>>;
 
@@ -35,7 +35,7 @@ namespace dxna {
 	template <class _Ty, class... _Types>
 	vectorptr<_Ty> NewVector(_Types&&... _Args) {
 		return std::make_shared<std::vector<_Ty>>(std::forward<_Types>(_Args)...);
-	}
+	}	
 }
 
 #endif

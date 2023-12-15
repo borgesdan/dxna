@@ -16,13 +16,14 @@ namespace dxna {
 	struct BoundingSphere;
 	struct BoundingFrustum;
 	struct Ray;
-
+	
 	struct Point {
 		int X{ 0 };
 		int Y{ 0 };
 
 		constexpr Point() noexcept = default;
 		constexpr Point(int x, int y) noexcept : X(x), Y(y) {}
+		constexpr Point(int value) noexcept : X(value), Y(value) {}
 
 		static constexpr Point Zero() noexcept { return Point(); }
 
@@ -35,7 +36,7 @@ namespace dxna {
 			return seed;
 		}
 	};
-
+	
 	struct Rectangle {
 		int X{ 0 };
 		int Y{ 0 };
@@ -46,6 +47,9 @@ namespace dxna {
 
 		constexpr Rectangle(int x, int y, int width, int height) noexcept :
 			X(x), Y(y), Width(width), Height(height) {}
+
+		constexpr Rectangle(Point const& location, Point const& size) noexcept:
+			X(location.X), Y(location.Y), Width(size.X), Height(size.Y) {}
 
 		constexpr size_t GetHashCode() const noexcept {
 			size_t seed = 0;
@@ -2527,271 +2531,7 @@ namespace dxna {
 		static constexpr Color WhiteSmoke{ Color(4294309365U) };
 		static constexpr Color Yellow{ Color(4278255615U) };
 		static constexpr Color YellowGreen{ Color(4281519514U) };
-	};
-
-	struct CurveKey {
-		float Position{ 0 };
-		float TangentIn{ 0 };
-		float TangentOut{ 0 };
-		float Value{ 0 };
-		CurveContinuity Continuity{ CurveContinuity::Smooth };
-
-		constexpr CurveKey() = default;
-
-		CurveKey(float position, float value, float tangentIn = 0, float tangentOut = 0, CurveContinuity continuity = CurveContinuity::Smooth) :
-			Position(position), Value(value), TangentIn(tangentIn), TangentOut(tangentOut), Continuity(continuity) {}
-
-		constexpr bool operator==(CurveKey const& other) const {
-			return Equals(other);
-		}
-
-		constexpr bool Equals(const CurveKey& other) const {
-			return Position == other.Position
-				&& TangentIn == other.TangentIn
-				&& TangentOut == other.TangentOut
-				&& Value == other.Value
-				&& Continuity == other.Continuity;
-		}
-	};
-
-	struct CurveKeyCollection {
-		constexpr CurveKey* operator[](size_t index) {
-			if (keys.empty() || index > keys.size())
-				return nullptr;
-
-			return &keys[index];
-		}
-
-		constexpr cs::Nullable<CurveKey> Get(size_t index) const {
-			if (keys.empty() || index > keys.size())
-				return cs::Nullable<CurveKey>();
-
-			return keys[index];
-		}
-
-		constexpr size_t Count() const { return keys.size(); }
-
-		constexpr CurveKey* Last() {
-			if (keys.empty())
-				return nullptr;
-
-			return &keys[keys.size() - 1];
-		}
-
-		constexpr void Add(CurveKey const& item) {
-			if (Count() == 0) {
-				keys.push_back(item);
-			}
-
-			for (size_t i = 0; i < keys.size(); ++i) {
-				if (item.Position < keys[i].Position) {
-					keys.insert(keys.begin() + i, item);
-					return;
-				}
-			}
-
-			keys.push_back(item);
-		}
-
-		constexpr void Clear() {
-			keys.clear();
-		}
-
-	private:
-		std::vector<CurveKey> keys;
-	};
-
-	struct Curve {
-		constexpr Curve() = default;
-
-		constexpr bool IsConstant() const {
-			return Keys.Count() <= 1;
-		}
-
-		constexpr float Evaluate(float position) {
-			if (Keys.Count() == 0)
-				return 0.0F;
-
-			if (Keys.Count() == 1)
-				return Keys[0]->Value;
-
-			const auto first = Keys[0];
-			const auto last = Keys.Last();
-			auto cycle = 0;
-			auto virtualPos = 0.0F;
-
-			if (position < first->Position) {
-				switch (PreLoop)
-				{
-				case dxna::CurveLoopType::Constant:
-					return first->Value;
-
-				case dxna::CurveLoopType::Cycle:
-					cycle = GetNumberOfCycle(position);
-					virtualPos = position - (cycle * (last->Position - first->Position));
-					return GetCurvePosition(virtualPos);
-
-				case dxna::CurveLoopType::CycleOffset:
-					cycle = GetNumberOfCycle(position);
-					virtualPos = position - (cycle * (last->Position - first->Position));
-					return (GetCurvePosition(virtualPos) + cycle * (last->Value - first->Value));
-
-				case dxna::CurveLoopType::Oscillate:
-					if (0 == std::fmod(static_cast<float>(cycle), 2.0f))
-						virtualPos = position - (cycle * (last->Position - first->Position));
-					else
-						virtualPos = last->Position - position + first->Position + (cycle * (last->Position - first->Position));
-
-					return GetCurvePosition(virtualPos);
-
-				case dxna::CurveLoopType::Linear:
-					return first->Value - first->TangentIn * (first->Position - position);
-
-				default:
-					break;
-				}
-			}
-			else if (position > last->Position) {
-				auto cycle = 0;
-				auto virtualPos = 0.0F;
-
-				switch (PostLoop)
-				{
-				case dxna::CurveLoopType::Constant:
-					return last->Value;
-				case dxna::CurveLoopType::Cycle:
-					cycle = GetNumberOfCycle(position);
-					virtualPos = position - (cycle * (last->Position - first->Position));
-					return GetCurvePosition(virtualPos);
-
-				case dxna::CurveLoopType::CycleOffset:
-					cycle = GetNumberOfCycle(position);
-					virtualPos = position - (cycle * (last->Position - first->Position));
-					return (GetCurvePosition(virtualPos) + cycle * (last->Value - first->Value));
-				case dxna::CurveLoopType::Oscillate:
-					cycle = GetNumberOfCycle(position);
-					virtualPos = position - (cycle * (last->Position - first->Position));
-
-					if (0 == std::fmod(static_cast<float>(cycle), 2.0f))
-						virtualPos = position - (cycle * (last->Position - first->Position));
-					else
-						virtualPos = last->Position - position + first->Position + (cycle * (last->Position - first->Position));
-
-					return GetCurvePosition(virtualPos);
-
-				case dxna::CurveLoopType::Linear:
-					return last->Value + first->TangentOut * (position - last->Position);
-
-				default:
-					break;
-				}
-			}
-		}
-
-		constexpr void ComputeTangents(CurveTangent const& tangentInType, CurveTangent const& tangentOutType) {
-			for (size_t i = 0; i < Keys.Count(); ++i) {
-				ComputeTangent(i, tangentInType, tangentOutType);
-			}
-		}
-
-		constexpr void ComputeTangent(size_t keyIndex, CurveTangent tangentInType, CurveTangent tangentOutType) {
-			auto key = Keys[keyIndex];
-
-			float p0, p, p1;
-			p0 = p = p1 = key->Position;
-
-			float v0, v, v1;
-			v0 = v = v1 = key->Value;
-
-			if (keyIndex > 0)
-			{
-				p0 = Keys[keyIndex - 1]->Position;
-				v0 = Keys[keyIndex - 1]->Value;
-			}
-
-			if (keyIndex < Keys.Count() - 1)
-			{
-				p1 = Keys[keyIndex + 1]->Position;
-				v1 = Keys[keyIndex + 1]->Value;
-			}
-
-			switch (tangentInType)
-			{
-			case CurveTangent::Flat:
-				key->TangentIn = 0;
-				break;
-			case CurveTangent::Linear:
-				key->TangentIn = v - v0;
-				break;
-			case CurveTangent::Smooth:
-				const auto pn = p1 - p0;
-				if (std::abs(pn) < std::numeric_limits<float>::epsilon())
-					key->TangentIn = 0;
-				else
-					key->TangentIn = (v1 - v0) * ((p - p0) / pn);
-				break;
-			}
-
-			switch (tangentOutType)
-			{
-			case CurveTangent::Flat:
-				key->TangentOut = 0;
-				break;
-			case CurveTangent::Linear:
-				key->TangentOut = v1 - v;
-				break;
-			case CurveTangent::Smooth:
-				const auto pn = p1 - p0;
-				if (std::abs(pn) < std::numeric_limits<float>::epsilon())
-					key->TangentOut = 0;
-				else
-					key->TangentOut = (v1 - v0) * ((p1 - p) / pn);
-				break;
-			}
-		}
-
-	public:
-		CurveLoopType PreLoop;
-		CurveLoopType PostLoop;
-		CurveKeyCollection Keys;
-
-	private:
-		int GetNumberOfCycle(float position) {
-			float cycle = (position - Keys[0]->Position) / (Keys.Last()->Position - Keys[0]->Position);
-
-			if (cycle < 0.0f)
-				cycle--;
-
-			return static_cast<int>(cycle);
-		}
-
-		float GetCurvePosition(float position) {
-			auto prev = Keys[0];
-
-			for (size_t i = 1; i < Keys.Count(); ++i) {
-				const auto next = Keys[i];
-
-				if (next->Position >= position) {
-					if (prev->Continuity == CurveContinuity::Step) {
-						if (position >= 1.0f) {
-							return next->Value;
-						}
-
-						return prev->Value;
-					}
-					const auto t = (position - prev->Position) / (next->Position - prev->Position);
-					const auto ts = t * t;
-					const auto tss = ts * t;
-
-					return (2 * tss - 3 * ts + 1.0f) * prev->Value + (tss - 2 * ts + t) * prev->TangentOut + (3 * ts - 2 * tss) * next->Value + (tss - ts) * next->TangentIn;
-				}
-
-				prev = next;
-			}
-
-			return 0.0f;
-		}
-	};
+	};	
 }
 
 // ---------------------------------- Vector2 ----------------------------------//

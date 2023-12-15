@@ -6,6 +6,8 @@
 // https://en.cppreference.com/w/cpp/utility/hash
 //
 
+#include <utility>
+
 namespace dxna {
 	struct Hash {
 		template <class T>
