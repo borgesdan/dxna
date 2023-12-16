@@ -26,16 +26,16 @@ namespace dxna {
 		return std::sqrt(num1 * num1 + num2 * num2);
 	}
 
-	float Vector3::Length() const {	return std::sqrt(LengthSquared()); }
+	float Vector3::Length() const noexcept {	return std::sqrt(LengthSquared()); }
 
-	void Vector3::Normalize() {
+	void Vector3::Normalize() noexcept {
 		const auto num = 1.0F / Length();
 		X *= num;
 		Y *= num;
 		Z *= num;
 	}
 
-	Vector3 Vector3::Normalize(Vector3 const& value) {
+	Vector3 Vector3::Normalize(Vector3 const& value) noexcept {
 		float num = 1.0F / std::sqrt(value.Length());
 		Vector3 vector;
 		vector.X *= num;
@@ -45,7 +45,7 @@ namespace dxna {
 		return vector;
 	}
 
-	float Vector3::Distance(Vector3 const& value1, Vector3 const& value2) {
+	float Vector3::Distance(Vector3 const& value1, Vector3 const& value2) noexcept {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
 		const auto num3 = value1.Z - value2.Z;
@@ -849,80 +849,74 @@ namespace dxna {
 		return reflection;
 	}
 
-	nullfloat dxna::BoundingBox::Intersects(Ray const& ray) const
-	{
-		float num1 = 0.0f;
-		float num2 = FloatMaxValue;
-		
-		if (std::abs(ray.Direction.X) < 9.9999999747524271E-07)	{
+	nullfloat dxna::BoundingBox::Intersects(Ray const& ray) const noexcept {
+		auto tMin = nullfloat();
+		auto tMax = nullfloat();
+
+		if (std::abs(ray.Direction.X) < Math::Epsilon) {
 			if (ray.Position.X < Min.X || ray.Position.X > Max.X)
 				return nullfloat();
 		}
 		else {
-			float num3 = 1.0f / ray.Direction.X;
-			float num4 = (Min.X - ray.Position.X) * num3;
-			float num5 = (Max.X - ray.Position.X) * num3;
-			
-			if (num4 > num5) {
-				float num6 = num4;
-				num4 = num5;
-				num5 = num6;
-			}
-			
-			num1 = MathHelper::Max(num4, num1);
-			num2 = MathHelper::Min(num5, num2);
+			tMin = (Min.X - ray.Position.X) / ray.Direction.X;
+			tMax = (Max.X - ray.Position.X) / ray.Direction.X;
 
-			if (num1 > num2)
-				return nullfloat();
+			if (tMin > tMax) {
+				const auto temp = tMin;
+				tMin = tMax;
+				tMax = temp;
+			}
 		}
-		
-		if (std::abs(ray.Direction.Y) < 9.9999999747524271E-07)
-		{
+
+		if (std::abs(ray.Direction.Y) < Math::Epsilon) {
 			if (ray.Position.Y < Min.Y || ray.Position.Y > Max.Y)
 				return nullfloat();
 		}
 		else {
-			float num7 = 1.0f / ray.Direction.Y;
-			float num8 = (Min.Y - ray.Position.Y) * num7;
-			float num9 = (Max.Y - ray.Position.Y) * num7;
-			if (num8 > num9)
-			{
-				float num10 = num8;
-				num8 = num9;
-				num9 = num10;
+			auto tMinY = (Min.Y - ray.Position.Y) / ray.Direction.Y;
+			auto tMaxY = (Max.Y - ray.Position.Y) / ray.Direction.Y;
+
+			if (tMinY > tMaxY) {
+				const auto temp = tMinY;
+				tMinY = tMaxY;
+				tMaxY = temp;
 			}
-			
-			num1 = MathHelper::Max(num8, num1);
-			num2 = MathHelper::Min(num9, num2);
-			
-			if (num1 > num2)
+
+			if ((tMin.HasValue() && tMin > tMaxY) || (tMax.HasValue() && tMinY > tMax))
 				return nullfloat();
+
+			if (!tMin.HasValue() || tMinY > tMin) tMin = tMinY;
+			if (!tMax.HasValue() || tMaxY < tMax) tMax = tMaxY;
 		}
 
-		if (std::abs(ray.Direction.Z) < 9.9999999747524271E-07) 	{
+		if (std::abs(ray.Direction.Z) < Math::Epsilon) {
 			if (ray.Position.Z < Min.Z || ray.Position.Z > Max.Z)
 				return nullfloat();
 		}
-		else
-		{
-			float num11 = 1.0f / ray.Direction.Z;
-			float num12 = (Min.Z - ray.Position.Z) * num11;
-			float num13 = (Max.Z - ray.Position.Z) * num11;
-			
-			if (num12 > num13)
-			{
-				float num14 = num12;
-				num12 = num13;
-				num13 = num14;
+		else {
+			auto tMinZ = (Min.Z - ray.Position.Z) / ray.Direction.Z;
+			auto tMaxZ = (Max.Z - ray.Position.Z) / ray.Direction.Z;
+
+			if (tMinZ > tMaxZ) {
+				const auto temp = tMinZ;
+				tMinZ = tMaxZ;
+				tMaxZ = temp;
 			}
 
-			num1 = MathHelper::Max(num12, num1);
-			float num15 = MathHelper::Min(num13, num2);
-
-			if (num1 > num15)
+			if ((tMin.HasValue() && tMin > tMaxZ) || (tMax.HasValue() && tMinZ > tMax))
 				return nullfloat();
+
+			if (!tMin.HasValue() || tMinZ > tMin) tMin = tMinZ;
+			if (!tMax.HasValue() || tMaxZ < tMax) tMax = tMaxZ;
 		}
-		return num1;
+		
+		if ((tMin.HasValue() && tMin < 0) && tMax > 0) 
+			return 0;
+
+		if (tMin < 0)
+			return nullfloat();
+
+		return tMin;
 	}
 
 	nullfloat BoundingSphere::Intersects(Ray const& ray) const {

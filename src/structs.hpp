@@ -8,6 +8,7 @@
 #include "mathhelper.hpp"
 #include "utility.hpp"
 #include "error.hpp"
+#include "types.hpp"
 
 namespace dxna {
 	struct Matrix;
@@ -381,38 +382,38 @@ namespace dxna {
 		constexpr Vector3 operator/=(Vector3 const& other) const { return Vector3::Divide(*this, other); }
 
 
-		float Length() const;
-		void Normalize();
+		float Length() const noexcept;
+		void Normalize() noexcept;
 
-		constexpr bool Equals(const Vector3& other) const { return X == other.X && Y == other.Y && Z == other.Z; }
-		constexpr float LengthSquared() const { return (X * X) + (Y * Y) + (Z * Z); }
+		constexpr bool Equals(const Vector3& other) const noexcept { return X == other.X && Y == other.Y && Z == other.Z; }
+		constexpr float LengthSquared() const noexcept { return (X * X) + (Y * Y) + (Z * Z); }
 
-		static constexpr Vector3 Zero() { return Vector3(); };
-		static constexpr Vector3 One() { return Vector3(1.F, 1.F, 1.F); }
-		static constexpr Vector3 UnitX() { return Vector3(1.0F, 0.0, 0.0); }
-		static constexpr Vector3 UnitY() { return Vector3(0.0, 1.0F, 0.0); }
-		static constexpr Vector3 UnitZ() { return Vector3(0.0, 0.0, 1.0F); }
-		static constexpr Vector3 Up() { return UnitY(); }
-		static constexpr Vector3 Down() { return -UnitY(); }
-		static constexpr Vector3 Right() { return UnitX(); }
-		static constexpr Vector3 Left() { { return -UnitX(); } }
-		static constexpr Vector3 Forward() { return -UnitZ(); }
-		static constexpr Vector3 Backward() { return UnitZ(); }
+		static constexpr Vector3 Zero() noexcept { return Vector3(); };
+		static constexpr Vector3 One() noexcept { return Vector3(1.F, 1.F, 1.F); }
+		static constexpr Vector3 UnitX() noexcept { return Vector3(1.0F, 0.0, 0.0); }
+		static constexpr Vector3 UnitY() noexcept { return Vector3(0.0, 1.0F, 0.0); }
+		static constexpr Vector3 UnitZ() noexcept { return Vector3(0.0, 0.0, 1.0F); }
+		static constexpr Vector3 Up() noexcept { return UnitY(); }
+		static constexpr Vector3 Down() noexcept { return -UnitY(); }
+		static constexpr Vector3 Right() noexcept { return UnitX(); }
+		static constexpr Vector3 Left() noexcept { { return -UnitX(); } }
+		static constexpr Vector3 Forward() noexcept { return -UnitZ(); }
+		static constexpr Vector3 Backward() noexcept { return UnitZ(); }
 
-		static float Distance(Vector3 const& value1, Vector3 const& value2);
+		static float Distance(Vector3 const& value1, Vector3 const& value2) noexcept;
 
-		static constexpr float DistanceSquared(Vector3 const& value1, Vector3 const& value2) {
+		static constexpr float DistanceSquared(Vector3 const& value1, Vector3 const& value2) noexcept {
 			const auto num1 = value1.X - value2.X;
 			const auto num2 = value1.Y - value2.Y;
 			const auto num3 = value1.Z - value2.Z;
 			return num1 * num1 + num2 * num2 + num3 * num3;
 		}
 
-		static constexpr float Dot(Vector3 const& vector1, Vector3 const& vector2) {
+		static constexpr float Dot(Vector3 const& vector1, Vector3 const& vector2) noexcept {
 			return vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z;
 		}
 
-		static constexpr Vector3 Cross(Vector3 const& vector1, Vector3 const& vector2) {
+		static constexpr Vector3 Cross(Vector3 const& vector1, Vector3 const& vector2) noexcept {
 			Vector3 vector3;
 			vector3.X = vector1.Y * vector2.Z - vector1.Z * vector2.Y;
 			vector3.Y = vector1.Z * vector2.X - vector1.X * vector2.Z;
@@ -420,7 +421,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 lect(Vector3 const& vector, Vector3 const& normal) {
+		static constexpr Vector3 lect(Vector3 const& vector, Vector3 const& normal) noexcept {
 			const auto num = vector.X * normal.X + vector.Y * normal.Y + vector.Z * normal.Z;
 			Vector3 vector3;
 			vector3.X = vector.X - 2.0F * num * normal.X;
@@ -429,7 +430,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Min(Vector3 const& value1, Vector3 const& value2) {
+		static constexpr Vector3 Min(Vector3 const& value1, Vector3 const& value2) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X < value2.X ? value1.X : value2.X;
 			vector3.Y = value1.Y < value2.Y ? value1.Y : value2.Y;
@@ -437,7 +438,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Max(Vector3 const& value1, Vector3 const& value2) {
+		static constexpr Vector3 Max(Vector3 const& value1, Vector3 const& value2) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X > value2.X ? value1.X : value2.X;
 			vector3.Y = value1.Y > value2.Y ? value1.Y : value2.Y;
@@ -445,7 +446,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Clamp(Vector3 const& value1, Vector3 const& min, Vector3 const& max) {
+		static constexpr Vector3 Clamp(Vector3 const& value1, Vector3 const& min, Vector3 const& max) noexcept {
 			const auto x = value1.X;
 			const auto num1 = x > max.X ? max.X : x;
 			const auto num2 = num1 < min.X ? min.X : num1;
@@ -462,7 +463,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Lerp(Vector3 const& value1, Vector3 const& value2, float amount) {
+		static constexpr Vector3 Lerp(Vector3 const& value1, Vector3 const& value2, float amount) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X + (value2.X - value1.X) * amount;
 			vector3.Y = value1.Y + (value2.Y - value1.Y) * amount;
@@ -471,7 +472,7 @@ namespace dxna {
 		}
 
 		static constexpr Vector3 Barycentric(Vector3 const& value1, Vector3 const& value2, Vector3 const& value3,
-			float amount1, float amount2) {
+			float amount1, float amount2) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X + amount1 * (value2.X - value1.X) + amount2 * (value3.X - value1.X);
 			vector3.Y = value1.Y + amount1 * (value2.Y - value1.Y) + amount2 * (value3.Y - value1.Y);
@@ -479,7 +480,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 SmoothStep(Vector3 const& value1, Vector3 const& value2, float amount) {
+		static constexpr Vector3 SmoothStep(Vector3 const& value1, Vector3 const& value2, float amount) noexcept {
 			amount = amount > 1.0F ? 1.0F : (amount < 0.0 ? 0.0F : amount);
 			amount = amount * amount * (3.0F - 2.0F * amount);
 			Vector3 vector3;
@@ -488,8 +489,9 @@ namespace dxna {
 			vector3.Z = value1.Z + (value2.Z - value1.Z) * amount;
 			return vector3;
 		}
+
 		static constexpr Vector3 CatmullRom(Vector3 const& value1, Vector3 const& value2, Vector3 const& value3,
-			Vector3 const& value4, float amount) {
+			Vector3 const& value4, float amount) noexcept {
 			const auto num1 = amount * amount;
 			const auto num2 = amount * num1;
 			Vector3 vector3;
@@ -500,7 +502,7 @@ namespace dxna {
 		}
 
 		static constexpr Vector3 Hermite(Vector3 const& value1, Vector3 const& tangent1, Vector3 const& value2,
-			Vector3 const& tangent2, float amount) {
+			Vector3 const& tangent2, float amount) noexcept {
 			const auto num1 = amount * amount;
 			const auto num2 = amount * num1;
 			const auto num3 = 2.0F * num2 - 3.0F * num1 + 1.0F;
@@ -514,9 +516,9 @@ namespace dxna {
 			return vector3;
 		}
 
-		static Vector3 Normalize(Vector3 const& value);
+		static Vector3 Normalize(Vector3 const& value) noexcept;
 
-		static constexpr Vector3 Negate(Vector3 const& value) {
+		static constexpr Vector3 Negate(Vector3 const& value) noexcept {
 			Vector3 vector;
 			vector.X = -value.X;
 			vector.Y = -value.Y;
@@ -524,7 +526,7 @@ namespace dxna {
 			return vector;
 		}
 
-		static constexpr Vector3 Add(Vector3 const& value1, Vector3 const& value2) {
+		static constexpr Vector3 Add(Vector3 const& value1, Vector3 const& value2) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X + value2.X;
 			vector3.Y = value1.Y + value2.Y;
@@ -532,7 +534,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Subtract(Vector3 const& value1, Vector3 const& value2) {
+		static constexpr Vector3 Subtract(Vector3 const& value1, Vector3 const& value2) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X - value2.X;
 			vector3.Y = value1.Y - value2.Y;
@@ -540,7 +542,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Multiply(Vector3 const& value1, Vector3 const& value2) {
+		static constexpr Vector3 Multiply(Vector3 const& value1, Vector3 const& value2) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X * value2.X;
 			vector3.Y = value1.Y * value2.Y;
@@ -548,7 +550,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Multiply(Vector3 const& value1, float scaleFactor) {
+		static constexpr Vector3 Multiply(Vector3 const& value1, float scaleFactor) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X * scaleFactor;
 			vector3.Y = value1.Y * scaleFactor;
@@ -556,7 +558,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Divide(Vector3 const& value1, Vector3 const& value2) {
+		static constexpr Vector3 Divide(Vector3 const& value1, Vector3 const& value2) noexcept {
 			Vector3 vector3;
 			vector3.X = value1.X / value2.X;
 			vector3.Y = value1.Y / value2.Y;
@@ -564,7 +566,7 @@ namespace dxna {
 			return vector3;
 		}
 
-		static constexpr Vector3 Divide(Vector3 const& value1, float value2) {
+		static constexpr Vector3 Divide(Vector3 const& value1, float value2) noexcept {
 			float num = 1.0F / value2;
 			Vector3 vector3;
 			vector3.X = value1.X * num;
@@ -585,7 +587,7 @@ namespace dxna {
 			Vector3* destinationArray,
 			size_t destinationLength,
 			size_t destinationIndex,
-			size_t length);
+			size_t length) noexcept;
 
 		static constexpr Error Transform(
 			Vector3 const* sourceArray,
@@ -595,7 +597,7 @@ namespace dxna {
 			Vector3* destinationArray,
 			size_t destinationLength,
 			size_t destinationIndex,
-			size_t length);
+			size_t length) noexcept;
 
 		static constexpr Error TransformNormal(
 			Vector3 const* sourceArray,
@@ -605,7 +607,7 @@ namespace dxna {
 			Vector3* destinationArray,
 			size_t destinationLength,
 			size_t destinationIndex,
-			size_t length);
+			size_t length) noexcept;
 	};
 
 	// Describes a 4D-vector.
@@ -891,6 +893,16 @@ namespace dxna {
 			M41(M41), M42(M42), M43(M43), M44(M44) {
 		}
 
+		constexpr size_t GetHashCode() const noexcept {
+			size_t seed = 0;
+			Hash::Combine(seed, M11 + M12 + M13 + M14);
+			Hash::Combine(seed, M21 + M22 + M23 + M24);
+			Hash::Combine(seed, M31 + M32 + M33 + M34);
+			Hash::Combine(seed, M41 + M42 + M43 + M44);		
+			
+			return seed;
+		}
+
 		constexpr Matrix operator-() const noexcept { return Matrix::Negate(*this); }
 		constexpr bool operator==(Matrix const& other) const noexcept = default;
 		friend constexpr Matrix operator+(Matrix const& value1, Matrix const& value2) noexcept { return Matrix::Add(value1, value2); }
@@ -900,7 +912,6 @@ namespace dxna {
 		friend constexpr Matrix operator*(float scale, Matrix const& value) noexcept { return Matrix::Multiply(value, scale); }
 		friend constexpr Matrix operator/(Matrix const& value1, Matrix const& value2) noexcept { return Matrix::Divide(value1, value2); }
 		friend constexpr Matrix operator/(Matrix const& value, float divider) noexcept { return Matrix::Divide(value, divider); }
-
 
 		constexpr Vector3 Up() const noexcept {
 			Vector3 up;
@@ -1518,6 +1529,15 @@ namespace dxna {
 		constexpr Quaternion(Vector3 const& vectorPart, float scalarPart) noexcept 
 			: X(vectorPart.X), Y(vectorPart.Y), Z(vectorPart.Z), W(scalarPart) {}
 
+		constexpr size_t GetHashCode() const noexcept {
+			size_t seed = 0;
+			Hash::Combine(seed, X);
+			Hash::Combine(seed, Y);
+			Hash::Combine(seed, Z);
+			Hash::Combine(seed, W);
+			return seed;
+		}
+
 		constexpr Quaternion operator-() const noexcept { return Quaternion::Negate(*this); }
 		constexpr bool operator==(Quaternion const& other) const noexcept = default;
 		friend constexpr Quaternion operator+(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Add(value1, value2); }
@@ -1668,97 +1688,84 @@ namespace dxna {
 		}
 	};
 
+	// Represents an axis-aligned bounding box (AABB) in 3D space.
 	struct BoundingBox {
 		Vector3 Min;
 		Vector3 Max;
 
-		constexpr BoundingBox() = default;
+		static constexpr int CornerCount = 8;
 
-		constexpr BoundingBox(Vector3 const& min, Vector3 const& max) :
+		constexpr BoundingBox() noexcept = default;
+
+		constexpr BoundingBox(Vector3 const& min, Vector3 const& max) noexcept :
 			Min(min), Max(max) {}
 
-		constexpr bool operator==(BoundingBox const& other) {
-			return Equals(other);
+		constexpr size_t GetHashCode() const noexcept {			
+			return Min.GetHashCode() + Max.GetHashCode();
 		}
 
-		constexpr bool Equals(BoundingBox const& other) const {
+		constexpr bool operator==(BoundingBox const& other) const noexcept {
 			return Min == other.Min && Max == other.Max;
+		}		
+
+		constexpr bool Intersects(BoundingBox const& box) const noexcept {
+			if ((Max.X >= box.Min.X) && (Min.X <= box.Max.X)) {
+				if ((Max.Y < box.Min.Y) || (Min.Y > box.Max.Y))
+					return false;
+
+				return (Max.Z >= box.Min.Z) && (Min.Z <= box.Max.Z);				
+			}
+			
+			return false;
 		}
 
-		constexpr void GetCorners(Vector3 corners[8]) const {
-			corners[0].X = Min.X;
-			corners[0].Y = Max.Y;
-			corners[0].Z = Max.Z;
-			corners[1].X = Max.X;
-			corners[1].Y = Max.Y;
-			corners[1].Z = Max.Z;
-			corners[2].X = Max.X;
-			corners[2].Y = Min.Y;
-			corners[2].Z = Max.Z;
-			corners[3].X = Min.X;
-			corners[3].Y = Min.Y;
-			corners[3].Z = Max.Z;
-			corners[4].X = Min.X;
-			corners[4].Y = Max.Y;
-			corners[4].Z = Min.Z;
-			corners[5].X = Max.X;
-			corners[5].Y = Max.Y;
-			corners[5].Z = Min.Z;
-			corners[6].X = Max.X;
-			corners[6].Y = Min.Y;
-			corners[6].Z = Min.Z;
-			corners[7].X = Min.X;
-			corners[7].Y = Min.Y;
-			corners[7].Z = Min.Z;
-		}
-
-		constexpr bool Intersects(BoundingBox const& box) const {
-			return Max.X >= box.Min.X
-				&& Min.X <= box.Max.X
-				&& Max.Y >= box.Min.Y
-				&& Min.Y <= box.Max.Y
-				&& Max.Z >= box.Min.Z
-				&& Min.Z <= box.Max.Z;
-		}
-
-		constexpr ContainmentType Contains(BoundingBox const& box) const {
-			if (Max.X < box.Min.X || Min.X > box.Max.X || Max.Y < box.Min.Y || Min.Y > box.Max.Y || Max.Z < box.Min.Z || Min.Z > box.Max.Z)
+		constexpr ContainmentType Contains(BoundingBox const& box) const noexcept {
+			if (Max.X < box.Min.X 
+				|| Min.X > box.Max.X 
+				|| Max.Y < box.Min.Y 
+				|| Min.Y > box.Max.Y 
+				|| Max.Z < box.Min.Z 
+				|| Min.Z > box.Max.Z)
 				return ContainmentType::Disjoint;
 
-			return Min.X > box.Min.X || box.Max.X > Max.X || Min.Y > box.Min.Y || box.Max.Y > Max.Y || Min.Z > box.Min.Z || box.Max.Z > Max.Z
-				? ContainmentType::Intersects : ContainmentType::Contains;
+			return box.Min.X >= Min.X
+				&& box.Max.X <= Max.X
+				&& box.Min.Y >= Min.Y
+				&& box.Max.Y <= Max.Y
+				&& box.Min.Z >= Min.Z
+				&& box.Max.Z <= Max.Z
+				? ContainmentType::Contains : ContainmentType::Intersects;
 		}
 
-		constexpr ContainmentType Contains(Vector3 const& point) const {
-			return Min.X > point.X || point.X > Max.X || Min.Y > point.Y || point.Y > Max.Y || Min.Z > point.Z || point.Z > Max.Z
+		constexpr ContainmentType Contains(Vector3 const& point) const noexcept {
+			return Min.X > point.X 
+				|| point.X > Max.X 
+				|| Min.Y > point.Y 
+				|| point.Y > Max.Y 
+				|| Min.Z > point.Z 
+				|| point.Z > Max.Z
 				? ContainmentType::Disjoint : ContainmentType::Contains;
-		}
+		}		
 
-		void SupportMapping(Vector3 const& v, Vector3& result) const {
-			result.X = v.X >= 0.0 ? Max.X : Min.X;
-			result.Y = v.Y >= 0.0 ? Max.Y : Min.Y;
-			result.Z = v.Z >= 0.0 ? Max.Z : Min.Z;
-		}
-
-		static constexpr BoundingBox CreateMerged(BoundingBox const& original, BoundingBox const& additional) {
-			Vector3 result1 = Vector3::Min(original.Min, additional.Min);
-			Vector3 result2 = Vector3::Max(original.Max, additional.Max);
-
+		static constexpr BoundingBox CreateMerged(BoundingBox const& original, BoundingBox const& additional) noexcept {
 			BoundingBox result;
-			result.Min = result1;
-			result.Max = result2;
+			result.Min.X = std::min(original.Min.X, additional.Min.X);
+			result.Min.Y = std::min(original.Min.Y, additional.Min.Y);
+			result.Min.Z = std::min(original.Min.Z, additional.Min.Z);
+			result.Max.X = std::max(original.Max.X, additional.Max.X);
+			result.Max.Y = std::max(original.Max.Y, additional.Max.Y);
+			result.Max.Z = std::max(original.Max.Z, additional.Max.Z);
 
 			return result;
 		}
 
-		constexpr bool Intersects(BoundingSphere const& sphere) const;
-		constexpr PlaneIntersectionType Intersects(Plane const& plane) const;
+		constexpr bool Intersects(BoundingSphere const& sphere) const noexcept;
+		constexpr PlaneIntersectionType Intersects(Plane const& plane) const noexcept;
 		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const;
-		constexpr ContainmentType Contains(BoundingSphere const& sphere) const;
-		static constexpr BoundingBox CreateFromSphere(BoundingSphere const& sphere);
-		constexpr bool Intersects(BoundingFrustum const& frustum);
-		constexpr PlaneIntersectionType Intersects(Plane const& plane);
-		nullfloat Intersects(Ray const& ray) const;
+		constexpr ContainmentType Contains(BoundingSphere const& sphere) const noexcept;
+		static constexpr BoundingBox CreateFromSphere(BoundingSphere const& sphere) noexcept;
+		constexpr bool Intersects(BoundingFrustum const& frustum) const noexcept;
+		nullfloat Intersects(Ray const& ray) const noexcept;
 	};
 
 	struct BoundingSphere {
@@ -2678,7 +2685,7 @@ namespace dxna {
 		Vector3* destinationArray,
 		size_t destinationLength,
 		size_t destinationIndex,
-		size_t length) {
+		size_t length) noexcept {
 
 		if (sourceArray == nullptr)
 			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
@@ -2712,7 +2719,7 @@ namespace dxna {
 		Vector3* destinationArray,
 		size_t destinationLength,
 		size_t destinationIndex,
-		size_t length) {
+		size_t length) noexcept {
 
 		if (sourceArray == nullptr)
 			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
@@ -2748,7 +2755,7 @@ namespace dxna {
 		Vector3* destinationArray,
 		size_t destinationLength,
 		size_t destinationIndex,
-		size_t length) {
+		size_t length)  noexcept {
 
 		if (sourceArray == nullptr)
 			return Error(ErrorCode::ARGUMENT_IS_NULL, 0);
@@ -2957,14 +2964,27 @@ namespace dxna {
 }
 
 namespace dxna {
-	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const {
-		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
-		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
-		return result2 <= sphere.Radius * sphere.Radius;
+	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const noexcept {
+		auto squareDistance = 0.0f;
+		const auto point = sphere.Center;
+
+		if (point.X < Min.X) 
+			squareDistance += (Min.X - point.X) * (Min.X - point.X);
+		if (point.X > Max.X) 
+			squareDistance += (point.X - Max.X) * (point.X - Max.X);
+		if (point.Y < Min.Y) 
+			squareDistance += (Min.Y - point.Y) * (Min.Y - point.Y);
+		if (point.Y > Max.Y) 
+			squareDistance += (point.Y - Max.Y) * (point.Y - Max.Y);
+		if (point.Z < Min.Z) 
+			squareDistance += (Min.Z - point.Z) * (Min.Z - point.Z);
+		if (point.Z > Max.Z) 
+			squareDistance += (point.Z - Max.Z) * (point.Z - Max.Z);
+		
+		return squareDistance <= sphere.Radius * sphere.Radius;
 	}
 
-	constexpr PlaneIntersectionType BoundingBox::Intersects(Plane const& plane) const
-	{
+	constexpr PlaneIntersectionType BoundingBox::Intersects(Plane const& plane) const noexcept {
 		Vector3 vector3_1;
 		vector3_1.X = plane.Normal.X >= 0.0 ? Min.X : Max.X;
 		vector3_1.Y = plane.Normal.Y >= 0.0 ? Min.Y : Max.Y;
@@ -2974,10 +2994,18 @@ namespace dxna {
 		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
 		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
 
-		if (plane.Normal.X * vector3_1.X + plane.Normal.Y * vector3_1.Y + plane.Normal.Z * vector3_1.Z + plane.D > 0.0)
+		if (plane.Normal.X * vector3_1.X
+			+ plane.Normal.Y * vector3_1.Y
+			+ plane.Normal.Z * vector3_1.Z
+			+ plane.D > 0.0)
 			return PlaneIntersectionType::Front;
 
-		return plane.Normal.X * vector3_2.X + plane.Normal.Y * vector3_2.Y + plane.Normal.Z * vector3_2.Z + plane.D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
+		return plane.Normal.X * vector3_2.X 
+			+ plane.Normal.Y * vector3_2.Y 
+			+ plane.Normal.Z * vector3_2.Z 
+			+ plane.D < 0.0 
+			? PlaneIntersectionType::Back 
+			: PlaneIntersectionType::Intersecting;
 	}
 
 	constexpr ContainmentType BoundingBox::Contains(BoundingFrustum const& frustum) const
@@ -2995,8 +3023,7 @@ namespace dxna {
 		return ContainmentType::Contains;
 	}
 
-	constexpr ContainmentType BoundingBox::Contains(BoundingSphere const& sphere) const
-	{
+	constexpr ContainmentType BoundingBox::Contains(BoundingSphere const& sphere) const noexcept {
 		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
 		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
 		float radius = sphere.Radius;
@@ -3012,11 +3039,12 @@ namespace dxna {
 			|| Max.Y - Min.Y <= radius
 			|| Min.Z + radius > sphere.Center.Z
 			|| sphere.Center.Z > Max.Z - radius
-			|| Max.X - Min.X <= radius ? ContainmentType::Intersects : ContainmentType::Contains;
+			|| Max.X - Min.X <= radius 
+			? ContainmentType::Intersects 
+			: ContainmentType::Contains;
 	}
 
-	constexpr BoundingBox BoundingBox::CreateFromSphere(BoundingSphere const& sphere)
-	{
+	constexpr BoundingBox BoundingBox::CreateFromSphere(BoundingSphere const& sphere) noexcept {
 		BoundingBox fromSphere;
 		fromSphere.Min.X = sphere.Center.X - sphere.Radius;
 		fromSphere.Min.Y = sphere.Center.Y - sphere.Radius;
@@ -3027,30 +3055,9 @@ namespace dxna {
 		return fromSphere;
 	}
 
-	constexpr bool BoundingBox::Intersects(BoundingFrustum const& frustum)
+	constexpr bool BoundingBox::Intersects(BoundingFrustum const& frustum) const noexcept
 	{
 		return frustum.Intersects(*this);
-	}
-
-	constexpr PlaneIntersectionType BoundingBox::Intersects(Plane const& plane)
-	{
-		Vector3 vector3_1;
-		vector3_1.X = plane.Normal.X >= 0.0 ? Min.X : Max.X;
-		vector3_1.Y = plane.Normal.Y >= 0.0 ? Min.Y : Max.Y;
-		vector3_1.Z = plane.Normal.Z >= 0.0 ? Min.Z : Max.Z;
-
-		Vector3 vector3_2;
-		vector3_2.X = plane.Normal.X >= 0.0 ? Max.X : Min.X;
-		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
-		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
-
-		if (plane.Normal.X * vector3_1.X + plane.Normal.Y * vector3_1.Y + plane.Normal.Z * vector3_1.Z + plane.D > 0.0)
-			return PlaneIntersectionType::Front;
-
-		return plane.Normal.X * vector3_2.X
-			+ plane.Normal.Y * vector3_2.Y
-			+ plane.Normal.Z * vector3_2.Z
-			+ plane.D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
 	}	
 
 	constexpr Matrix dxna::Matrix::CreateFromQuaternion(Quaternion const& quaternion) noexcept
