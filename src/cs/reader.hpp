@@ -9,31 +9,51 @@
 #include <codecvt>
 #include <locale> 
 
+#include "../error.hpp"
+#include "forward.hpp"
+
 namespace cs {
 	class BinaryReader {
 	public:
-		BinaryReader(std::shared_ptr<Stream> const& input) {
+		using dxerror = dxna::Error;
+		using dxerrcd = dxna::ErrorCode;
+
+		BinaryReader(StreamPtr const& input) {
 			stream = input;
 			buffer = std::vector<bytecs>(BufferLength);
 		}
 
-		std::shared_ptr<Stream> BaseStream() const { return stream; }
+		StreamPtr BaseStream() const { return stream; }
 
-		intcs PeekChar() {
-			if (stream == nullptr || !stream->CanRead() || !stream->CanSeek())
-				return -1;
+		dxerror PeekChar(intcs& result) {
+			if (stream == nullptr)
+				return dxerror(dxerrcd::CS_STREAM_IS_NULL);
+
+			if (!stream->CanSeek()) {
+				result = -1;
+				return dxerror::NoError();
+			}				
 
 			longcs position = stream->Position();
-			intcs num = Read();
+			intcs num = 0;
+			const auto readres = Read(num);
+
+			if (readres != dxerrcd::NONE)
+				return readres;
+
 			stream->Position(position);
-			return num;
+			
+			result = num;
+			return dxerror::NoError();
 		}
 
-		intcs Read() {
-			if (stream == nullptr || !stream->CanRead() || !stream->CanSeek())
-				return -1;
+		dxerror Read(intcs& result) {
+			if (stream == nullptr)
+				return dxerror(dxerrcd::CS_STREAM_IS_NULL);	
 
-			intcs num1 = 0;
+			return dxerror::NoError();
+
+			/*intcs num1 = 0;
 			longcs num2;
 			longcs num3 = num2 = 0;
 
@@ -75,247 +95,66 @@ namespace cs {
 				}
 			}
 
-			return num1 == 0 ? -1 : (intcs)singleChar[0];
+			return num1 == 0 ? -1 : (intcs)singleChar[0];*/
 		}
 
-		Nullable<bool> ReadBoolean() {
-			auto result = FillBuffer(1);
-
-			if (!result)
+		Nullable<bool> ReadBoolean() {			
 				return nullbool();
-
-			return buffer[0] > 0;
 		}
 
 		Nullable<bytecs> ReadByte() {
-			if (stream == nullptr)
 				return nullbytecs();
-
-			intcs num = stream->ReadByte();
-
-			if (num == -1)
-				return nullbytecs();
-
-			return (bytecs)num;
 		}
 
 		Nullable<sbytecs> ReadSByte() {
-			auto result = FillBuffer(1);
-
-			if (!result)
 				return nullsbytecs();
-
-			return (sbytecs)buffer[0];
 		}
 
 		Nullable<charcs> ReadChar() {
-			intcs num = Read();
-
-			if (num == -1)
 				return nullcharcs();
-
-			return (charcs)num;
 		}
 
 		Nullable<shortcs> ReadInt16() {
-			auto result = FillBuffer(2);
-
-			if (!result)
 				return nullshortcs();
-
-			return (shortcs)((intcs)buffer[0] | (intcs)buffer[1] << 8);
 		}
 
-		Nullable<ushortcs> ReadUInt16() {
-			auto result = FillBuffer(2);
-
-			if (!result)
+		Nullable<ushortcs> ReadUInt16() {			
 				return nullushortcs();
-
-			return (ushortcs)((uintcs)buffer[0] | (uintcs)buffer[1] << 8);
 		}
 
 		Nullable<intcs> ReadInt32() {
-			auto result = FillBuffer(4);
-
-			if (!result)
 				return nullintcs();
-
-			return (intcs)buffer[0] 
-				| (intcs)buffer[1] << 8 
-				| (intcs)buffer[2] << 16 
-				| (intcs)buffer[3] << 24;
 		}
 
 		Nullable<uintcs> ReadUInt32() {
-			auto result = FillBuffer(4);
-
-			if (!result)
 				return nulluintcs();
-
-			return (uintcs)((intcs)buffer[0]
-				| (intcs)buffer[1] << 8
-				| (intcs)buffer[2] << 16
-				| (intcs)buffer[3] << 24);
 		}
 
 		Nullable<longcs> ReadInt64() {
-			auto result = FillBuffer(8);
-
-			if (!result)
 				return nulllongcs();
-
-			return (longcs)((intcs)buffer[4] 
-				| (intcs)buffer[5] << 8
-				| (intcs)buffer[6] << 16
-				| (intcs)buffer[7] << 24) << 32
-				| (ulongcs)((intcs)buffer[0]
-					| (intcs)buffer[1] << 8
-					| (intcs)buffer[2] << 16
-					| (intcs)buffer[3] << 24);
 		}
 
 		Nullable<ulongcs> ReadUInt64() {
-			auto result = FillBuffer(8);
-
-			if (!result)
 				return nullulongcs();
-
-			return (ulongcs)((intcs)buffer[4]
-				| (intcs)buffer[5] << 8
-				| (intcs)buffer[6] << 16
-				| (intcs)buffer[7] << 24) << 32
-				| (ulongcs)((intcs)buffer[0]
-					| (intcs)buffer[1] << 8
-					| (intcs)buffer[2] << 16
-					| (intcs)buffer[3] << 24);
 		}
 
 		Nullable<float> ReadSingle() {
-			auto result = FillBuffer(4);
-			auto value = (uintcs)((intcs)buffer[0]
-				| (intcs)buffer[1] << 8
-				| (intcs)buffer[2] << 16
-				| (intcs)buffer[3] << 24);
-
-			return *(float*)&value;
+			return nullfloat();
 		}
 
 		Nullable<double> ReadDouble() {
-			auto result = FillBuffer(8);
-			auto value = ((ulongcs)((intcs)buffer[4]
-				| (intcs)buffer[5] << 8
-				| (intcs)buffer[6] << 16
-				| (intcs)buffer[7] << 24) << 32
-				| (ulongcs)((intcs)buffer[0]
-					| (intcs)buffer[1] << 8
-					| (intcs)buffer[2] << 16
-					| (intcs)buffer[3] << 24));
-
-			return *(double*)&value;
+			return nulldouble();
 		}			
 
 		std::vector<bytecs> ReadBytes(size_t count) {
-			if (count == 0)
-				return std::vector<bytecs>();
-
-			std::vector<bytecs> numArray(count);
-			int length = 0;
-
-			do {
-				int num = stream->Read(
-					numArray.data(),
-					count, 
-					length,
-					count);
-
-				if (num != 0) {
-					length += num;
-					count -= num;
-				}
-				else
-					break;
-
-			} while (count > 0);
-
-			if (length != numArray.size()) {
-				std::vector<bytecs> dst(length);
-
-				for (size_t i = 0; i < length; ++i) {
-					dst[i] = numArray[i];
-				}
-
-				return dst;
-			}
-
-			return numArray;
+			return std::vector<bytecs>();
 		}
 
-		std::string ReadString() {
-			int num = 0;
-			int val1 = 0;
-			
-			if (val1 <= 0)
-				std::string();
-
-			if (charBytes.empty())
-				charBytes = std::vector<bytecs>(MaxCharBytesSize);
-
-			if (charBuffer.empty())
-				charBuffer = std::vector<charcs>(MaxCharBytesSize);
-
-			do {
-				auto byteCount = stream->Read(charBytes.data(), charBytes.size(), 0, val1 - num > MaxCharBytesSize ? MaxCharBytesSize : val1 - num);
-
-				if (byteCount == 0)
-					return std::string();
-
-				//TODO
-//				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> cv;
-
-	//			auto r1 = reinterpret_cast<char*>(charBytes.data());
-
-		//		const auto result = cv.from_bytes(r1, r1 + byteCount);
-
-			} while (num < val1);
-
+		std::string ReadString() {			
 			return std::string();
 		}
 
 	private:	
-		/// <summary>Fills the internal buffer with the specified number of bytes read from the stream.</summary>
-		bool FillBuffer(intcs numBytes) {
-			if (!buffer.empty() && (numBytes < 0 || numBytes > BufferLength))
-				return false;
-
-			if (stream == nullptr || !stream->CanRead())
-				return false;
-
-			intcs offset = 0;
-
-			if (numBytes == 1) {
-				intcs num = stream->ReadByte();
-
-				if (num == -1)
-					return false;
-
-				buffer[0] = (bytecs)num;
-			}
-			else {
-				do {
-					intcs num = stream->Read(buffer.data(), buffer.size(), offset, numBytes - offset);
-
-					if (num == 0)
-						return false;
-
-					offset += num;
-
-				} while (offset < numBytes);
-			}
-
-			return true;
-		}
-
 		static constexpr int MaxCharBytesSize = 128;
 		static constexpr int BufferLength = 16;
 		std::shared_ptr<Stream> stream;
@@ -325,9 +164,62 @@ namespace cs {
 		std::vector<charcs> charBuffer;
 		
 		bool m2BytesPerChar{ true };
-	};
 
-	using BinaryReaderPtr = std::shared_ptr<BinaryReader>;
+		intcs InternalReadOneChar() {
+			intcs num1 = 0;
+			longcs num2;
+			longcs num3 = num2 = 0;
+
+			if (stream->CanSeek())
+				num3 = stream->Position();
+
+			if (charBytes.empty())
+				charBytes.resize(128);
+
+			if (singleChar.empty())
+				singleChar.resize(1);
+
+			while (num1 == 0)
+			{
+				auto byteCount = m2BytesPerChar ? 2 : 1;
+				const auto num4 = stream->ReadByte();
+
+				charBytes[0] = static_cast<bytecs>(num4);
+
+				if (num4 == -1)
+					byteCount = 0;
+
+				if (byteCount == 2)	{
+					auto num5 = stream->ReadByte();
+					charBytes[1] = static_cast<bytecs>(num5);
+
+					if (num5 == -1)
+						byteCount = 1;
+				}
+
+				if (byteCount == 0)
+					return -1;
+
+				/*try
+				{
+					num1 = this.m_decoder.GetChars(this.m_charBytes, 0, byteCount, this.m_singleChar, 0);
+				}
+				catch
+				{
+					if (this.m_stream.CanSeek)
+						this.m_stream.Seek(num3 - this.m_stream.Position, SeekOrigin.Current);
+					throw;
+				}*/
+			}
+			
+			return num1 == 0 ? -1 : static_cast<intcs>(singleChar[0]);
+		}
+		
+		bool FillBuffer(intcs numBytes) {
+
+			return true;
+		}
+	};
 }
 
 #endif
