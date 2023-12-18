@@ -6,3 +6,4 @@
 #include "reader.hpp"
 #include "buffer.hpp"
 #include "bitconverter.hpp"
+#include "encoding.hpp"

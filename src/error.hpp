@@ -30,8 +30,6 @@ namespace dxna {
 		int Index { -1 };
 		ErrorCode Flag{ ErrorCode::NONE };
 	};	
-
-	inline constexpr Error NoError = Error::NoError();
 }
 
 #endif
