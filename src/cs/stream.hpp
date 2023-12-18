@@ -33,44 +33,39 @@ namespace cs {
 
 	class MemoryStream : public Stream {
 	public:
-		constexpr MemoryStream(intcs capacity) {
-			if (capacity <= 0)
-				capacity = 1;
+		constexpr MemoryStream(size_t capacity) : 
+		_capacity(capacity),
+		_buffer(std::vector<bytecs>(capacity)),
+		_expandable(true),
+		_writable(true),
+		_exposable(true),
+		_origin(0),
+		_isOpen(true){}
 
-			_buffer = std::vector<bytecs>(capacity);
-			_capacity = capacity;
-			_expandable = true;
-			_writable = true;
-			_exposable = true;
-			_origin = 0;
-			_isOpen = true;
-		}
-
-		constexpr MemoryStream(std::vector<bytecs> const& buffer, intcs index, intcs count, bool writable = true, bool publiclyVisible = false) {			
-			if (index < 0)
-				index = 0;
-
-			if (count < 0)
-				count = 0;
-			
-			_buffer = buffer;
-
+		constexpr MemoryStream(
+			std::vector<bytecs> const& buffer,
+			size_t index,
+			size_t count,
+			bool writable = true,
+			bool publiclyVisible = false) :
+			_buffer(buffer),
+			_origin(index),
+			_position(_origin),
+			_length(_position + count),
+			_capacity(_length),
+			_writable(writable),
+			_exposable(publiclyVisible),
+			_expandable(false),
+			_isOpen(true){
 			if (_buffer.size() - index < count)
-				_buffer.resize(count);
-
-			_origin = _position = index;
-			_length = _capacity = index + count;
-			_writable = writable;
-			_exposable = publiclyVisible;
-			_expandable = false;
-			_isOpen = true;
+				_buffer.resize(count);			
 		}
 
-		constexpr virtual bool CanRead() const override { return _isOpen; }
-		constexpr virtual bool CanSeek() const { return _isOpen; }
-		constexpr virtual bool CanWrite() const { return _writable; }
+		constexpr virtual bool CanRead() const noexcept override { return _isOpen; }
+		constexpr virtual bool CanSeek() const noexcept { return _isOpen; }
+		constexpr virtual bool CanWrite() const noexcept { return _writable; }
 
-		constexpr virtual intcs Capacity() const {
+		constexpr virtual intcs Capacity() const noexcept {
 			if (!_isOpen)
 				return 0;
 
@@ -85,14 +80,14 @@ namespace cs {
 			_capacity = value;
 		}
 
-		constexpr virtual longcs Position() const override {
+		constexpr virtual longcs Position() const noexcept override {
 			if (!_isOpen)
 				return 0;
 
 			return _position - _origin;
 		}
 
-		constexpr virtual void Position(longcs value) override {
+		constexpr virtual void Position(longcs value) noexcept override {
 			if (value < 0)
 				return;
 
@@ -253,18 +248,7 @@ namespace cs {
 			_buffer[_position++] = value;
 		}
 
-		virtual void WriteTo(Stream* stream) const {
-			if (stream == nullptr)
-				return;
-
-			if (!_isOpen)
-				return;
-
-			stream->Write(_buffer.data(),
-				static_cast<intcs>(_buffer.size()),
-				static_cast<intcs>(_origin),
-				static_cast<intcs>(_length - _origin));
-		}
+		virtual void WriteTo(Stream* stream) const;
 
 	private:
 		constexpr bool EnsureCapacity(intcs value) {
@@ -299,10 +283,7 @@ namespace cs {
 		bool _writable{ true };
 		bool _exposable{ true };
 		bool _isOpen{ false };
-	};
-
-	using StreamPtr = std::shared_ptr<Stream>;
-	using MemoryStreamPtr = std::shared_ptr<MemoryStream>;
+	};	
 }
 
 #endif
