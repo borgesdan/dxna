@@ -535,11 +535,11 @@ namespace dxna {
 		return quaternion;
 	}
 	
-	BoundingSphere BoundingSphere::CreateMerged(BoundingSphere const& original, BoundingSphere const& additional) {
+	BoundingSphere BoundingSphere::CreateMerged(BoundingSphere const& original, BoundingSphere const& additional) noexcept {
 		Vector3 result = Vector3::Subtract(additional.Center, original.Center);
-		float num1 = result.Length();
-		float radius1 = original.Radius;
-		float radius2 = additional.Radius;
+		const auto num1 = result.Length();
+		const auto radius1 = original.Radius;
+		const auto radius2 = additional.Radius;
 
 		if (radius1 + radius2 >= num1) {
 			if (radius1 - radius2 >= num1)
@@ -549,8 +549,8 @@ namespace dxna {
 		}
 
 		Vector3 vector3 = result * (1.0f / num1);
-		float num2 = MathHelper::Min(-radius1, num1 - radius2);
-		float num3 = (MathHelper::Max(radius1, num1 + radius2) - num2) * 0.5F;
+		const auto num2 = MathHelper::Min(-radius1, num1 - radius2);
+		const auto num3 = (MathHelper::Max(radius1, num1 + radius2) - num2) * 0.5F;
 
 		BoundingSphere merged;
 		merged.Center = original.Center + vector3 * (num3 + num2);
@@ -558,7 +558,7 @@ namespace dxna {
 		return merged;
 	}
 
-	BoundingSphere BoundingSphere::CreateFromBoundingBox(BoundingBox const& box) {
+	BoundingSphere BoundingSphere::CreateFromBoundingBox(BoundingBox const& box) noexcept {
 		BoundingSphere fromBoundingBox;
 		fromBoundingBox.Center = Vector3::Lerp(box.Min, box.Max, 0.5f);
 		float result = Vector3::Distance(box.Min, box.Max);
@@ -566,7 +566,7 @@ namespace dxna {
 		return fromBoundingBox;
 	}
 	
-	BoundingSphere BoundingSphere::CreateFromPoints(Vector3* points, size_t length, size_t offset) {
+	BoundingSphere BoundingSphere::CreateFromPoints(Vector3* points, size_t length, size_t offset) noexcept {
 		Vector3 current;
 		Vector3 vector3_1 = current = points[offset];
 		Vector3 vector3_2 = current;
@@ -640,7 +640,7 @@ namespace dxna {
 		return fromPoints;
 	}
 
-	ContainmentType BoundingSphere::Contains(BoundingBox const& box) const {
+	ContainmentType BoundingSphere::Contains(BoundingBox const& box) const noexcept {
 		if (!box.Intersects(*this))
 			return ContainmentType::Disjoint;
 
@@ -701,16 +701,9 @@ namespace dxna {
 		vector3.Z = Center.Z - box.Min.Z;
 
 		return vector3.LengthSquared() > num ? ContainmentType::Intersects : ContainmentType::Contains;
-	}
+	}	
 
-	void BoundingSphere::SupportMapping(Vector3 const& v, Vector3& result) const {
-		float num = Radius / v.Length();
-		result.X = Center.X + v.X * num;
-		result.Y = Center.Y + v.Y * num;
-		result.Z = Center.Z + v.Z * num;
-	}
-
-	BoundingSphere BoundingSphere::Transform(Matrix const& matrix) const {
+	BoundingSphere BoundingSphere::Transform(Matrix const& matrix) const noexcept {
 		BoundingSphere boundingSphere;
 		boundingSphere.Center = Vector3::Transform(Center, matrix);
 		float d = MathHelper::Max((matrix.M11 * matrix.M11 + matrix.M12 * matrix.M12 + matrix.M13 * matrix.M13), MathHelper::Max((matrix.M21 * matrix.M21 + matrix.M22 * matrix.M22 + matrix.M23 * matrix.M23), (matrix.M31 * matrix.M31 + matrix.M32 * matrix.M32 + matrix.M33 * matrix.M33)));
@@ -718,24 +711,24 @@ namespace dxna {
 		return boundingSphere;
 	}
 
-	Plane::Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3) {
-		float num1 = point2.X - point1.X;
-		float num2 = point2.Y - point1.Y;
-		float num3 = point2.Z - point1.Z;
-		float num4 = point3.X - point1.X;
-		float num5 = point3.Y - point1.Y;
-		float num6 = point3.Z - point1.Z;
-		float num7 = (num2 * num6 - num3 * num5);
-		float num8 = (num3 * num4 - num1 * num6);
-		float num9 = (num1 * num5 - num2 * num4);
-		float num10 = 1.0f / std::sqrt(num7 * num7 + num8 * num8 + num9 * num9);
+	Plane::Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3) noexcept {
+		const auto num1 = point2.X - point1.X;
+		const auto num2 = point2.Y - point1.Y;
+		const auto num3 = point2.Z - point1.Z;
+		const auto num4 = point3.X - point1.X;
+		const auto num5 = point3.Y - point1.Y;
+		const auto num6 = point3.Z - point1.Z;
+		const auto num7 = (num2 * num6 - num3 * num5);
+		const auto num8 = (num3 * num4 - num1 * num6);
+		const auto num9 = (num1 * num5 - num2 * num4);
+		const auto num10 = 1.0f / std::sqrt(num7 * num7 + num8 * num8 + num9 * num9);
 		Normal.X = num7 * num10;
 		Normal.Y = num8 * num10;
 		Normal.Z = num9 * num10;
 		D = -(Normal.X * point1.X + Normal.Y * point1.Y + Normal.Z * point1.Z);
 	}
 
-	void Plane::Normalize()	{
+	void Plane::Normalize() noexcept {
 		float d = (Normal.X * Normal.X + Normal.Y * Normal.Y + Normal.Z * Normal.Z);
 		if (std::abs(d - 1.0f) < 1.1920928955078125E-07)
 			return;
@@ -746,7 +739,7 @@ namespace dxna {
 		D *= num;
 	}
 
-	Plane Plane::Normalize(Plane const& value) {
+	Plane Plane::Normalize(Plane const& value) noexcept {
 		float d = (value.Normal.X * value.Normal.X + value.Normal.Y * value.Normal.Y + value.Normal.Z * value.Normal.Z);
 		
 		if (std::abs(d - 1.0f) < 1.1920928955078125E-07) {
@@ -784,7 +777,7 @@ namespace dxna {
 		return num3;
 	}
 
-	float Plane::PerpendicularDistance(Vector3 const& point, Plane const& plane) {
+	float Plane::PerpendicularDistance(Vector3 const& point, Plane const& plane) noexcept {
 		return std::abs((plane.Normal.X * point.X + plane.Normal.Y * point.Y + plane.Normal.Z * point.Z)
 			/ std::sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
 	}
@@ -919,7 +912,7 @@ namespace dxna {
 		return tMin;
 	}
 
-	nullfloat BoundingSphere::Intersects(Ray const& ray) const {
+	nullfloat BoundingSphere::Intersects(Ray const& ray) const noexcept {
 		float num1 = Center.X - ray.Position.X;
 		float num2 = Center.Y - ray.Position.Y;
 		float num3 = Center.Z - ray.Position.Z;
@@ -944,7 +937,7 @@ namespace dxna {
 		return num6 - num8;
 	}
 
-	BoundingSphere dxna::BoundingSphere::CreateFromFrustum(BoundingFrustum const& frustum) {
+	BoundingSphere dxna::BoundingSphere::CreateFromFrustum(BoundingFrustum const& frustum)  noexcept {
 		std::vector<Vector3> points(frustum.CornerCount);
 
 		return CreateFromPoints(points.data(), points.size(), 0);

@@ -17,7 +17,7 @@ namespace dxna {
 	struct BoundingSphere;
 	struct BoundingFrustum;
 	struct Ray;
-	
+
 	// Describes a 2D-point.
 	struct Point {
 		int X{ 0 };
@@ -38,7 +38,7 @@ namespace dxna {
 			return seed;
 		}
 	};
-	
+
 	// Describes a 2D-rectangle. 
 	struct Rectangle {
 		int X{ 0 };
@@ -51,7 +51,7 @@ namespace dxna {
 		constexpr Rectangle(int x, int y, int width, int height) noexcept :
 			X(x), Y(y), Width(width), Height(height) {}
 
-		constexpr Rectangle(Point const& location, Point const& size) noexcept:
+		constexpr Rectangle(Point const& location, Point const& size) noexcept :
 			X(location.X), Y(location.Y), Width(size.X), Height(size.Y) {}
 
 		constexpr size_t GetHashCode() const noexcept {
@@ -898,8 +898,8 @@ namespace dxna {
 			Hash::Combine(seed, M11 + M12 + M13 + M14);
 			Hash::Combine(seed, M21 + M22 + M23 + M24);
 			Hash::Combine(seed, M31 + M32 + M33 + M34);
-			Hash::Combine(seed, M41 + M42 + M43 + M44);		
-			
+			Hash::Combine(seed, M41 + M42 + M43 + M44);
+
 			return seed;
 		}
 
@@ -1034,9 +1034,9 @@ namespace dxna {
 			const auto num4 = m31 * m44 - m34 * m41;
 			const auto num5 = m31 * m43 - m33 * m41;
 			const auto num6 = m31 * m42 - m32 * m41;
-			return (m11 * (m22 * num1 - m23 * num2 + m24 * num3) 
-				- m12 * (m21 * num1 - m23 * num4 + m24 * num5) 
-				+ m13 * (m21 * num2 - m22 * num4 + m24 * num6) 
+			return (m11 * (m22 * num1 - m23 * num2 + m24 * num3)
+				- m12 * (m21 * num1 - m23 * num4 + m24 * num5)
+				+ m13 * (m21 * num2 - m22 * num4 + m24 * num6)
 				- m14 * (m21 * num3 - m22 * num5 + m23 * num6));
 		}
 
@@ -1189,7 +1189,7 @@ namespace dxna {
 			perspective.M34 = -1.0f;
 			perspective.M41 = perspective.M42 = perspective.M44 = 0.0f;
 			perspective.M43 = nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-			
+
 			result = perspective;
 			return Error::NoError();
 		}
@@ -1218,7 +1218,7 @@ namespace dxna {
 			perspectiveOffCenter.M34 = -1.0f;
 			perspectiveOffCenter.M43 = nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
 			perspectiveOffCenter.M41 = perspectiveOffCenter.M42 = perspectiveOffCenter.M44 = 0.0f;
-			
+
 			result = perspectiveOffCenter;
 			return Error::NoError();
 		}
@@ -1526,7 +1526,7 @@ namespace dxna {
 
 		constexpr Quaternion(float X, float Y, float Z, float W) noexcept : X(X), Y(Y), Z(Z), W(W) {}
 
-		constexpr Quaternion(Vector3 const& vectorPart, float scalarPart) noexcept 
+		constexpr Quaternion(Vector3 const& vectorPart, float scalarPart) noexcept
 			: X(vectorPart.X), Y(vectorPart.Y), Z(vectorPart.Z), W(scalarPart) {}
 
 		constexpr size_t GetHashCode() const noexcept {
@@ -1545,7 +1545,7 @@ namespace dxna {
 		friend constexpr Quaternion operator*(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Multiply(value1, value2); }
 		friend constexpr Quaternion operator*(Quaternion const& value, float scale) noexcept { return Quaternion::Multiply(value, scale); }
 		friend constexpr Quaternion operator*(float scale, Quaternion const& value) noexcept { return Quaternion::Multiply(value, scale); }
-		friend constexpr Quaternion operator/(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Divide(value1, value2); }		
+		friend constexpr Quaternion operator/(Quaternion const& value1, Quaternion const& value2) noexcept { return Quaternion::Divide(value1, value2); }
 
 		constexpr float LengthSquared() const noexcept { return X * X + Y * Y + Z * Z + W * W; }
 
@@ -1700,31 +1700,31 @@ namespace dxna {
 		constexpr BoundingBox(Vector3 const& min, Vector3 const& max) noexcept :
 			Min(min), Max(max) {}
 
-		constexpr size_t GetHashCode() const noexcept {			
+		constexpr size_t GetHashCode() const noexcept {
 			return Min.GetHashCode() + Max.GetHashCode();
 		}
 
 		constexpr bool operator==(BoundingBox const& other) const noexcept {
 			return Min == other.Min && Max == other.Max;
-		}		
+		}
 
 		constexpr bool Intersects(BoundingBox const& box) const noexcept {
 			if ((Max.X >= box.Min.X) && (Min.X <= box.Max.X)) {
 				if ((Max.Y < box.Min.Y) || (Min.Y > box.Max.Y))
 					return false;
 
-				return (Max.Z >= box.Min.Z) && (Min.Z <= box.Max.Z);				
+				return (Max.Z >= box.Min.Z) && (Min.Z <= box.Max.Z);
 			}
-			
+
 			return false;
 		}
 
 		constexpr ContainmentType Contains(BoundingBox const& box) const noexcept {
-			if (Max.X < box.Min.X 
-				|| Min.X > box.Max.X 
-				|| Max.Y < box.Min.Y 
-				|| Min.Y > box.Max.Y 
-				|| Max.Z < box.Min.Z 
+			if (Max.X < box.Min.X
+				|| Min.X > box.Max.X
+				|| Max.Y < box.Min.Y
+				|| Min.Y > box.Max.Y
+				|| Max.Z < box.Min.Z
 				|| Min.Z > box.Max.Z)
 				return ContainmentType::Disjoint;
 
@@ -1738,14 +1738,14 @@ namespace dxna {
 		}
 
 		constexpr ContainmentType Contains(Vector3 const& point) const noexcept {
-			return Min.X > point.X 
-				|| point.X > Max.X 
-				|| Min.Y > point.Y 
-				|| point.Y > Max.Y 
-				|| Min.Z > point.Z 
+			return Min.X > point.X
+				|| point.X > Max.X
+				|| Min.Y > point.Y
+				|| point.Y > Max.Y
+				|| Min.Z > point.Z
 				|| point.Z > Max.Z
 				? ContainmentType::Disjoint : ContainmentType::Contains;
-		}		
+		}
 
 		static constexpr BoundingBox CreateMerged(BoundingBox const& original, BoundingBox const& additional) noexcept {
 			BoundingBox result;
@@ -1768,47 +1768,50 @@ namespace dxna {
 		nullfloat Intersects(Ray const& ray) const noexcept;
 	};
 
+	// Describes a sphere in 3D-space for bounding operations.
 	struct BoundingSphere {
 		Vector3 Center;
 		float Radius{ 0 };
 
-		constexpr BoundingSphere() = default;
+		constexpr BoundingSphere() noexcept = default;
 
-		constexpr BoundingSphere(Vector3 const& center, float radius) :
+		constexpr BoundingSphere(Vector3 const& center, float radius) noexcept :
 			Center(center), Radius(radius) {}
 
-		constexpr bool operator==(BoundingSphere const& other) {
-			return Equals(other);
+		constexpr size_t GetHashCode() const noexcept {
+			size_t seed = 0;
+			Hash::Combine(seed, Radius);
+			return Center.GetHashCode() + seed;
 		}
 
-		bool constexpr Equals(BoundingSphere const& other) const {
+		constexpr bool operator==(BoundingSphere const& other) noexcept {
 			return Center == other.Center && Radius == other.Radius;
 		}
 
-		static BoundingSphere CreateMerged(BoundingSphere const& original, BoundingSphere const& additional);
-		static BoundingSphere CreateFromBoundingBox(BoundingBox const& box);
-		static BoundingSphere CreateFromPoints(Vector3* points, size_t length, size_t offset = 0);
+		static BoundingSphere CreateMerged(BoundingSphere const& original, BoundingSphere const& additional) noexcept;
+		static BoundingSphere CreateFromBoundingBox(BoundingBox const& box) noexcept;
+		static BoundingSphere CreateFromPoints(Vector3* points, size_t length, size_t offset = 0) noexcept;
 
-		bool Intersects(BoundingBox const& box) const {
+		bool Intersects(BoundingBox const& box) const noexcept {
 			const auto result1 = Vector3::Clamp(Center, box.Min, box.Max);
 			const auto result2 = Vector3::DistanceSquared(Center, result1);
 			return result2 <= Radius * Radius;
 		}
 
-		bool Intersects(BoundingSphere const& sphere) const {
+		bool Intersects(BoundingSphere const& sphere) const noexcept {
 			const auto result = Vector3::DistanceSquared(Center, sphere.Center);
 			const auto radius1 = Radius;
 			const auto radius2 = sphere.Radius;
 			return radius1 * radius1 + 2.0F * radius1 * radius2 + radius2 * radius2 > result;
 		}
 
-		ContainmentType Contains(BoundingBox const& box) const;
+		ContainmentType Contains(BoundingBox const& box) const noexcept;
 
 		constexpr ContainmentType Contains(Vector3 point) const {
 			return Vector3::DistanceSquared(point, Center) >= Radius * Radius ? ContainmentType::Disjoint : ContainmentType::Contains;
 		}
 
-		ContainmentType Contains(BoundingSphere sphere) const {
+		ContainmentType Contains(BoundingSphere sphere) const noexcept {
 			const auto result = Vector3::Distance(Center, sphere.Center);
 			const auto radius1 = Radius;
 			const auto radius2 = sphere.Radius;
@@ -1819,46 +1822,36 @@ namespace dxna {
 			return radius1 - radius2 < result ? ContainmentType::Intersects : ContainmentType::Contains;
 		}
 
-		void SupportMapping(Vector3 const& v, Vector3& result) const;
+		BoundingSphere Transform(Matrix const& matrix) const noexcept;
 
-		BoundingSphere Transform(Matrix const& matrix) const;
-
-		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const;
-		constexpr bool Intersects(BoundingFrustum const& frustum) const;
-		constexpr PlaneIntersectionType Intersects(Plane const& plane) const;
-		nullfloat Intersects(Ray const& ray) const;
-		static BoundingSphere CreateFromFrustum(BoundingFrustum const& frustum);
+		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const noexcept;
+		constexpr bool Intersects(BoundingFrustum const& frustum) const noexcept;
+		constexpr PlaneIntersectionType Intersects(Plane const& plane) const noexcept;
+		nullfloat Intersects(Ray const& ray) const noexcept;
+		static BoundingSphere CreateFromFrustum(BoundingFrustum const& frustum) noexcept;
 	};
 
+	// A plane in 3d space, 
+	// represented by its normal away from the origin and its distance from the origin, D.
 	struct Plane {
 		Vector3 Normal;
 		float D{ 0 };
 
-		constexpr Plane() = default;
+		constexpr Plane() noexcept = default;
+		constexpr Plane(const Vector3& Normal, float D) noexcept : Normal(Normal), D(D) {}
+		constexpr Plane(float a, float b, float c, float d) noexcept : Normal({ a,b, c }), D(d) { }
+		constexpr Plane(Vector4 const& value) noexcept : Normal({ value.X, value.Y, value.Z }), D(value.W) {}
 
-		constexpr Plane(const Vector3& Normal, float D)
-			: Normal(Normal), D(D) {}
+		Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3) noexcept;
 
-		constexpr Plane(float a, float b, float c, float d)
-			: Normal({ a,b, c }), D(d) { }
-
-		constexpr Plane(Vector4 const& value)
-			: Normal({ value.X, value.Y, value.Z }), D(value.W) {}
-
-		Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3);
-
-		constexpr bool operator==(const Plane& other) const {
-			return Equals(other);
-		}
-
-		constexpr bool Equals(const Plane& other) const {
+		constexpr bool operator==(const Plane& other) const noexcept {
 			return Normal == other.Normal && D == other.D;
 		}
 
-		void Normalize();
-		static Plane Normalize(Plane const& value);
+		void Normalize() noexcept;
+		static Plane Normalize(Plane const& value) noexcept;
 
-		static constexpr Plane Transform(Plane const& plane, Matrix const& matrix) {
+		static constexpr Plane Transform(Plane const& plane, Matrix const& matrix) noexcept {
 			const auto result = Matrix::Invert(matrix);
 			const auto x = plane.Normal.X;
 			const auto y = plane.Normal.Y;
@@ -1873,7 +1866,7 @@ namespace dxna {
 			return plane1;
 		}
 
-		static Plane Transform(Plane const& plane, Quaternion const& rotation) {
+		static Plane Transform(Plane const& plane, Quaternion const& rotation) noexcept {
 			const auto num1 = rotation.X + rotation.X;
 			const auto num2 = rotation.Y + rotation.Y;
 			const auto num3 = rotation.Z + rotation.Z;
@@ -1908,19 +1901,19 @@ namespace dxna {
 			return plane1;
 		}
 
-		constexpr float Dot(Vector4 const& value) const {
+		constexpr float Dot(Vector4 const& value) const noexcept {
 			return (Normal.X * value.X + Normal.Y * value.Y + Normal.Z * value.Z + D * value.W);
 		}
 
-		constexpr  float DotCoordinate(Vector3 const& value) const {
+		constexpr  float DotCoordinate(Vector3 const& value) const noexcept {
 			return (Normal.X * value.X + Normal.Y * value.Y + Normal.Z * value.Z) + D;
 		}
 
-		constexpr float DotNormal(Vector3 const& value) const {
+		constexpr float DotNormal(Vector3 const& value) const noexcept {
 			return (Normal.X * value.X + Normal.Y * value.Y + Normal.Z * value.Z);
 		}
 
-		constexpr PlaneIntersectionType Intersects(BoundingBox const& box) {
+		constexpr PlaneIntersectionType Intersects(BoundingBox const& box) noexcept {
 			Vector3 vector3_1;
 			vector3_1.X = Normal.X >= 0.0 ? box.Min.X : box.Max.X;
 			vector3_1.Y = Normal.Y >= 0.0 ? box.Min.Y : box.Max.Y;
@@ -1937,7 +1930,7 @@ namespace dxna {
 			return Normal.X * vector3_2.X + Normal.Y * vector3_2.Y + Normal.Z * vector3_2.Z + D < 0.0 ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
 		}
 
-		constexpr PlaneIntersectionType Intersects(BoundingSphere const& sphere) const {
+		constexpr PlaneIntersectionType Intersects(BoundingSphere const& sphere) const noexcept {
 			const auto num = (sphere.Center.X * Normal.X + sphere.Center.Y * Normal.Y + sphere.Center.Z * Normal.Z) + D;
 
 			if (num > sphere.Radius)
@@ -1946,9 +1939,9 @@ namespace dxna {
 			return num < -sphere.Radius ? PlaneIntersectionType::Back : PlaneIntersectionType::Intersecting;
 		}
 
-		constexpr PlaneIntersectionType Intersects(BoundingFrustum const& frustum) const;
+		constexpr PlaneIntersectionType Intersects(BoundingFrustum const& frustum) const noexcept;
 
-		constexpr PlaneIntersectionType Intersects(Vector3 const& point) const {
+		constexpr PlaneIntersectionType Intersects(Vector3 const& point) const noexcept {
 			float distance = DotCoordinate(point);
 
 			if (distance > 0)
@@ -1963,24 +1956,23 @@ namespace dxna {
 		nullfloat Intersects(Ray const& ray) const;
 
 	public:
-		static constexpr float ClassifyPoint(Vector3 const& point, Plane const& plane) {
+		static constexpr float ClassifyPoint(Vector3 const& point, Plane const& plane) noexcept {
 			return point.X * plane.Normal.X + point.Y * plane.Normal.Y + point.Z * plane.Normal.Z + plane.D;
 		}
 
-		static float PerpendicularDistance(Vector3 const& point, Plane const& plane);
+		static float PerpendicularDistance(Vector3 const& point, Plane const& plane) noexcept;
 	};
 
+	// Defines a viewing frustum for intersection operations.
 	struct BoundingFrustum {
 		using Matrix_ = dxna::Matrix;
 
-		BoundingFrustum(Matrix_ const& value) : _matrix(value) {
+		BoundingFrustum(Matrix_ const& value) noexcept : _matrix(value) {
 			createCorners();
 			createPlanes();
 		}
 
-		constexpr bool operator==(const BoundingFrustum& other) const { return Equals(other); }
-
-		constexpr bool Equals(BoundingFrustum const& other) const {
+		constexpr bool operator==(const BoundingFrustum& other) const noexcept {
 			return _matrix == other._matrix
 				&& _corners0 == other._corners0
 				&& _corners1 == other._corners1
@@ -1998,27 +1990,27 @@ namespace dxna {
 				&& _planes5 == other._planes5;
 		}
 
-		constexpr Matrix_ Matrix() const { return _matrix; }
+		constexpr Matrix_ Matrix() const noexcept { return _matrix; }
 
-		void Matrix(Matrix_ const& value) {
+		void Matrix(Matrix_ const& value) noexcept {
 			_matrix = value;
 			createPlanes();
 			createCorners();
 		}
 
-		constexpr Plane Near() const { return _planes0; }
-		constexpr Plane Far() const { return _planes1; }
-		constexpr Plane Left() const { return _planes2; }
-		constexpr Plane Right() const { return _planes3; }
-		constexpr Plane Top() const { return _planes4; }
-		constexpr Plane Bottom() const { return _planes5; }
+		constexpr Plane Near() const noexcept { return _planes0; }
+		constexpr Plane Far() const noexcept { return _planes1; }
+		constexpr Plane Left() const noexcept { return _planes2; }
+		constexpr Plane Right() const noexcept { return _planes3; }
+		constexpr Plane Top() const noexcept { return _planes4; }
+		constexpr Plane Bottom() const noexcept { return _planes5; }
 
-		constexpr ContainmentType Contains(BoundingBox const& box) const {
+		constexpr ContainmentType Contains(BoundingBox const& box) const noexcept {
 			auto intersects = false;
 
 			for (size_t i = 0; i < PlaneCount; ++i)
 			{
-				const auto plane = getPlane(i);
+				const auto& plane = GetPlane(i);
 				const auto planeIntersectionType = box.Intersects(plane);
 
 				switch (planeIntersectionType)
@@ -2034,14 +2026,14 @@ namespace dxna {
 			return intersects ? ContainmentType::Intersects : ContainmentType::Contains;
 		}
 
-		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const {
+		constexpr ContainmentType Contains(BoundingFrustum const& frustum) const noexcept {
 			if (*this == frustum)
 				return ContainmentType::Contains;
 
 			auto intersects = false;
 
 			for (size_t i = 0; i < PlaneCount; ++i) {
-				const auto plane = getPlane(i);
+				const auto& plane = GetPlane(i);
 				PlaneIntersectionType planeIntersectionType = frustum.Intersects(plane);
 
 				switch (planeIntersectionType)
@@ -2056,11 +2048,11 @@ namespace dxna {
 			return intersects ? ContainmentType::Intersects : ContainmentType::Contains;
 		}
 
-		constexpr ContainmentType Contains(BoundingSphere const& sphere) const {
+		constexpr ContainmentType Contains(BoundingSphere const& sphere) const noexcept {
 			auto intersects = false;
 
 			for (size_t i = 0; i < PlaneCount; ++i) {
-				const auto plane = getPlane(i);
+				const auto& plane = GetPlane(i);
 				auto planeIntersectionType = sphere.Intersects(plane);
 				switch (planeIntersectionType)
 				{
@@ -2074,9 +2066,9 @@ namespace dxna {
 			return intersects ? ContainmentType::Intersects : ContainmentType::Contains;
 		}
 
-		constexpr ContainmentType Contains(Vector3 const& point) const {
+		constexpr ContainmentType Contains(Vector3 const& point) const noexcept {
 			for (size_t i = 0; i < PlaneCount; ++i) {
-				const auto plane = getPlane(i);
+				const auto& plane = GetPlane(i);
 
 				if (Plane::ClassifyPoint(point, plane) > 0.0F) {
 					return ContainmentType::Disjoint;
@@ -2086,32 +2078,25 @@ namespace dxna {
 			return ContainmentType::Contains;
 		}
 
-		constexpr void GetCorners(Vector3 cornerArray[8]) const {
-			for (size_t i = 0; i < CornerCount; ++i) {
-				const auto corner = getCorner(i);
-				cornerArray[i] = corner;
-			}
-		}
-
-		constexpr bool Intersects(BoundingBox const& box) const {
+		constexpr bool Intersects(BoundingBox const& box) const noexcept {
 			const auto containment = Contains(box);
 			return containment != ContainmentType::Disjoint;
 		}
 
-		constexpr bool Intersects(BoundingFrustum const& frustum) const {
+		constexpr bool Intersects(BoundingFrustum const& frustum) const noexcept {
 			return Contains(frustum) != ContainmentType::Disjoint;
 		}
 
-		constexpr bool Intersects(BoundingSphere const& sphere) const {
+		constexpr bool Intersects(BoundingSphere const& sphere) const noexcept {
 			const auto containment = Contains(sphere);
 			return containment != ContainmentType::Disjoint;
 		}
 
-		constexpr PlaneIntersectionType Intersects(Plane const& plane) const {
+		constexpr PlaneIntersectionType Intersects(Plane const& plane) const noexcept {
 			auto result = plane.Intersects(_corners0);
 
 			for (size_t i = 1; i < CornerCount; i++) {
-				const auto corner = getCorner(i);
+				const auto& corner = GetCorner(i);
 
 				if (plane.Intersects(corner) != result)
 					result = PlaneIntersectionType::Intersecting;
@@ -2120,13 +2105,13 @@ namespace dxna {
 			return result;
 		}
 
-		constexpr nullfloat Intersects(Ray const& ray) const;
+		constexpr nullfloat Intersects(Ray const& ray) const noexcept;
 
 	public:
 		static constexpr int PlaneCount = 6;
 		static constexpr int CornerCount = 8;
 
-		constexpr Plane getPlane(size_t index) const {
+		constexpr const Plane& GetPlane(size_t index) const noexcept {
 			switch (index)
 			{
 			case 0:
@@ -2142,11 +2127,12 @@ namespace dxna {
 			case 5:
 				return _planes5;
 			default:
-				return Plane();
+				auto p = Plane();
+				return p;
 			}
 		}
 
-		constexpr Vector3 getCorner(size_t index) const {
+		constexpr const Vector3& GetCorner(size_t index) const noexcept {
 			switch (index)
 			{
 			case 0:
@@ -2171,7 +2157,7 @@ namespace dxna {
 		}
 
 	private:
-		static constexpr Vector3 IntersectionPoint(Plane const& a, Plane const& b, Plane const& c) {
+		static constexpr Vector3 IntersectionPoint(Plane const& a, Plane const& b, Plane const& c) noexcept {
 			Vector3 cross = Vector3::Cross(b.Normal, c.Normal);
 
 			float f = Vector3::Dot(a.Normal, cross);
@@ -2194,7 +2180,7 @@ namespace dxna {
 			return result;
 		}
 
-		constexpr void createCorners() {
+		constexpr void createCorners() noexcept {
 			_corners0 = IntersectionPoint(_planes0, _planes2, _planes4);
 			_corners1 = IntersectionPoint(_planes0, _planes3, _planes4);
 			_corners2 = IntersectionPoint(_planes0, _planes3, _planes5);
@@ -2205,7 +2191,7 @@ namespace dxna {
 			_corners7 = IntersectionPoint(_planes1, _planes2, _planes5);
 		}
 
-		void createPlanes() {
+		void createPlanes() noexcept {
 			_planes0 = Plane(-_matrix.M13, -_matrix.M23, -_matrix.M33, -_matrix.M43);
 			_planes1 = Plane(_matrix.M13 - _matrix.M14, _matrix.M23 - _matrix.M24, _matrix.M33 - _matrix.M34, _matrix.M43 - _matrix.M44);
 			_planes2 = Plane(-_matrix.M14 - _matrix.M11, -_matrix.M24 - _matrix.M21, -_matrix.M34 - _matrix.M31, -_matrix.M44 - _matrix.M41);
@@ -2221,8 +2207,10 @@ namespace dxna {
 			_planes5.Normalize();
 		}
 
+	private:
 		Matrix_ _matrix;
 
+	public:
 		Vector3 _corners0;
 		Vector3 _corners1;
 		Vector3 _corners2;
@@ -2535,10 +2523,10 @@ namespace dxna {
 		static constexpr Color WhiteSmoke{ Color(4294309365U) };
 		static constexpr Color Yellow{ Color(4278255615U) };
 		static constexpr Color YellowGreen{ Color(4281519514U) };
-	};	
+	};
 }
 
-// ---------------------------------- Vector2 ----------------------------------//
+// ----------------------------- Vector2 ---------------------------------------//
 namespace dxna {
 	constexpr Vector2 Vector2::Transform(Vector2 const& position, Matrix const& matrix) noexcept {
 		const auto num1 = (position.X * matrix.M11 + position.Y * matrix.M21) + matrix.M41;
@@ -2590,7 +2578,7 @@ namespace dxna {
 		if (destinationLength < destinationIndex + length)
 			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 5);
 
-		for (size_t i = 0; i < length; ++i)	{
+		for (size_t i = 0; i < length; ++i) {
 			const auto& value = sourceArray[sourceIndex + i];
 			destinationArray[destinationIndex + i] = Transform(value, matrix);
 		}
@@ -2630,7 +2618,7 @@ namespace dxna {
 	}
 }
 
-// ---------------------------------- Vector3 ----------------------------------//
+// ----------------------------- Vector3 ---------------------------------------//
 namespace dxna {
 	constexpr Vector3 dxna::Vector3::Transform(Vector3 const& position, Matrix const& matrix) noexcept {
 		float num1 = (position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31) + matrix.M41;
@@ -2788,7 +2776,7 @@ namespace dxna {
 	}
 }
 
-// ---------------------------------- Vector4 ----------------------------------//
+// ----------------------------- Vector4 ---------------------------------------//
 namespace dxna {
 	constexpr Vector4 dxna::Vector4::Transform(Vector2 const& position, Matrix const& matrix) noexcept
 	{
@@ -2954,7 +2942,7 @@ namespace dxna {
 		if (destinationLength < destinationIndex + length)
 			return Error(ErrorCode::ARGUMENT_OUT_OF_RANGE, 6);
 
-		for (size_t i = 0; i < length; ++i)	{
+		for (size_t i = 0; i < length; ++i) {
 			const auto& value = sourceArray[sourceIndex + i];
 			destinationArray[destinationIndex + i] = Transform(value, rotation);
 		}
@@ -2963,103 +2951,8 @@ namespace dxna {
 	}
 }
 
+// ------------------------------ Matrix ---------------------------------------//
 namespace dxna {
-	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const noexcept {
-		auto squareDistance = 0.0f;
-		const auto point = sphere.Center;
-
-		if (point.X < Min.X) 
-			squareDistance += (Min.X - point.X) * (Min.X - point.X);
-		if (point.X > Max.X) 
-			squareDistance += (point.X - Max.X) * (point.X - Max.X);
-		if (point.Y < Min.Y) 
-			squareDistance += (Min.Y - point.Y) * (Min.Y - point.Y);
-		if (point.Y > Max.Y) 
-			squareDistance += (point.Y - Max.Y) * (point.Y - Max.Y);
-		if (point.Z < Min.Z) 
-			squareDistance += (Min.Z - point.Z) * (Min.Z - point.Z);
-		if (point.Z > Max.Z) 
-			squareDistance += (point.Z - Max.Z) * (point.Z - Max.Z);
-		
-		return squareDistance <= sphere.Radius * sphere.Radius;
-	}
-
-	constexpr PlaneIntersectionType BoundingBox::Intersects(Plane const& plane) const noexcept {
-		Vector3 vector3_1;
-		vector3_1.X = plane.Normal.X >= 0.0 ? Min.X : Max.X;
-		vector3_1.Y = plane.Normal.Y >= 0.0 ? Min.Y : Max.Y;
-		vector3_1.Z = plane.Normal.Z >= 0.0 ? Min.Z : Max.Z;
-		Vector3 vector3_2;
-		vector3_2.X = plane.Normal.X >= 0.0 ? Max.X : Min.X;
-		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
-		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
-
-		if (plane.Normal.X * vector3_1.X
-			+ plane.Normal.Y * vector3_1.Y
-			+ plane.Normal.Z * vector3_1.Z
-			+ plane.D > 0.0)
-			return PlaneIntersectionType::Front;
-
-		return plane.Normal.X * vector3_2.X 
-			+ plane.Normal.Y * vector3_2.Y 
-			+ plane.Normal.Z * vector3_2.Z 
-			+ plane.D < 0.0 
-			? PlaneIntersectionType::Back 
-			: PlaneIntersectionType::Intersecting;
-	}
-
-	constexpr ContainmentType BoundingBox::Contains(BoundingFrustum const& frustum) const
-	{
-		if (!frustum.Intersects(*this))
-			return ContainmentType::Disjoint;
-
-		for (size_t i = 0; i < frustum.CornerCount; ++i) {
-			const auto corner = frustum.getCorner(i);
-
-			if (Contains(corner) == ContainmentType::Disjoint)
-				return ContainmentType::Intersects;
-		}
-
-		return ContainmentType::Contains;
-	}
-
-	constexpr ContainmentType BoundingBox::Contains(BoundingSphere const& sphere) const noexcept {
-		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
-		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
-		float radius = sphere.Radius;
-
-		if (result2 > radius * radius)
-			return ContainmentType::Disjoint;
-
-		return Min.X + radius > sphere.Center.X
-			|| sphere.Center.X > Max.X - radius
-			|| Max.X - Min.X <= radius
-			|| Min.Y + radius > sphere.Center.Y
-			|| sphere.Center.Y > Max.Y - radius
-			|| Max.Y - Min.Y <= radius
-			|| Min.Z + radius > sphere.Center.Z
-			|| sphere.Center.Z > Max.Z - radius
-			|| Max.X - Min.X <= radius 
-			? ContainmentType::Intersects 
-			: ContainmentType::Contains;
-	}
-
-	constexpr BoundingBox BoundingBox::CreateFromSphere(BoundingSphere const& sphere) noexcept {
-		BoundingBox fromSphere;
-		fromSphere.Min.X = sphere.Center.X - sphere.Radius;
-		fromSphere.Min.Y = sphere.Center.Y - sphere.Radius;
-		fromSphere.Min.Z = sphere.Center.Z - sphere.Radius;
-		fromSphere.Max.X = sphere.Center.X + sphere.Radius;
-		fromSphere.Max.Y = sphere.Center.Y + sphere.Radius;
-		fromSphere.Max.Z = sphere.Center.Z + sphere.Radius;
-		return fromSphere;
-	}
-
-	constexpr bool BoundingBox::Intersects(BoundingFrustum const& frustum) const noexcept
-	{
-		return frustum.Intersects(*this);
-	}	
-
 	constexpr Matrix dxna::Matrix::CreateFromQuaternion(Quaternion const& quaternion) noexcept
 	{
 		const auto num1 = quaternion.X * quaternion.X;
@@ -3135,8 +3028,143 @@ namespace dxna {
 		matrix.M44 = value.M44;
 		return matrix;
 	}
+}
 
-	constexpr nullfloat BoundingFrustum::Intersects(Ray const& ray) const
+// --------------------------- BoundingBox -------------------------------------//
+namespace dxna {
+	constexpr bool dxna::BoundingBox::Intersects(BoundingSphere const& sphere) const noexcept {
+		auto squareDistance = 0.0f;
+		const auto point = sphere.Center;
+
+		if (point.X < Min.X)
+			squareDistance += (Min.X - point.X) * (Min.X - point.X);
+		if (point.X > Max.X)
+			squareDistance += (point.X - Max.X) * (point.X - Max.X);
+		if (point.Y < Min.Y)
+			squareDistance += (Min.Y - point.Y) * (Min.Y - point.Y);
+		if (point.Y > Max.Y)
+			squareDistance += (point.Y - Max.Y) * (point.Y - Max.Y);
+		if (point.Z < Min.Z)
+			squareDistance += (Min.Z - point.Z) * (Min.Z - point.Z);
+		if (point.Z > Max.Z)
+			squareDistance += (point.Z - Max.Z) * (point.Z - Max.Z);
+
+		return squareDistance <= sphere.Radius * sphere.Radius;
+	}
+
+	constexpr PlaneIntersectionType BoundingBox::Intersects(Plane const& plane) const noexcept {
+		Vector3 vector3_1;
+		vector3_1.X = plane.Normal.X >= 0.0 ? Min.X : Max.X;
+		vector3_1.Y = plane.Normal.Y >= 0.0 ? Min.Y : Max.Y;
+		vector3_1.Z = plane.Normal.Z >= 0.0 ? Min.Z : Max.Z;
+		Vector3 vector3_2;
+		vector3_2.X = plane.Normal.X >= 0.0 ? Max.X : Min.X;
+		vector3_2.Y = plane.Normal.Y >= 0.0 ? Max.Y : Min.Y;
+		vector3_2.Z = plane.Normal.Z >= 0.0 ? Max.Z : Min.Z;
+
+		if (plane.Normal.X * vector3_1.X
+			+ plane.Normal.Y * vector3_1.Y
+			+ plane.Normal.Z * vector3_1.Z
+			+ plane.D > 0.0)
+			return PlaneIntersectionType::Front;
+
+		return plane.Normal.X * vector3_2.X
+			+ plane.Normal.Y * vector3_2.Y
+			+ plane.Normal.Z * vector3_2.Z
+			+ plane.D < 0.0
+			? PlaneIntersectionType::Back
+			: PlaneIntersectionType::Intersecting;
+	}
+
+	constexpr ContainmentType BoundingBox::Contains(BoundingFrustum const& frustum) const
+	{
+		if (!frustum.Intersects(*this))
+			return ContainmentType::Disjoint;
+
+		for (size_t i = 0; i < frustum.CornerCount; ++i) {
+			const auto& corner = frustum.GetCorner(i);
+
+			if (Contains(corner) == ContainmentType::Disjoint)
+				return ContainmentType::Intersects;
+		}
+
+		return ContainmentType::Contains;
+	}
+
+	constexpr ContainmentType BoundingBox::Contains(BoundingSphere const& sphere) const noexcept {
+		Vector3 result1 = Vector3::Clamp(sphere.Center, Min, Max);
+		float result2 = Vector3::DistanceSquared(sphere.Center, result1);
+		float radius = sphere.Radius;
+
+		if (result2 > radius * radius)
+			return ContainmentType::Disjoint;
+
+		return Min.X + radius > sphere.Center.X
+			|| sphere.Center.X > Max.X - radius
+			|| Max.X - Min.X <= radius
+			|| Min.Y + radius > sphere.Center.Y
+			|| sphere.Center.Y > Max.Y - radius
+			|| Max.Y - Min.Y <= radius
+			|| Min.Z + radius > sphere.Center.Z
+			|| sphere.Center.Z > Max.Z - radius
+			|| Max.X - Min.X <= radius
+			? ContainmentType::Intersects
+			: ContainmentType::Contains;
+	}
+
+	constexpr BoundingBox BoundingBox::CreateFromSphere(BoundingSphere const& sphere) noexcept {
+		BoundingBox fromSphere;
+		fromSphere.Min.X = sphere.Center.X - sphere.Radius;
+		fromSphere.Min.Y = sphere.Center.Y - sphere.Radius;
+		fromSphere.Min.Z = sphere.Center.Z - sphere.Radius;
+		fromSphere.Max.X = sphere.Center.X + sphere.Radius;
+		fromSphere.Max.Y = sphere.Center.Y + sphere.Radius;
+		fromSphere.Max.Z = sphere.Center.Z + sphere.Radius;
+		return fromSphere;
+	}
+
+	constexpr bool BoundingBox::Intersects(BoundingFrustum const& frustum) const noexcept
+	{
+		return frustum.Intersects(*this);
+	}
+}
+
+// ------------------------- BoundingSphere ------------------------------------//
+namespace dxna {
+	constexpr ContainmentType dxna::BoundingSphere::Contains(BoundingFrustum const& frustum) const noexcept
+	{
+		if (!frustum.Intersects(*this))
+			return ContainmentType::Disjoint;
+
+		float num = Radius * Radius;
+
+		for (size_t i = 0; i < frustum.CornerCount; ++i) {
+			const auto& corner = frustum.GetCorner(i);
+
+			Vector3 vector3;
+			vector3.X = corner.X - Center.X;
+			vector3.Y = corner.Y - Center.Y;
+			vector3.Z = corner.Z - Center.Z;
+
+			if (vector3.LengthSquared() > num)
+				return ContainmentType::Intersects;
+		}
+
+		return ContainmentType::Contains;
+	}
+
+	constexpr bool BoundingSphere::Intersects(BoundingFrustum const& frustum) const noexcept {
+		return frustum.Intersects(*this);
+	}
+
+	constexpr PlaneIntersectionType BoundingSphere::Intersects(Plane const& plane) const noexcept {
+		return plane.Intersects(*this);
+	}
+}
+
+namespace dxna {
+
+	constexpr nullfloat BoundingFrustum::Intersects(Ray const& ray) const noexcept
 	{
 		ContainmentType result1 = Contains(ray.Position);
 		auto result = nullfloat();
@@ -3149,7 +3177,7 @@ namespace dxna {
 			float num2 = FloatMaxValue;
 
 			for (size_t i = 0; i < PlaneCount; ++i) {
-				const auto plane = getPlane(i);
+				const auto& plane = GetPlane(i);
 
 				Vector3 normal = plane.Normal;
 				float result2 = Vector3::Dot(ray.Direction, normal);
@@ -3192,37 +3220,9 @@ namespace dxna {
 		return result;
 	}
 
-	constexpr ContainmentType dxna::BoundingSphere::Contains(BoundingFrustum const& frustum) const
-	{
-		if (!frustum.Intersects(*this))
-			return ContainmentType::Disjoint;
 
-		float num = Radius * Radius;
 
-		for (size_t i = 0; i < frustum.CornerCount; ++i) {
-			const auto corner = frustum.getCorner(i);
-
-			Vector3 vector3;
-			vector3.X = corner.X - Center.X;
-			vector3.Y = corner.Y - Center.Y;
-			vector3.Z = corner.Z - Center.Z;
-
-			if (vector3.LengthSquared() > num)
-				return ContainmentType::Intersects;
-		}
-
-		return ContainmentType::Contains;
-	}
-
-	constexpr bool BoundingSphere::Intersects(BoundingFrustum const& frustum) const {
-		return frustum.Intersects(*this);
-	}
-
-	constexpr PlaneIntersectionType BoundingSphere::Intersects(Plane const& plane) const {
-		return plane.Intersects(*this);
-	}
-
-	constexpr PlaneIntersectionType Plane::Intersects(BoundingFrustum const& frustum) const {
+	constexpr PlaneIntersectionType Plane::Intersects(BoundingFrustum const& frustum) const noexcept {
 		return frustum.Intersects(*this);
 	}
 }
