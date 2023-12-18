@@ -3,15 +3,15 @@
 #include <vector>
 
 namespace dxna {
-	float Vector2::Length() const { return std::sqrt(LengthSquared()); }
+	float Vector2::Length() const noexcept { return std::sqrt(LengthSquared()); }
 
-	void Vector2::Normalize() {
+	void Vector2::Normalize() noexcept {
 		const auto num = 1.0F / Length();
 		X *= num;
 		Y *= num;
 	}
 
-	Vector2 Vector2::Normalize(Vector2 const& value) {
+	Vector2 Vector2::Normalize(Vector2 const& value) noexcept {
 		float num = 1.0F / std::sqrt(value.Length());
 		Vector2 vector;
 		vector.X *= num;
@@ -20,22 +20,22 @@ namespace dxna {
 		return vector;
 	}
 
-	float Vector2::Distance(Vector2 const& value1, Vector2 const& value2) {
+	float Vector2::Distance(Vector2 const& value1, Vector2 const& value2) noexcept {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
 		return std::sqrt(num1 * num1 + num2 * num2);
 	}
 
-	float Vector3::Length() const {	return std::sqrt(LengthSquared()); }
+	float Vector3::Length() const noexcept {	return std::sqrt(LengthSquared()); }
 
-	void Vector3::Normalize() {
+	void Vector3::Normalize() noexcept {
 		const auto num = 1.0F / Length();
 		X *= num;
 		Y *= num;
 		Z *= num;
 	}
 
-	Vector3 Vector3::Normalize(Vector3 const& value) {
+	Vector3 Vector3::Normalize(Vector3 const& value) noexcept {
 		float num = 1.0F / std::sqrt(value.Length());
 		Vector3 vector;
 		vector.X *= num;
@@ -45,18 +45,18 @@ namespace dxna {
 		return vector;
 	}
 
-	float Vector3::Distance(Vector3 const& value1, Vector3 const& value2) {
+	float Vector3::Distance(Vector3 const& value1, Vector3 const& value2) noexcept {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
 		const auto num3 = value1.Z - value2.Z;
 		return std::sqrt(num1 * num1 + num2 * num2 + num3 * num3);
 	}
 
-	float Vector4::Length() const {
+	float Vector4::Length() const noexcept {
 		return std::sqrt(LengthSquared());
 	}
 
-	float Vector4::Distance(Vector4 const& value1, Vector4 const& value2) {
+	float Vector4::Distance(Vector4 const& value1, Vector4 const& value2) noexcept {
 		const auto num1 = value1.X - value2.X;
 		const auto num2 = value1.Y - value2.Y;
 		const auto num3 = value1.Z - value2.Z;
@@ -64,7 +64,7 @@ namespace dxna {
 		return std::sqrt(num1 * num1 + num2 * num2 + num3 * num3 + num4 * num4);
 	}
 
-	void Vector4::Normalize() {
+	void Vector4::Normalize() noexcept {
 		float num = 1.0F / std::sqrt(Length());
 		X *= num;
 		Y *= num;
@@ -72,7 +72,7 @@ namespace dxna {
 		W *= num;
 	}
 
-	Vector4 Vector4::Normalize(Vector4 const& value) {
+	Vector4 Vector4::Normalize(Vector4 const& value) noexcept {
 		float num = 1.0F / std::sqrt(value.Length());
 		Vector4 vector;
 		vector.X *= num;
@@ -84,7 +84,7 @@ namespace dxna {
 	}
 
 	Matrix Matrix::CreateBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
-		Vector3 const& cameraUpVector, Vector3* const cameraForwardVector) {
+		Vector3 const& cameraUpVector, Vector3* const cameraForwardVector) noexcept {
 		Vector3 result1;
 		result1.X = objectPosition.X - cameraPosition.X;
 		result1.Y = objectPosition.Y - cameraPosition.Y;
@@ -123,7 +123,7 @@ namespace dxna {
 	}
 
 	Matrix Matrix::CreateConstrainedBillboard(Vector3 const& objectPosition, Vector3 const& cameraPosition,
-		Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector) {
+		Vector3 rotateAxis, Vector3* const cameraForwardVector, Vector3* const objectForwardVector) noexcept {
 		Vector3 result1;
 		result1.X = objectPosition.X - cameraPosition.X;
 		result1.Y = objectPosition.Y - cameraPosition.Y;
@@ -188,7 +188,7 @@ namespace dxna {
 		return constrainedBillboard;
 	}
 
-	Matrix Matrix::CreateRotationX(float radians) {
+	Matrix Matrix::CreateRotationX(float radians) noexcept {
 		const auto num1 = std::cos(radians);
 		const auto num2 = std::sin(radians);
 		Matrix rotationX;
@@ -211,7 +211,7 @@ namespace dxna {
 		return rotationX;
 	}
 
-	Matrix Matrix::CreateRotationY(float radians) {
+	Matrix Matrix::CreateRotationY(float radians)  noexcept {
 		const auto num1 = std::cos(radians);
 		const auto num2 = std::sin(radians);
 		Matrix rotationY;
@@ -234,7 +234,7 @@ namespace dxna {
 		return rotationY;
 	}
 
-	Matrix Matrix::CreateRotationZ(float radians) {
+	Matrix Matrix::CreateRotationZ(float radians) noexcept {
 		const auto num1 = std::cos(radians);
 		const auto num2 = std::sin(radians);
 		Matrix rotationZ;
@@ -257,18 +257,18 @@ namespace dxna {
 		return rotationZ;
 	}
 
-	Matrix Matrix::CreateFromAxisAngle(Vector3 const& axis, float angle) {
-		float x = axis.X;
-		float y = axis.Y;
-		float z = axis.Z;
-		float num1 = std::sin(angle);
-		float num2 = std::cos(angle);
-		float num3 = x * x;
-		float num4 = y * y;
-		float num5 = z * z;
-		float num6 = x * y;
-		float num7 = x * z;
-		float num8 = y * z;
+	Matrix Matrix::CreateFromAxisAngle(Vector3 const& axis, float angle) noexcept {
+		const auto x = axis.X;
+		const auto y = axis.Y;
+		const auto z = axis.Z;
+		const auto num1 = std::sin(angle);
+		const auto num2 = std::cos(angle);
+		const auto num3 = x * x;
+		const auto num4 = y * y;
+		const auto num5 = z * z;
+		const auto num6 = x * y;
+		const auto num7 = x * z;
+		const auto num8 = y * z;
 
 		Matrix fromAxisAngle;
 		fromAxisAngle.M11 = num3 + num2 * (1.0f - num3);
@@ -290,20 +290,19 @@ namespace dxna {
 		return fromAxisAngle;
 	}
 
-	Matrix Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) {
+	Error Matrix::CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, Matrix& result) noexcept {
 		const Matrix zero(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
 		if (fieldOfView <= 0.0F || fieldOfView >= 3.1415927410125732)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_LE_ZERO_OR_GE_PI, 0);
 
 		if (nearPlaneDistance <= 0.0F)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 2);
 
 		if (farPlaneDistance <= 0.0F)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_LESS_OR_EQUAL_ZERO, 3);
 
 		if (nearPlaneDistance >= farPlaneDistance)
-			return zero;
+			return Error(ErrorCode::ARGUMENT_GREATER_OR_EQUAL_OTHER, 2);
 
 		const auto num1 = 1.0F / std::tan(fieldOfView * 0.5F);
 		const auto num2 = num1 / aspectRatio;
@@ -317,10 +316,12 @@ namespace dxna {
 		perspectiveFieldOfView.M34 = -1.0f;
 		perspectiveFieldOfView.M41 = perspectiveFieldOfView.M42 = perspectiveFieldOfView.M44 = 0.0f;
 		perspectiveFieldOfView.M43 = (nearPlaneDistance * farPlaneDistance / (nearPlaneDistance - farPlaneDistance));
-		return perspectiveFieldOfView;
+
+		result = perspectiveFieldOfView;
+		return Error::NoError();
 	}
 
-	Matrix Matrix::CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector) {
+	Matrix Matrix::CreateLookAt(Vector3 const& cameraPosition, Vector3 const& cameraTarget, Vector3 const& cameraUpVector) noexcept {
 		Vector3 vector3_1 = Vector3::Normalize(cameraPosition - cameraTarget);
 		Vector3 vector3_2 = Vector3::Normalize(Vector3::Cross(cameraUpVector, vector3_1));
 		Vector3 vector1 = Vector3::Cross(vector3_1, vector3_2);
@@ -345,7 +346,7 @@ namespace dxna {
 		return lookAt;
 	}
 
-	Matrix Matrix::CreateWorld(Vector3 position, Vector3 forward, Vector3 up) {
+	Matrix Matrix::CreateWorld(Vector3 position, Vector3 forward, Vector3 up) noexcept {
 		Vector3 vector3_1 = Vector3::Normalize(-forward);
 		Vector3 vector2 = Vector3::Normalize(Vector3::Cross(up, vector3_1));
 		Vector3 vector3_2 = Vector3::Cross(vector3_1, vector2);
@@ -370,17 +371,17 @@ namespace dxna {
 		return world;
 	}
 
-	Matrix Matrix::CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+	Matrix Matrix::CreateFromYawPitchRoll(float yaw, float pitch, float roll) noexcept
 	{
 		const auto result = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
 		return CreateFromQuaternion(result);
 	}
 
-	float Quaternion::Length() const {
+	float Quaternion::Length() const noexcept {
 		return std::sqrt(LengthSquared());
 	}
 	
-	void Quaternion::Normalize() {
+	void Quaternion::Normalize() noexcept {
 		float num = 1.0F / Length();
 		X *= num;
 		Y *= num;
@@ -388,13 +389,13 @@ namespace dxna {
 		W *= num;
 	}
 
-	void Quaternion::Conjugate() {
+	void Quaternion::Conjugate() noexcept {
 		X = -X;
 		Y = -Y;
 		Z = -Z;
 	}
 
-	Quaternion Quaternion::Normalize(Quaternion const& quaternion) {
+	Quaternion Quaternion::Normalize(Quaternion const& quaternion) noexcept {
 		float num = 1.0f / quaternion.Length();
 		Quaternion quaternion1;
 		quaternion1.X = quaternion.X * num;
@@ -404,7 +405,7 @@ namespace dxna {
 		return quaternion1;
 	}
 
-	Quaternion Quaternion::CreateFromAxisAngle(Vector3 const& axis, float angle) {
+	Quaternion Quaternion::CreateFromAxisAngle(Vector3 const& axis, float angle) noexcept {
 		float num1 = angle * 0.5f;
 		float num2 = std::sin(num1);
 		float num3 = std::cos(num1);
@@ -417,7 +418,7 @@ namespace dxna {
 		return fromAxisAngle;
 	}
 
-	Quaternion Quaternion::CreateFromYawPitchRoll(float yaw, float pitch, float roll) {
+	Quaternion Quaternion::CreateFromYawPitchRoll(float yaw, float pitch, float roll) noexcept {
 		float num1 = roll * 0.5f;
 		float num2 = std::sin(num1);
 		float num3 = std::cos(num1);
@@ -436,7 +437,7 @@ namespace dxna {
 		return fromYawPitchRoll;
 	}
 
-	Quaternion Quaternion::CreateFromRotationMatrix(Matrix const& matrix) {
+	Quaternion Quaternion::CreateFromRotationMatrix(Matrix const& matrix) noexcept {
 		float num1 = matrix.M11 + matrix.M22 + matrix.M33;
 		Quaternion fromRotationMatrix;
 
@@ -475,7 +476,7 @@ namespace dxna {
 		return fromRotationMatrix;
 	}
 
-	Quaternion Quaternion::Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) {
+	Quaternion Quaternion::Slerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) noexcept {
 		float num1 = amount;
 		float d = quaternion1.X * quaternion2.X + quaternion1.Y * quaternion2.Y + quaternion1.Z * quaternion2.Z + quaternion1.W * quaternion2.W;
 		bool flag = false;
@@ -508,7 +509,7 @@ namespace dxna {
 		return quaternion;
 	}
 
-	Quaternion Quaternion::Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) {
+	Quaternion Quaternion::Lerp(Quaternion const& quaternion1, Quaternion const& quaternion2, float amount) noexcept {
 		float num1 = amount;
 		float num2 = 1.0f - num1;
 		Quaternion quaternion;
@@ -534,11 +535,11 @@ namespace dxna {
 		return quaternion;
 	}
 	
-	BoundingSphere BoundingSphere::CreateMerged(BoundingSphere const& original, BoundingSphere const& additional) {
+	BoundingSphere BoundingSphere::CreateMerged(BoundingSphere const& original, BoundingSphere const& additional) noexcept {
 		Vector3 result = Vector3::Subtract(additional.Center, original.Center);
-		float num1 = result.Length();
-		float radius1 = original.Radius;
-		float radius2 = additional.Radius;
+		const auto num1 = result.Length();
+		const auto radius1 = original.Radius;
+		const auto radius2 = additional.Radius;
 
 		if (radius1 + radius2 >= num1) {
 			if (radius1 - radius2 >= num1)
@@ -548,8 +549,8 @@ namespace dxna {
 		}
 
 		Vector3 vector3 = result * (1.0f / num1);
-		float num2 = MathHelper::Min(-radius1, num1 - radius2);
-		float num3 = (MathHelper::Max(radius1, num1 + radius2) - num2) * 0.5F;
+		const auto num2 = MathHelper::Min(-radius1, num1 - radius2);
+		const auto num3 = (MathHelper::Max(radius1, num1 + radius2) - num2) * 0.5F;
 
 		BoundingSphere merged;
 		merged.Center = original.Center + vector3 * (num3 + num2);
@@ -557,7 +558,7 @@ namespace dxna {
 		return merged;
 	}
 
-	BoundingSphere BoundingSphere::CreateFromBoundingBox(BoundingBox const& box) {
+	BoundingSphere BoundingSphere::CreateFromBoundingBox(BoundingBox const& box) noexcept {
 		BoundingSphere fromBoundingBox;
 		fromBoundingBox.Center = Vector3::Lerp(box.Min, box.Max, 0.5f);
 		float result = Vector3::Distance(box.Min, box.Max);
@@ -565,7 +566,7 @@ namespace dxna {
 		return fromBoundingBox;
 	}
 	
-	BoundingSphere BoundingSphere::CreateFromPoints(Vector3* points, size_t length, size_t offset) {
+	BoundingSphere BoundingSphere::CreateFromPoints(Vector3* points, size_t length, size_t offset) noexcept {
 		Vector3 current;
 		Vector3 vector3_1 = current = points[offset];
 		Vector3 vector3_2 = current;
@@ -639,7 +640,7 @@ namespace dxna {
 		return fromPoints;
 	}
 
-	ContainmentType BoundingSphere::Contains(BoundingBox const& box) const {
+	ContainmentType BoundingSphere::Contains(BoundingBox const& box) const noexcept {
 		if (!box.Intersects(*this))
 			return ContainmentType::Disjoint;
 
@@ -700,16 +701,9 @@ namespace dxna {
 		vector3.Z = Center.Z - box.Min.Z;
 
 		return vector3.LengthSquared() > num ? ContainmentType::Intersects : ContainmentType::Contains;
-	}
+	}	
 
-	void BoundingSphere::SupportMapping(Vector3 const& v, Vector3& result) const {
-		float num = Radius / v.Length();
-		result.X = Center.X + v.X * num;
-		result.Y = Center.Y + v.Y * num;
-		result.Z = Center.Z + v.Z * num;
-	}
-
-	BoundingSphere BoundingSphere::Transform(Matrix const& matrix) const {
+	BoundingSphere BoundingSphere::Transform(Matrix const& matrix) const noexcept {
 		BoundingSphere boundingSphere;
 		boundingSphere.Center = Vector3::Transform(Center, matrix);
 		float d = MathHelper::Max((matrix.M11 * matrix.M11 + matrix.M12 * matrix.M12 + matrix.M13 * matrix.M13), MathHelper::Max((matrix.M21 * matrix.M21 + matrix.M22 * matrix.M22 + matrix.M23 * matrix.M23), (matrix.M31 * matrix.M31 + matrix.M32 * matrix.M32 + matrix.M33 * matrix.M33)));
@@ -717,24 +711,24 @@ namespace dxna {
 		return boundingSphere;
 	}
 
-	Plane::Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3) {
-		float num1 = point2.X - point1.X;
-		float num2 = point2.Y - point1.Y;
-		float num3 = point2.Z - point1.Z;
-		float num4 = point3.X - point1.X;
-		float num5 = point3.Y - point1.Y;
-		float num6 = point3.Z - point1.Z;
-		float num7 = (num2 * num6 - num3 * num5);
-		float num8 = (num3 * num4 - num1 * num6);
-		float num9 = (num1 * num5 - num2 * num4);
-		float num10 = 1.0f / std::sqrt(num7 * num7 + num8 * num8 + num9 * num9);
+	Plane::Plane(Vector3 const& point1, Vector3 const& point2, Vector3 const& point3) noexcept {
+		const auto num1 = point2.X - point1.X;
+		const auto num2 = point2.Y - point1.Y;
+		const auto num3 = point2.Z - point1.Z;
+		const auto num4 = point3.X - point1.X;
+		const auto num5 = point3.Y - point1.Y;
+		const auto num6 = point3.Z - point1.Z;
+		const auto num7 = (num2 * num6 - num3 * num5);
+		const auto num8 = (num3 * num4 - num1 * num6);
+		const auto num9 = (num1 * num5 - num2 * num4);
+		const auto num10 = 1.0f / std::sqrt(num7 * num7 + num8 * num8 + num9 * num9);
 		Normal.X = num7 * num10;
 		Normal.Y = num8 * num10;
 		Normal.Z = num9 * num10;
 		D = -(Normal.X * point1.X + Normal.Y * point1.Y + Normal.Z * point1.Z);
 	}
 
-	void Plane::Normalize()	{
+	void Plane::Normalize() noexcept {
 		float d = (Normal.X * Normal.X + Normal.Y * Normal.Y + Normal.Z * Normal.Z);
 		if (std::abs(d - 1.0f) < 1.1920928955078125E-07)
 			return;
@@ -745,7 +739,7 @@ namespace dxna {
 		D *= num;
 	}
 
-	Plane Plane::Normalize(Plane const& value) {
+	Plane Plane::Normalize(Plane const& value) noexcept {
 		float d = (value.Normal.X * value.Normal.X + value.Normal.Y * value.Normal.Y + value.Normal.Z * value.Normal.Z);
 		
 		if (std::abs(d - 1.0f) < 1.1920928955078125E-07) {
@@ -783,19 +777,19 @@ namespace dxna {
 		return num3;
 	}
 
-	float Plane::PerpendicularDistance(Vector3 const& point, Plane const& plane) {
+	float Plane::PerpendicularDistance(Vector3 const& point, Plane const& plane) noexcept {
 		return std::abs((plane.Normal.X * point.X + plane.Normal.Y * point.Y + plane.Normal.Z * point.Z)
 			/ std::sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
 	}
 
-	Matrix Matrix::CreateShadow(Vector3 const& lightDirection, Plane const& plane)
+	Matrix Matrix::CreateShadow(Vector3 const& lightDirection, Plane const& plane) noexcept
 	{
 		Plane result = Plane::Normalize(plane);
-		float num1 = (result.Normal.X * lightDirection.X + result.Normal.Y * lightDirection.Y + result.Normal.Z * lightDirection.Z);
-		float num2 = -result.Normal.X;
-		float num3 = -result.Normal.Y;
-		float num4 = -result.Normal.Z;
-		float num5 = -result.D;
+		const auto num1 = (result.Normal.X * lightDirection.X + result.Normal.Y * lightDirection.Y + result.Normal.Z * lightDirection.Z);
+		const auto num2 = -result.Normal.X;
+		const auto num3 = -result.Normal.Y;
+		const auto num4 = -result.Normal.Z;
+		const auto num5 = -result.D;
 
 		Matrix shadow;
 		shadow.M11 = num2 * lightDirection.X + num1;
@@ -817,17 +811,17 @@ namespace dxna {
 		return shadow;
 	}
 	
-	Matrix Matrix::CreateReflection(Plane const& original)
+	Matrix Matrix::CreateReflection(Plane const& original) noexcept
 	{
 		auto value = original;
-
 		value.Normalize();
-		float x = value.Normal.X;
-		float y = value.Normal.Y;
-		float z = value.Normal.Z;
-		float num1 = -2.f * x;
-		float num2 = -2.f * y;
-		float num3 = -2.f * z;
+
+		const auto x = value.Normal.X;
+		const auto y = value.Normal.Y;
+		const auto z = value.Normal.Z;
+		const auto num1 = -2.f * x;
+		const auto num2 = -2.f * y;
+		const auto num3 = -2.f * z;
 		Matrix reflection;
 		reflection.M11 = (num1 * x + 1.0F);
 		reflection.M12 = num2 * x;
@@ -848,83 +842,77 @@ namespace dxna {
 		return reflection;
 	}
 
-	nullfloat dxna::BoundingBox::Intersects(Ray const& ray) const
-	{
-		float num1 = 0.0f;
-		float num2 = FloatMaxValue;
-		
-		if (std::abs(ray.Direction.X) < 9.9999999747524271E-07)	{
+	nullfloat dxna::BoundingBox::Intersects(Ray const& ray) const noexcept {
+		auto tMin = nullfloat();
+		auto tMax = nullfloat();
+
+		if (std::abs(ray.Direction.X) < Math::Epsilon) {
 			if (ray.Position.X < Min.X || ray.Position.X > Max.X)
 				return nullfloat();
 		}
 		else {
-			float num3 = 1.0f / ray.Direction.X;
-			float num4 = (Min.X - ray.Position.X) * num3;
-			float num5 = (Max.X - ray.Position.X) * num3;
-			
-			if (num4 > num5) {
-				float num6 = num4;
-				num4 = num5;
-				num5 = num6;
-			}
-			
-			num1 = MathHelper::Max(num4, num1);
-			num2 = MathHelper::Min(num5, num2);
+			tMin = (Min.X - ray.Position.X) / ray.Direction.X;
+			tMax = (Max.X - ray.Position.X) / ray.Direction.X;
 
-			if (num1 > num2)
-				return nullfloat();
+			if (tMin > tMax) {
+				const auto temp = tMin;
+				tMin = tMax;
+				tMax = temp;
+			}
 		}
-		
-		if (std::abs(ray.Direction.Y) < 9.9999999747524271E-07)
-		{
+
+		if (std::abs(ray.Direction.Y) < Math::Epsilon) {
 			if (ray.Position.Y < Min.Y || ray.Position.Y > Max.Y)
 				return nullfloat();
 		}
 		else {
-			float num7 = 1.0f / ray.Direction.Y;
-			float num8 = (Min.Y - ray.Position.Y) * num7;
-			float num9 = (Max.Y - ray.Position.Y) * num7;
-			if (num8 > num9)
-			{
-				float num10 = num8;
-				num8 = num9;
-				num9 = num10;
+			auto tMinY = (Min.Y - ray.Position.Y) / ray.Direction.Y;
+			auto tMaxY = (Max.Y - ray.Position.Y) / ray.Direction.Y;
+
+			if (tMinY > tMaxY) {
+				const auto temp = tMinY;
+				tMinY = tMaxY;
+				tMaxY = temp;
 			}
-			
-			num1 = MathHelper::Max(num8, num1);
-			num2 = MathHelper::Min(num9, num2);
-			
-			if (num1 > num2)
+
+			if ((tMin.HasValue() && tMin > tMaxY) || (tMax.HasValue() && tMinY > tMax))
 				return nullfloat();
+
+			if (!tMin.HasValue() || tMinY > tMin) tMin = tMinY;
+			if (!tMax.HasValue() || tMaxY < tMax) tMax = tMaxY;
 		}
 
-		if (std::abs(ray.Direction.Z) < 9.9999999747524271E-07) 	{
+		if (std::abs(ray.Direction.Z) < Math::Epsilon) {
 			if (ray.Position.Z < Min.Z || ray.Position.Z > Max.Z)
 				return nullfloat();
 		}
-		else
-		{
-			float num11 = 1.0f / ray.Direction.Z;
-			float num12 = (Min.Z - ray.Position.Z) * num11;
-			float num13 = (Max.Z - ray.Position.Z) * num11;
-			
-			if (num12 > num13)
-			{
-				float num14 = num12;
-				num12 = num13;
-				num13 = num14;
+		else {
+			auto tMinZ = (Min.Z - ray.Position.Z) / ray.Direction.Z;
+			auto tMaxZ = (Max.Z - ray.Position.Z) / ray.Direction.Z;
+
+			if (tMinZ > tMaxZ) {
+				const auto temp = tMinZ;
+				tMinZ = tMaxZ;
+				tMaxZ = temp;
 			}
 
-			num1 = MathHelper::Max(num12, num1);
-			float num15 = MathHelper::Min(num13, num2);
-
-			if (num1 > num15)
+			if ((tMin.HasValue() && tMin > tMaxZ) || (tMax.HasValue() && tMinZ > tMax))
 				return nullfloat();
+
+			if (!tMin.HasValue() || tMinZ > tMin) tMin = tMinZ;
+			if (!tMax.HasValue() || tMaxZ < tMax) tMax = tMaxZ;
 		}
-		return num1;
+		
+		if ((tMin.HasValue() && tMin < 0) && tMax > 0) 
+			return 0;
+
+		if (tMin < 0)
+			return nullfloat();
+
+		return tMin;
 	}
 
-	nullfloat BoundingSphere::Intersects(Ray const& ray) const {
+	nullfloat BoundingSphere::Intersects(Ray const& ray) const noexcept {
 		float num1 = Center.X - ray.Position.X;
 		float num2 = Center.Y - ray.Position.Y;
 		float num3 = Center.Z - ray.Position.Z;
@@ -949,7 +937,7 @@ namespace dxna {
 		return num6 - num8;
 	}
 
-	BoundingSphere dxna::BoundingSphere::CreateFromFrustum(BoundingFrustum const& frustum) {
+	BoundingSphere dxna::BoundingSphere::CreateFromFrustum(BoundingFrustum const& frustum)  noexcept {
 		std::vector<Vector3> points(frustum.CornerCount);
 
 		return CreateFromPoints(points.data(), points.size(), 0);
