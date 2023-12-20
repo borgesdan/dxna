@@ -2,9 +2,10 @@
 
 namespace dxna::graphics {
 	Shader::Shader(GraphicsDevicePtr const& device, cs::BinaryReader& reader) {
-		this->Device(device);
+		this->Device(device);		
 
-		const auto isVertexShader = (bool)reader.ReadBoolean();
+		const auto isVertexShader = reader.ReadBoolean();
+
 		Stage = isVertexShader ? ShaderStage::Vertex : ShaderStage::Pixel;
 
 		const auto length = (intcs)reader.ReadInt32();

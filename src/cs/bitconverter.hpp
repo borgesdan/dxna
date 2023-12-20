@@ -170,7 +170,7 @@ namespace cs {
 		}
 
 		
-		static constexpr char GetHexValue(intcs i) {
+		static constexpr charcs GetHexValue(intcs i) {
 			return i < 10 ? (charcs)(i + 48) : (charcs)(i - 10 + 65);
 		}
 

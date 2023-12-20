@@ -26,6 +26,7 @@ namespace cs {
 		virtual longcs Seek(longcs offset, SeekOrigin const& origin) { return 0; }
 		virtual void SetLength(longcs value) {};
 		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) { return 0; }
+		virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) { return 0; }
 		virtual intcs ReadByte() { return 0; }
 		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) {}
 		virtual void WriteByte(bytecs value) {}
@@ -119,6 +120,10 @@ namespace cs {
 
 			_position += byteCount;
 			return static_cast<intcs>(byteCount);
+		}
+
+		constexpr virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) override {
+			return Read(buffer.data(), static_cast<intcs>(buffer.size()), offset, count);
 		}
 
 		constexpr virtual intcs ReadByte() override {

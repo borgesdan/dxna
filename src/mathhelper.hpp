@@ -34,7 +34,7 @@ namespace dxna {
 			return Clamp(value, min, max);
 		}
 
-		static constexpr float Clamp(int value, int min, int max) noexcept {
+		static constexpr int Clamp(int value, int min, int max) noexcept {
 			value = value > max ? max : value;
 			value = value < min ? min : value;
 			return value;
@@ -68,14 +68,14 @@ namespace dxna {
 		}
 
 		static float LerpPrecise(float value1, float value2, float amount) noexcept {
-			return ((1.0 - amount) * value1) + (value2 * amount);
+			return ((1.0F - amount) * value1) + (value2 * amount);
 		}
 
 		static constexpr float Min(float value1, float value2) noexcept {
 			return std::min(value1, value2);
 		}
 
-		static constexpr float Min(int value1, int value2) noexcept {
+		static constexpr int Min(int value1, int value2) noexcept {
 			return std::min(value1, value2);
 		}
 
@@ -83,7 +83,7 @@ namespace dxna {
 			return std::max(value1, value2);
 		}
 
-		static constexpr float Max(int value1, int value2) noexcept {
+		static constexpr int Max(int value1, int value2) noexcept {
 			return std::max(value1, value2);
 		}
 
