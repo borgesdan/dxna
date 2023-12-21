@@ -11,6 +11,7 @@
 
 #include "../error.hpp"
 #include "forward.hpp"
+#include "enumerations.hpp"
 
 namespace cs {
 	class BinaryReader {
@@ -471,6 +472,139 @@ namespace cs {
 			}
 
 			return count - charCount;
+		}
+	};
+
+	class BinaryWriter {
+		BinaryWriter(Stream* stream) : _stream(stream), _buffer(16) {
+		}
+
+		longcs Seek(intcs offset, SeekOrigin origin) {
+			_stream->Seek(offset, origin);
+		}
+
+		void Write(bool value) {
+			_buffer[0] = value ? 1 : 0;
+			_stream->Write(_buffer, 0, 1);
+		}
+
+		void Write(bytecs value) {			
+			_stream->WriteByte(value);
+		}
+
+		void Write(bytecs const* buffer, size_t bufferLength) {
+			_stream->Write(buffer, bufferLength, 0, bufferLength);
+		}
+
+		void Write(std::vector<bytecs> const& buffer) {
+			_stream->Write(buffer, 0, buffer.size());
+		}
+
+		void Write(bytecs const* buffer, size_t bufferLength, intcs index, intcs count) {
+			_stream->Write(buffer, bufferLength, index, count);
+		}
+
+		void Write(std::vector<bytecs> const& buffer, intcs index, intcs count) {
+			_stream->Write(buffer, index, count);
+		}
+		
+		void Write(charcs ch) {
+			_stream->Write(_buffer, 0, ch);
+		}
+
+		void Write(double value) {
+			ulongcs num = (ulongcs)*(longcs*)&value;
+			_buffer[0] = (bytecs)num;
+			_buffer[1] = (bytecs)(num >> 8);
+			_buffer[2] = (bytecs)(num >> 16);
+			_buffer[3] = (bytecs)(num >> 24);
+			_buffer[4] = (bytecs)(num >> 32);
+			_buffer[5] = (bytecs)(num >> 40);
+			_buffer[6] = (bytecs)(num >> 48);
+			_buffer[7] = (bytecs)(num >> 56);
+
+			_stream->Write(_buffer, 0, 8);
+		}
+
+		void Write(shortcs value) {
+			_buffer[0] = (bytecs)value;
+			_buffer[1] = (bytecs)((uintcs)value >> 8);
+			_stream->Write(_buffer, 0, 2);
+		}
+
+		void Write(ushortcs value) {
+			_buffer[0] = (bytecs)value;
+			_buffer[1] = (bytecs)((uintcs)value >> 8);
+			_stream->Write(_buffer, 0, 2);
+		}
+
+		void Write(intcs value) {
+			_buffer[0] = (bytecs)value;
+			_buffer[1] = (bytecs)(value >> 8);
+			_buffer[2] = (bytecs)(value >> 16);
+			_buffer[3] = (bytecs)(value >> 24);
+			_stream->Write(_buffer, 0, 4);
+		}
+
+		void Write(uintcs value) {
+			_buffer[0] = (bytecs)value;
+			_buffer[1] = (bytecs)(value >> 8);
+			_buffer[2] = (bytecs)(value >> 16);
+			_buffer[3] = (bytecs)(value >> 24);
+			_stream->Write(_buffer, 0, 4);
+		}
+
+		void Write(longcs value)
+		{
+			_buffer[0] = (bytecs)value;
+			_buffer[1] = (bytecs)(value >> 8);
+			_buffer[2] = (bytecs)(value >> 16);
+			_buffer[3] = (bytecs)(value >> 24);
+			_buffer[4] = (bytecs)(value >> 32);
+			_buffer[5] = (bytecs)(value >> 40);
+			_buffer[6] = (bytecs)(value >> 48);
+			_buffer[7] = (bytecs)(value >> 56);
+			_stream->Write(_buffer, 0, 8);
+		}
+
+		void Write(ulongcs value)
+		{
+			_buffer[0] = (bytecs)value;
+			_buffer[1] = (bytecs)(value >> 8);
+			_buffer[2] = (bytecs)(value >> 16);
+			_buffer[3] = (bytecs)(value >> 24);
+			_buffer[4] = (bytecs)(value >> 32);
+			_buffer[5] = (bytecs)(value >> 40);
+			_buffer[6] = (bytecs)(value >> 48);
+			_buffer[7] = (bytecs)(value >> 56);
+			_stream->Write(_buffer, 0, 8);
+		}
+
+		void Write(float value)
+		{
+			uintcs num = *(uintcs*)&value;
+			_buffer[0] = (bytecs)num;
+			_buffer[1] = (bytecs)(num >> 8);
+			_buffer[2] = (bytecs)(num >> 16);
+			_buffer[3] = (bytecs)(num >> 24);
+			_stream->Write(_buffer, 0, 4);
+		}
+
+		void Write(std::string value) {
+
+		}
+
+	private:
+		Stream* _stream;
+		std::vector<bytecs> _buffer;
+
+		void Write7BitEncodedInt(intcs value)
+		{
+			uintcs num;
+			for (num = (uintcs)value; num >= 128U; num >>= 7)
+				Write((bytecs)(num | 128U));
+
+			Write((bytecs)num);
 		}
 	};
 }

@@ -31,6 +31,7 @@ namespace cs {
 		virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) { return 0; }
 		virtual intcs ReadByte() { return 0; }
 		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) {}
+		virtual void Write(std::vector<bytecs> const& buffer, intcs offset, intcs count) {}
 		virtual void WriteByte(bytecs value) {}
 	};
 
@@ -151,6 +152,10 @@ namespace cs {
 			_fstream.write(str + offset, count);
 
 			setCurrentPos();
+		}
+
+		virtual void Write(std::vector<bytecs> const& buffer, intcs offset, intcs count) override {
+			Write(buffer.data(), buffer.size(), offset, count);
 		}
 
 		virtual intcs ReadByte() override {
@@ -395,6 +400,10 @@ namespace cs {
 			}
 
 			_position = num1;
+		}
+
+		virtual void Write(std::vector<bytecs> const& buffer, intcs offset, intcs count) override {
+			Write(buffer.data(), buffer.size(), offset, count);
 		}
 
 		constexpr virtual void WriteByte(bytecs value) override {
