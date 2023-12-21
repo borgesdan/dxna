@@ -5,6 +5,8 @@
 #include "enumerations.hpp"
 #include <vector>
 #include <memory>
+#include <fstream>
+#include <string>
 
 namespace cs {
 	class Stream {
@@ -30,6 +32,154 @@ namespace cs {
 		virtual intcs ReadByte() { return 0; }
 		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) {}
 		virtual void WriteByte(bytecs value) {}
+	};
+
+	enum class FileMode {		
+		CreateNew = 1,
+		Create = 2,
+		Open = 3,
+		OpenOrCreate = 4,
+		Truncate = 5,
+		Append = 6,
+	};
+
+	class FileStream : public Stream {
+		FileStream(std::string const& path) {
+			_fstream.open(path.c_str(),
+				std::fstream::in 
+				| std::fstream::out 
+				| std::fstream::binary
+				| std::fstream::ate);
+
+			fileSize = _fstream.tellg();
+			currentpos = fileSize;
+			fileName = path;
+		}
+
+		~FileStream() {
+			if (_fstream.is_open())
+				_fstream.close();
+		}
+
+		virtual bool CanRead() const noexcept override { 
+			return _fstream.is_open();
+		}
+
+		virtual bool CanWrite() const noexcept override { 
+			return _fstream.is_open();
+		}
+
+		virtual bool CanSeek() const noexcept override { 
+			return _fstream.is_open();
+		}
+		
+		virtual intcs Length() const { 
+			if (!_fstream.is_open())
+				return -1;
+
+			return fileSize;			 
+		}
+
+		std::string Name() const {
+			return fileName;
+		}
+
+		virtual longcs Position() const override { 
+			return currentpos;
+		}		
+
+		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) override {
+			if (buffer == nullptr)
+				return -1;
+
+			if (offset < 0)
+				offset = 0;
+
+			if (count < 0)
+				count = 0;
+
+			if (bufferLength - offset < count)
+				return -1;
+			
+			auto str = reinterpret_cast<char*>(buffer);
+
+			auto& i = _fstream.read(str + offset, count);
+
+			setCurrentPos();
+
+			return i.gcount();
+		}
+
+		virtual longcs Seek(longcs offset, SeekOrigin const& origin) override {
+			int seek;
+
+			switch (origin)
+			{
+			case SeekOrigin::Begin:
+				seek = std::ios_base::beg;
+				break;
+			case SeekOrigin::Current:
+				seek = std::ios_base::cur;
+				break;
+			case SeekOrigin::End:
+				seek = std::ios_base::end;
+				break;
+			default:
+				seek = std::ios_base::cur;
+				break;
+			}
+
+			_fstream.seekg(offset, seek);
+
+			setCurrentPos();
+		}
+
+		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) override {
+			auto str = reinterpret_cast<const char*>(buffer);
+			_fstream.write(str + offset, count);
+
+			setCurrentPos();
+		}
+
+		virtual intcs ReadByte() override {
+			char* str = new char[1];
+
+			_fstream.read(str, 1);
+			
+			const auto result = static_cast<bytecs>(str[0]);
+			delete[] str;
+
+			setCurrentPos();
+			return result;
+		}
+
+		virtual void WriteByte(bytecs value) override {
+			char* str = new char[1];
+			str[0] = static_cast<char>(value);
+
+			_fstream.write(str, value);
+
+			delete[] str;
+
+			setCurrentPos();
+		}
+
+		virtual void Close() override {
+			if(_fstream.is_open())
+				_fstream.close();
+		}
+
+	public:
+		std::fstream _fstream;
+
+	private:
+		std::streampos currentpos;
+		size_t fileSize;
+		std::string fileName;
+
+		void setCurrentPos() {
+			currentpos = _fstream.tellg();
+		}
 	};
 
 	class MemoryStream : public Stream {
@@ -188,7 +338,7 @@ namespace cs {
 			_position = num;
 		};
 
-		constexpr virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) {
+		constexpr virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) override {
 			if (buffer == nullptr || offset < 0 || count < 0 || bufferLength - offset < count || !_isOpen || !_writable)
 				return;
 
