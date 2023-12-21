@@ -89,6 +89,9 @@ namespace cs {
 		}		
 
 		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) override {
+			if (!CanRead())
+				return -1;
+			
 			if (buffer == nullptr)
 				return -1;
 
@@ -111,6 +114,9 @@ namespace cs {
 		}
 
 		virtual longcs Seek(longcs offset, SeekOrigin const& origin) override {
+			if (!CanSeek())
+				return -1;
+
 			int seek;
 
 			switch (origin)
@@ -129,19 +135,28 @@ namespace cs {
 				break;
 			}
 
-			_fstream.seekg(offset, seek);
+			const auto& i = _fstream.seekg(offset, seek);			
 
 			setCurrentPos();
+
+			return Position();
 		}
 
 		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) override {
+			if (!CanWrite())
+				return;
+			
 			auto str = reinterpret_cast<const char*>(buffer);
+			
 			_fstream.write(str + offset, count);
 
 			setCurrentPos();
 		}
 
 		virtual intcs ReadByte() override {
+			if (!CanRead())
+				return -1;
+
 			char* str = new char[1];
 
 			_fstream.read(str, 1);
@@ -154,6 +169,9 @@ namespace cs {
 		}
 
 		virtual void WriteByte(bytecs value) override {
+			if (!CanWrite())
+				return;
+
 			char* str = new char[1];
 			str[0] = static_cast<char>(value);
 
