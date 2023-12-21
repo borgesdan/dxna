@@ -1,34 +1,36 @@
 ﻿// dxna.cpp : Defines the entry point for the application.
 //
 
-#include "main.hpp"
-#include <bitset>
-#include <any>
 #include <iostream>
-#include "graphics/viewport.hpp"
+#include "main.hpp"
 #include "cs/cs.hpp"
-#include "structs.hpp"
-#include "types.hpp"
 
 using namespace dxna;
 using namespace std;
 using namespace cs;
 
-class Shibica {
-	Shibica(int i) {
-		value = i;
-	}
-
-		int value = 0;
-};
+void Read(Stream* fs) {
+    BinaryReader reader(fs);   
+    cout << "bool  : " << std::boolalpha<< reader.ReadBoolean() << endl;
+    cout << "byte  : " << (int)reader.ReadByte() << endl;
+    cout << "sbyte : " << (int)reader.ReadSByte() << endl;
+    cout << "char  : " << (char)reader.ReadChar() << endl;
+    cout << "short : " << reader.ReadInt16() << endl;
+    cout << "ushort: " << reader.ReadUInt16() << endl;
+    cout << "int   : " << reader.ReadInt32() << endl;
+    cout << "uint  : " << reader.ReadUInt32() << endl;
+    cout << "long  : " << reader.ReadInt64() << endl;
+    cout << "ulong : " << reader.ReadUInt64() << endl;
+    cout << "single: " << reader.ReadSingle() << endl;
+    cout << "double: " << reader.ReadDouble() << endl;
+    cout << "string: " << reader.ReadString() << endl;
+}
 
 int main() {
-	auto bit = BitConveter::GetBytes(ShortMaxValue);
-
-	for (size_t i = 0; i < 2; ++i)
-		cout << (int)bit[i] << endl;
-
-	delete[] bit;
+	FileStream fs("D:/file.bin");
+    auto a = dynamic_cast<Stream*>(&fs);
+    Read(a);    
 
 	return 0;
 }
+

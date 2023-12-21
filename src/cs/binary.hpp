@@ -16,12 +16,10 @@
 namespace cs {
 	class BinaryReader {
 	public:
-		BinaryReader(StreamPtr const& input) {
+		BinaryReader(Stream* const& input) {
 			stream = input;
 			buffer = std::vector<bytecs>(BufferLength);
-		}
-
-		StreamPtr BaseStream() const { return stream; }
+		}		
 
 		intcs PeekChar(dxna::Error err = dxna::NoError) {
 			if (stream == nullptr) {
@@ -292,13 +290,13 @@ namespace cs {
 	private:
 		static constexpr int MaxCharBytesSize = 128;
 		static constexpr int BufferLength = 16;
-		std::shared_ptr<Stream> stream;
+		Stream* stream;
 		std::vector<bytecs> charBytes;
 		std::vector<charcs> singleChar;
 		std::vector<bytecs> buffer;
 		std::vector<charcs> charBuffer;
 
-		bool m2BytesPerChar{ true };
+		bool m2BytesPerChar{ false };
 
 		intcs InternalReadOneChar(dxna::Error err = dxna::NoError) {
 			intcs num1 = 0;
@@ -341,6 +339,7 @@ namespace cs {
 					//TODO: _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 					std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
 					auto data = reinterpret_cast<char*>(charBytes.data());
+					
 
 					std::u16string ucs2 = ucs2conv.from_bytes(data, data + byteCount);
 
@@ -476,6 +475,7 @@ namespace cs {
 	};
 
 	class BinaryWriter {
+	public:
 		BinaryWriter(Stream* stream) : _stream(stream), _buffer(16) {
 		}
 

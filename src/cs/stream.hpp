@@ -45,6 +45,7 @@ namespace cs {
 	};
 
 	class FileStream : public Stream {
+	public:
 		FileStream(std::string const& path) {
 			_fstream.open(path.c_str(),
 				std::fstream::in 
@@ -55,6 +56,7 @@ namespace cs {
 			fileSize = _fstream.tellg();
 			currentpos = fileSize;
 			fileName = path;
+			_fstream.seekg(0);
 		}
 
 		~FileStream() {
@@ -111,7 +113,11 @@ namespace cs {
 
 			setCurrentPos();
 
-			return i.gcount();
+			return _fstream.gcount();
+		}
+
+		virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) override {
+			return Read(buffer.data(), buffer.size(), offset, count);
 		}
 
 		virtual longcs Seek(longcs offset, SeekOrigin const& origin) override {
@@ -164,7 +170,7 @@ namespace cs {
 
 			char* str = new char[1];
 
-			_fstream.read(str, 1);
+			_fstream.read(str, 1);				
 			
 			const auto result = static_cast<bytecs>(str[0]);
 			delete[] str;
