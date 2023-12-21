@@ -22,27 +22,27 @@ namespace cs {
 
 		StreamPtr BaseStream() const { return stream; }
 
-		dxna::Error PeekChar(intcs& result) {
-			if (stream == nullptr)
-				return dxna::Error(dxna::ErrorCode::CS_STREAM_IS_NULL);
+		intcs PeekChar(dxna::Error err = dxna::NoError) {
+			if (stream == nullptr) {
+				err = dxna::Error(dxna::ErrorCode::CS_STREAM_IS_NULL);
+				return -1;
+			}
 
 			if (!stream->CanSeek()) {
-				result = -1;
-				return dxna::Error::NoError();
+				err = dxna::Error::NoError();
+				return -1;
 			}
 
 			longcs position = stream->Position();
 
-			dxna::Error err;
 			intcs num = Read(err);
 
 			if (err != dxna::ErrorCode::NONE)
-				return err;
+				return -1;
 
 			stream->Position(position);
 
-			result = num;
-			return dxna::Error::NoError();
+			return num;
 		}
 
 		intcs Read(dxna::Error err = dxna::NoError) {
@@ -51,9 +51,8 @@ namespace cs {
 				err = dxna::Error(dxna::ErrorCode::CS_STREAM_IS_NULL);
 				return -1;
 			}
-
-			intcs result;
-			err = InternalReadOneChar(result);			
+			
+			intcs result= InternalReadOneChar(err);
 
 			return err.HasError() ? -1 : result;
 		}
@@ -154,7 +153,7 @@ namespace cs {
 				static_cast<intcs>(buffer[4])
 				| static_cast<intcs>(buffer[5]) << 8
 				| static_cast<intcs>(buffer[6]) << 16
-				| static_cast<intcs>(buffer[7]) << 24) << 32;
+				| static_cast<intcs>(buffer[7]) << 24);
 
 			const auto num2 = static_cast<uintcs>(
 				static_cast<intcs>(buffer[0])
@@ -162,7 +161,7 @@ namespace cs {
 				| static_cast<intcs>(buffer[2]) << 16
 				| static_cast<intcs>(buffer[3]) << 24);
 
-			return static_cast<longcs>(num1) | static_cast<longcs>(num2);
+			return static_cast<longcs>(num1) << 32 | static_cast<longcs>(num2);
 		}
 
 		ulongcs ReadUInt64(dxna::Error err = dxna::NoError) {
@@ -175,7 +174,7 @@ namespace cs {
 				static_cast<intcs>(buffer[4])
 				| static_cast<intcs>(buffer[5]) << 8
 				| static_cast<intcs>(buffer[6]) << 16
-				| static_cast<intcs>(buffer[7]) << 24) << 32;
+				| static_cast<intcs>(buffer[7]) << 24);
 
 			const auto num2 = static_cast<uintcs>(
 				static_cast<intcs>(buffer[0])
@@ -183,7 +182,7 @@ namespace cs {
 				| static_cast<intcs>(buffer[2]) << 16
 				| static_cast<intcs>(buffer[3]) << 24);
 
-			return static_cast<ulongcs>(num1) | static_cast<ulongcs>(num2);
+			return static_cast<ulongcs>(num1) << 32 | static_cast<ulongcs>(num2);
 		}
 
 		float ReadSingle(dxna::Error err = dxna::NoError) {
@@ -211,7 +210,7 @@ namespace cs {
 				static_cast<intcs>(buffer[4])
 				| static_cast<intcs>(buffer[5]) << 8
 				| static_cast<intcs>(buffer[6]) << 16
-				| static_cast<intcs>(buffer[7]) << 24) << 32;
+				| static_cast<intcs>(buffer[7]) << 24);
 
 			const auto num2 = static_cast<uintcs>(
 				  static_cast<intcs>(buffer[0])
@@ -219,13 +218,70 @@ namespace cs {
 				| static_cast<intcs>(buffer[2]) << 6
 				| static_cast<intcs>(buffer[3]) << 24);
 
-			const auto num3 = static_cast<ulongcs>(num1) | static_cast<ulongcs>(num2);
+			const auto num3 = static_cast<ulongcs>(num1) << 32 | static_cast<ulongcs>(num2);
 
 			return *(double*)&num3;
 		}
 
 		std::string ReadString(dxna::Error err = dxna::NoError) {
-			return std::string();
+			static const auto empty = std::string();
+
+			if (stream == nullptr)
+			{
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return empty;
+			}
+			
+			intcs num = 0;
+			intcs val1 = Read7BitEncodedInt(err);
+
+			if (err.HasError())
+				return empty;
+
+			if (val1 < 0) {
+				err = { dxna::ErrorCode::IO_INVALID_STRING_LEN };
+				return empty;
+			}
+
+			if (val1 == 0)
+				return empty;
+
+			if (charBytes.empty())
+				charBytes.resize(MaxCharBytesSize);
+
+			if (charBuffer.empty())
+				charBuffer.resize(MaxCharBytesSize);
+
+			std::string sb;
+
+			do {
+				const auto byteCount = stream->Read(charBytes, 0, val1 - num > 128 ? 128 : val1 - num);
+
+				if (byteCount == 0) {
+					err = { dxna::ErrorCode::CS_STREAM_ENDOFFILE };
+					return empty;
+				}
+
+				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
+				auto data = reinterpret_cast<char*>(charBytes.data());
+
+				std::u16string ucs2 = ucs2conv.from_bytes(data, data + byteCount);
+				const auto result = ucs2conv.to_bytes(ucs2);
+
+				if (num == 0 && byteCount == val1) {					
+					return result;
+				}
+
+				sb.append(result);
+				num += byteCount;				
+
+			} while (num < val1);
+
+			return empty;
+		}
+
+		intcs Read(char* buffer, intcs index, intcs count, dxna::Error err = dxna::NoError) {
+			return 0;
 		}
 
 		std::vector<bytecs> ReadBytes(size_t count, dxna::Error err = dxna::NoError) {
@@ -243,7 +299,7 @@ namespace cs {
 
 		bool m2BytesPerChar{ true };
 
-		dxna::Error InternalReadOneChar(intcs& result) {
+		intcs InternalReadOneChar(dxna::Error err = dxna::NoError) {
 			intcs num1 = 0;
 			longcs num2;
 			longcs num3 = num2 = 0;
@@ -276,12 +332,12 @@ namespace cs {
 				}
 
 				if (byteCount == 0) {
-					result = -1;
-					return dxna::Error::NoError();
+					return -1;
 				}
 
 				try
 				{
+					//TODO: _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 					std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
 					auto data = reinterpret_cast<char*>(charBytes.data());
 
@@ -289,7 +345,7 @@ namespace cs {
 
 					if (!ucs2.empty())
 					{
-						num1 = ucs2.size();
+						num1 = static_cast<intcs>(ucs2.size());
 						singleChar[0] = ucs2[0];
 					}
 
@@ -299,12 +355,12 @@ namespace cs {
 					if (stream->CanSeek())
 						stream->Seek(num3 - stream->Position(), SeekOrigin::Current);
 
-					return dxna::Error(dxna::ErrorCode::CS_STREAM_READ_RANGE_ERROR);
+					err = dxna::Error(dxna::ErrorCode::CS_STREAM_READ_RANGE_ERROR);
+					return -1;
 				}
 			}
 
-			result = num1 == 0 ? -1 : static_cast<intcs>(singleChar[0]);
-			return dxna::Error::NoError();
+			return num1 == 0 ? -1 : static_cast<intcs>(singleChar[0]);
 		}
 
 		dxna::Error FillBuffer(intcs numBytes) {
@@ -339,6 +395,82 @@ namespace cs {
 			}
 
 			return dxna::Error::NoError();
+		}
+
+		intcs Read7BitEncodedInt(dxna::Error err = dxna::NoError)
+		{
+			intcs num1 = 0;
+			intcs num2 = 0;
+
+			while (num2 != 35) {
+				auto num3 = ReadByte(err);
+
+				if (err.HasError())
+					return -1;
+
+				num1 |= (static_cast<intcs>(num3) & static_cast<intcs>(SByteMaxValue)) << num2;
+				num2 += 7;
+				
+				if ((static_cast<intcs>(num3) & 128) == 0)
+					return num1;
+			}
+
+			err = { dxna::ErrorCode::CS_STREAM_BAD_FORMAT_7BIT };
+			return -1;
+		}
+
+		intcs InternalReadChars(char* buffer, size_t bufferSize, intcs index, intcs count, dxna::Error err = dxna::NoError) {
+			intcs charCount = count;
+			
+			if (charBytes.empty())
+				charBytes.resize(128);
+
+			while (charCount > 0) {
+				auto count1 = charCount;
+				
+				if (count1 > 1)
+					--count1;
+
+				if (m2BytesPerChar)
+					count1 <<= 1;
+
+				if (count1 > 128)
+					count1 = 128;
+
+				intcs num = 0;
+				intcs byteCount;
+
+				std::vector<bytecs> numArray;
+
+				byteCount = stream->Read(charBytes, 0, count1);
+				numArray = charBytes;	
+
+				if (byteCount == 0)
+					return count - charCount;
+
+				if (num < 0 || byteCount < 0 || (num + byteCount) > numArray.size()) {
+					err = { dxna::ErrorCode::ARGUMENT_OUT_OF_RANGE };
+					return -1;
+				}
+
+				if (index < 0 || charCount < 0 || (index + charCount) > bufferSize) {
+					err = { dxna::ErrorCode::ARGUMENT_OUT_OF_RANGE };
+					return -1;
+				}
+
+				
+				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
+				auto data = reinterpret_cast<char*>(numArray.data());
+
+				std::u16string ucs2 = ucs2conv.from_bytes((data + num), (data + num) + byteCount);
+				
+				const auto chars = ucs2.size();
+
+				charCount -= chars;
+				index += chars;
+			}
+
+			return count - charCount;
 		}
 	};
 }
