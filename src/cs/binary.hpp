@@ -279,6 +279,62 @@ namespace cs {
 			return empty;
 		}
 
+		std::u16string ReadString16(dxna::Error err = dxna::NoError) {
+			static const auto empty = std::u16string();
+
+			if (stream == nullptr)
+			{
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return empty;
+			}
+
+			intcs num = 0;
+			intcs val1 = Read7BitEncodedInt(err);
+
+			if (err.HasError())
+				return empty;
+
+			if (val1 < 0) {
+				err = { dxna::ErrorCode::IO_INVALID_STRING_LEN };
+				return empty;
+			}
+
+			if (val1 == 0)
+				return empty;
+
+			if (charBytes.empty())
+				charBytes.resize(MaxCharBytesSize);
+
+			if (charBuffer.empty())
+				charBuffer.resize(MaxCharBytesSize);
+
+			std::u16string sb;
+
+			do {
+				const auto byteCount = stream->Read(charBytes, 0, val1 - num > 128 ? 128 : val1 - num);
+
+				if (byteCount == 0) {
+					err = { dxna::ErrorCode::CS_STREAM_ENDOFFILE };
+					return empty;
+				}
+
+				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
+				auto data = reinterpret_cast<char*>(charBytes.data());
+
+				std::u16string ucs2 = ucs2conv.from_bytes(data, data + byteCount);				
+
+				if (num == 0 && byteCount == val1) {
+					return ucs2;
+				}
+
+				sb.append(ucs2);
+				num += byteCount;
+
+			} while (num < val1);
+
+			return empty;
+		}
+
 		intcs Read(char* buffer, intcs index, intcs count, dxna::Error err = dxna::NoError) {
 			return 0;
 		}

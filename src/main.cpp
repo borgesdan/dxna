@@ -4,13 +4,19 @@
 #include <iostream>
 #include "main.hpp"
 #include "cs/cs.hpp"
+#include <Windows.h>
+#include <sstream>
+#include <string>
+#include <cstdio>
 
 using namespace dxna;
 using namespace std;
 using namespace cs;
 
+
 void Read(Stream* fs) {
     BinaryReader reader(fs);   
+
     cout << "bool  : " << std::boolalpha<< reader.ReadBoolean() << endl;
     cout << "byte  : " << (int)reader.ReadByte() << endl;
     cout << "sbyte : " << (int)reader.ReadSByte() << endl;
@@ -23,11 +29,16 @@ void Read(Stream* fs) {
     cout << "ulong : " << reader.ReadUInt64() << endl;
     cout << "single: " << reader.ReadSingle() << endl;
     cout << "double: " << reader.ReadDouble() << endl;
-    cout << "string: " << reader.ReadString() << endl;
+    auto s = reader.ReadString();
+    
+    cout << "string: " << s << endl;
 }
 
 int main() {
-	FileStream fs("D:/file.bin");
+    SetConsoleOutputCP(CP_UTF8);
+    setvbuf(stdout, nullptr, _IONBF, 0);
+
+	FileStream fs("D:/file2.bin");
     auto a = dynamic_cast<Stream*>(&fs);
     Read(a);    
 
