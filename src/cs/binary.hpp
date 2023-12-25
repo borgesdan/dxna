@@ -6,9 +6,6 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <codecvt>
-#include <locale> 
-
 #include "../error.hpp"
 #include "forward.hpp"
 #include "enumerations.hpp"
@@ -19,7 +16,7 @@ namespace cs {
 		BinaryReader(Stream* const& input) {
 			stream = input;
 			buffer = std::vector<bytecs>(BufferLength);
-		}		
+		}
 
 		intcs PeekChar(dxna::Error err = dxna::NoError) {
 			if (stream == nullptr) {
@@ -50,15 +47,15 @@ namespace cs {
 				err = dxna::Error(dxna::ErrorCode::CS_STREAM_IS_NULL);
 				return -1;
 			}
-			
-			intcs result= InternalReadOneChar(err);
+
+			intcs result = InternalReadOneChar(err);
 
 			return err.HasError() ? -1 : result;
 		}
 
 		// Reads a Boolean value from the current stream and advances the current position of the stream by one byte.
 		bool ReadBoolean(dxna::Error err = dxna::NoError) {
-			err = FillBuffer(1);		
+			err = FillBuffer(1);
 			return err.HasError() ? false : buffer[0] > 0;
 		}
 
@@ -102,7 +99,7 @@ namespace cs {
 				return -1;
 
 			return static_cast<shortcs>(
-				static_cast<intcs>(buffer[0]) 
+				static_cast<intcs>(buffer[0])
 				| static_cast<intcs>(buffer[1]) << 8);
 		}
 
@@ -124,8 +121,8 @@ namespace cs {
 				return -1;
 
 			return static_cast<intcs>(buffer[0])
-				| static_cast<intcs>(buffer[1]) << 8 
-				| static_cast<intcs>(buffer[2]) << 16 
+				| static_cast<intcs>(buffer[1]) << 8
+				| static_cast<intcs>(buffer[2]) << 16
 				| static_cast<intcs>(buffer[3]) << 24;
 		}
 
@@ -191,7 +188,7 @@ namespace cs {
 				return std::numeric_limits<float>::quiet_NaN();
 
 			const auto num = static_cast<uintcs>(
-				  static_cast<intcs>(buffer[0])
+				static_cast<intcs>(buffer[0])
 				| static_cast<intcs>(buffer[1]) << 8
 				| static_cast<intcs>(buffer[2]) << 16
 				| static_cast<intcs>(buffer[3]) << 24);
@@ -212,8 +209,8 @@ namespace cs {
 				| static_cast<intcs>(buffer[7]) << 24);
 
 			const auto num2 = static_cast<uintcs>(
-				  static_cast<intcs>(buffer[0])
-				| static_cast<intcs>(buffer[1]) <<8
+				static_cast<intcs>(buffer[0])
+				| static_cast<intcs>(buffer[1]) << 8
 				| static_cast<intcs>(buffer[2]) << 6
 				| static_cast<intcs>(buffer[3]) << 24);
 
@@ -230,7 +227,7 @@ namespace cs {
 				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
 				return empty;
 			}
-			
+
 			intcs num = 0;
 			intcs val1 = Read7BitEncodedInt(err);
 
@@ -260,80 +257,21 @@ namespace cs {
 					err = { dxna::ErrorCode::CS_STREAM_ENDOFFILE };
 					return empty;
 				}
+				
+				auto data = reinterpret_cast<char*>(charBytes.data());				
+				const auto result = std::string(data);
 
-				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
-				auto data = reinterpret_cast<char*>(charBytes.data());
-
-				std::u16string ucs2 = ucs2conv.from_bytes(data, data + byteCount);
-				const auto result = ucs2conv.to_bytes(ucs2);
-
-				if (num == 0 && byteCount == val1) {					
+				if (num == 0 && byteCount == val1) {
 					return result;
 				}
 
 				sb.append(result);
-				num += byteCount;				
-
-			} while (num < val1);
-
-			return empty;
-		}
-
-		std::u16string ReadString16(dxna::Error err = dxna::NoError) {
-			static const auto empty = std::u16string();
-
-			if (stream == nullptr)
-			{
-				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
-				return empty;
-			}
-
-			intcs num = 0;
-			intcs val1 = Read7BitEncodedInt(err);
-
-			if (err.HasError())
-				return empty;
-
-			if (val1 < 0) {
-				err = { dxna::ErrorCode::IO_INVALID_STRING_LEN };
-				return empty;
-			}
-
-			if (val1 == 0)
-				return empty;
-
-			if (charBytes.empty())
-				charBytes.resize(MaxCharBytesSize);
-
-			if (charBuffer.empty())
-				charBuffer.resize(MaxCharBytesSize);
-
-			std::u16string sb;
-
-			do {
-				const auto byteCount = stream->Read(charBytes, 0, val1 - num > 128 ? 128 : val1 - num);
-
-				if (byteCount == 0) {
-					err = { dxna::ErrorCode::CS_STREAM_ENDOFFILE };
-					return empty;
-				}
-
-				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
-				auto data = reinterpret_cast<char*>(charBytes.data());
-
-				std::u16string ucs2 = ucs2conv.from_bytes(data, data + byteCount);				
-
-				if (num == 0 && byteCount == val1) {
-					return ucs2;
-				}
-
-				sb.append(ucs2);
 				num += byteCount;
 
 			} while (num < val1);
 
 			return empty;
-		}
+		}		
 
 		intcs Read(char* buffer, intcs index, intcs count, dxna::Error err = dxna::NoError) {
 			return 0;
@@ -341,7 +279,7 @@ namespace cs {
 
 		std::vector<bytecs> ReadBytes(size_t count, dxna::Error err = dxna::NoError) {
 			return std::vector<bytecs>();
-		}		
+		}
 
 	private:
 		static constexpr int MaxCharBytesSize = 128;
@@ -390,29 +328,13 @@ namespace cs {
 					return -1;
 				}
 
-				try
+				auto data = reinterpret_cast<char*>(charBytes.data());
+				const auto result = std::string(data, data + byteCount);
+
+				if (!result.empty())
 				{
-					//TODO: _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-					std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
-					auto data = reinterpret_cast<char*>(charBytes.data());
-					
-
-					std::u16string ucs2 = ucs2conv.from_bytes(data, data + byteCount);
-
-					if (!ucs2.empty())
-					{
-						num1 = static_cast<intcs>(ucs2.size());
-						singleChar[0] = ucs2[0];
-					}
-
-				}
-				catch (...)
-				{
-					if (stream->CanSeek())
-						stream->Seek(num3 - stream->Position(), SeekOrigin::Current);
-
-					err = dxna::Error(dxna::ErrorCode::CS_STREAM_READ_RANGE_ERROR);
-					return -1;
+					num1 = static_cast<intcs>(result.size());
+					singleChar[0] = result[0];
 				}
 			}
 
@@ -430,7 +352,7 @@ namespace cs {
 
 			if (numBytes == 1)
 			{
-				
+
 				const auto num = stream->ReadByte();
 				if (num == -1)
 					return dxna::Error(dxna::ErrorCode::CS_STREAM_ENDOFFILE);
@@ -442,7 +364,7 @@ namespace cs {
 				do
 				{
 					const auto num = stream->Read(buffer, offset, numBytes - offset);
-					
+
 					if (num == 0)
 						return dxna::Error(dxna::ErrorCode::CS_STREAM_ENDOFFILE);
 
@@ -466,7 +388,7 @@ namespace cs {
 
 				num1 |= (static_cast<intcs>(num3) & static_cast<intcs>(SByteMaxValue)) << num2;
 				num2 += 7;
-				
+
 				if ((static_cast<intcs>(num3) & 128) == 0)
 					return num1;
 			}
@@ -477,13 +399,13 @@ namespace cs {
 
 		intcs InternalReadChars(char* buffer, size_t bufferSize, intcs index, intcs count, dxna::Error err = dxna::NoError) {
 			intcs charCount = count;
-			
+
 			if (charBytes.empty())
 				charBytes.resize(128);
 
 			while (charCount > 0) {
 				auto count1 = charCount;
-				
+
 				if (count1 > 1)
 					--count1;
 
@@ -499,7 +421,7 @@ namespace cs {
 				std::vector<bytecs> numArray;
 
 				byteCount = stream->Read(charBytes, 0, count1);
-				numArray = charBytes;	
+				numArray = charBytes;
 
 				if (byteCount == 0)
 					return count - charCount;
@@ -514,13 +436,10 @@ namespace cs {
 					return -1;
 				}
 
-				
-				std::wstring_convert<std::codecvt_utf8<charcs>, charcs> ucs2conv;
-				auto data = reinterpret_cast<char*>(numArray.data());
+				auto data = reinterpret_cast<char*>(charBytes.data());
+				const auto result = std::string((data + num), (data + num) + byteCount);
 
-				std::u16string ucs2 = ucs2conv.from_bytes((data + num), (data + num) + byteCount);
-				
-				const auto chars = ucs2.size();
+				const auto chars = result.size();
 
 				charCount -= chars;
 				index += chars;
@@ -540,12 +459,16 @@ namespace cs {
 		}
 
 		void Write(bool value) {
-			_buffer[0] = value ? 1 : 0;
+			_buffer[0] = value ? (bytecs)1 : (bytecs)0;
 			_stream->Write(_buffer, 0, 1);
 		}
 
-		void Write(bytecs value) {			
+		void Write(bytecs value) {
 			_stream->WriteByte(value);
+		}
+
+		void Write(sbytecs value) {
+			_stream->WriteByte(static_cast<bytecs>(value));
 		}
 
 		void Write(bytecs const* buffer, size_t bufferLength) {
@@ -563,91 +486,98 @@ namespace cs {
 		void Write(std::vector<bytecs> const& buffer, intcs index, intcs count) {
 			_stream->Write(buffer, index, count);
 		}
-		
+
 		void Write(charcs ch) {
-			_stream->Write(_buffer, 0, ch);
+			_buffer[0] = static_cast<bytecs>(ch);
+			_stream->Write(_buffer, 0, 1);
 		}
 
 		void Write(double value) {
-			ulongcs num = (ulongcs)*(longcs*)&value;
-			_buffer[0] = (bytecs)num;
-			_buffer[1] = (bytecs)(num >> 8);
-			_buffer[2] = (bytecs)(num >> 16);
-			_buffer[3] = (bytecs)(num >> 24);
-			_buffer[4] = (bytecs)(num >> 32);
-			_buffer[5] = (bytecs)(num >> 40);
-			_buffer[6] = (bytecs)(num >> 48);
-			_buffer[7] = (bytecs)(num >> 56);
+			ulongcs num = (ulongcs) * (longcs*)&value;
+			_buffer[0] = static_cast<bytecs>(num);
+			_buffer[1] = static_cast<bytecs>(num >> 8);
+			_buffer[2] = static_cast<bytecs>(num >> 16);
+			_buffer[3] = static_cast<bytecs>(num >> 24);
+			_buffer[4] = static_cast<bytecs>(num >> 32);
+			_buffer[5] = static_cast<bytecs>(num >> 40);
+			_buffer[6] = static_cast<bytecs>(num >> 48);
+			_buffer[7] = static_cast<bytecs>(num >> 56);
 
 			_stream->Write(_buffer, 0, 8);
 		}
 
 		void Write(shortcs value) {
-			_buffer[0] = (bytecs)value;
-			_buffer[1] = (bytecs)((uintcs)value >> 8);
+			_buffer[0] = static_cast<bytecs>(value);
+			_buffer[1] = static_cast<bytecs>((uintcs)value >> 8);
 			_stream->Write(_buffer, 0, 2);
 		}
 
 		void Write(ushortcs value) {
-			_buffer[0] = (bytecs)value;
-			_buffer[1] = (bytecs)((uintcs)value >> 8);
+			_buffer[0] = static_cast<bytecs>(value);
+			_buffer[1] = static_cast<bytecs>((uintcs)value >> 8);
 			_stream->Write(_buffer, 0, 2);
 		}
 
 		void Write(intcs value) {
-			_buffer[0] = (bytecs)value;
-			_buffer[1] = (bytecs)(value >> 8);
-			_buffer[2] = (bytecs)(value >> 16);
-			_buffer[3] = (bytecs)(value >> 24);
+			_buffer[0] = static_cast<bytecs>(value);
+			_buffer[1] = static_cast<bytecs>(value >> 8);
+			_buffer[2] = static_cast<bytecs>(value >> 16);
+			_buffer[3] = static_cast<bytecs>(value >> 24);
 			_stream->Write(_buffer, 0, 4);
 		}
 
 		void Write(uintcs value) {
-			_buffer[0] = (bytecs)value;
-			_buffer[1] = (bytecs)(value >> 8);
-			_buffer[2] = (bytecs)(value >> 16);
-			_buffer[3] = (bytecs)(value >> 24);
+			_buffer[0] = static_cast<bytecs>(value);
+			_buffer[1] = static_cast<bytecs>(value >> 8);
+			_buffer[2] = static_cast<bytecs>(value >> 16);
+			_buffer[3] = static_cast<bytecs>(value >> 24);
 			_stream->Write(_buffer, 0, 4);
 		}
 
 		void Write(longcs value)
 		{
-			_buffer[0] = (bytecs)value;
-			_buffer[1] = (bytecs)(value >> 8);
-			_buffer[2] = (bytecs)(value >> 16);
-			_buffer[3] = (bytecs)(value >> 24);
-			_buffer[4] = (bytecs)(value >> 32);
-			_buffer[5] = (bytecs)(value >> 40);
-			_buffer[6] = (bytecs)(value >> 48);
-			_buffer[7] = (bytecs)(value >> 56);
+			_buffer[0] = static_cast<bytecs>(value);
+			_buffer[1] = static_cast<bytecs>(value >> 8);
+			_buffer[2] = static_cast<bytecs>(value >> 16);
+			_buffer[3] = static_cast<bytecs>(value >> 24);
+			_buffer[4] = static_cast<bytecs>(value >> 32);
+			_buffer[5] = static_cast<bytecs>(value >> 40);
+			_buffer[6] = static_cast<bytecs>(value >> 48);
+			_buffer[7] = static_cast<bytecs>(value >> 56);
 			_stream->Write(_buffer, 0, 8);
 		}
 
 		void Write(ulongcs value)
 		{
-			_buffer[0] = (bytecs)value;
-			_buffer[1] = (bytecs)(value >> 8);
-			_buffer[2] = (bytecs)(value >> 16);
-			_buffer[3] = (bytecs)(value >> 24);
-			_buffer[4] = (bytecs)(value >> 32);
-			_buffer[5] = (bytecs)(value >> 40);
-			_buffer[6] = (bytecs)(value >> 48);
-			_buffer[7] = (bytecs)(value >> 56);
+			_buffer[0] = static_cast<bytecs>(value);
+			_buffer[1] = static_cast<bytecs>(value >> 8);
+			_buffer[2] = static_cast<bytecs>(value >> 16);
+			_buffer[3] = static_cast<bytecs>(value >> 24);
+			_buffer[4] = static_cast<bytecs>(value >> 32);
+			_buffer[5] = static_cast<bytecs>(value >> 40);
+			_buffer[6] = static_cast<bytecs>(value >> 48);
+			_buffer[7] = static_cast<bytecs>(value >> 56);
 			_stream->Write(_buffer, 0, 8);
 		}
 
 		void Write(float value)
 		{
 			uintcs num = *(uintcs*)&value;
-			_buffer[0] = (bytecs)num;
-			_buffer[1] = (bytecs)(num >> 8);
-			_buffer[2] = (bytecs)(num >> 16);
-			_buffer[3] = (bytecs)(num >> 24);
+			_buffer[0] = static_cast<bytecs>(num);
+			_buffer[1] = static_cast<bytecs>(num >> 8);
+			_buffer[2] = static_cast<bytecs>(num >> 16);
+			_buffer[3] = static_cast<bytecs>(num >> 24);
 			_stream->Write(_buffer, 0, 4);
 		}
 
-		void Write(std::string value) {
+		void Write(std::string const& value) {
+			Write(value.c_str(), value.size());
+		}
 
+		void Write(const char* _string, size_t stringLength) {			
+			Write7BitEncodedInt(stringLength);
+			const auto b = reinterpret_cast<const bytecs*>(_string);			
+			_stream->Write(b, stringLength, 0, stringLength);
 		}
 
 	private:
@@ -657,8 +587,8 @@ namespace cs {
 		void Write7BitEncodedInt(intcs value)
 		{
 			uintcs num;
-			for (num = (uintcs)value; num >= 128U; num >>= 7)
-				Write((bytecs)(num | 128U));
+			for (num = (uintcs)value; num >= (uintcs)128U; num >>= 7)
+				Write((bytecs)(num | (uintcs)128U));
 
 			Write((bytecs)num);
 		}
