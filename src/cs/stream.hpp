@@ -26,10 +26,10 @@ namespace cs {
 		virtual void WriteTimeout(intcs value) { }
 		virtual void Close() {}
 		virtual void Flush() {}
-		virtual longcs Seek(longcs offset, SeekOrigin const& origin) { return 0; }
+		virtual longcs Seek(longcs offset, SeekOrigin const& origin) { return -1; }
 		virtual void SetLength(longcs value) {};
-		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) { return 0; }
-		virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) { return 0; }
+		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) { return -1; }
+		virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) { return -1; }
 		virtual intcs ReadByte() { return 0; }
 		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) {}
 		virtual void Write(std::vector<bytecs> const& buffer, intcs offset, intcs count) {}

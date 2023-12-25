@@ -257,8 +257,8 @@ namespace cs {
 					err = { dxna::ErrorCode::CS_STREAM_ENDOFFILE };
 					return empty;
 				}
-				
-				auto data = reinterpret_cast<char*>(charBytes.data());				
+
+				auto data = reinterpret_cast<char*>(charBytes.data());
 				const auto result = std::string(data);
 
 				if (num == 0 && byteCount == val1) {
@@ -271,7 +271,7 @@ namespace cs {
 			} while (num < val1);
 
 			return empty;
-		}		
+		}
 
 		intcs Read(char* buffer, intcs index, intcs count, dxna::Error err = dxna::NoError) {
 			return 0;
@@ -454,45 +454,95 @@ namespace cs {
 		BinaryWriter(Stream* stream) : _stream(stream), _buffer(16) {
 		}
 
-		longcs Seek(intcs offset, SeekOrigin origin) {
+		longcs Seek(intcs offset, SeekOrigin origin, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return -1;
+			}
+
 			_stream->Seek(offset, origin);
 		}
 
-		void Write(bool value) {
+		void Write(bool value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = value ? (bytecs)1 : (bytecs)0;
 			_stream->Write(_buffer, 0, 1);
 		}
 
-		void Write(bytecs value) {
+		void Write(bytecs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_stream->WriteByte(value);
 		}
 
-		void Write(sbytecs value) {
+		void Write(sbytecs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_stream->WriteByte(static_cast<bytecs>(value));
 		}
 
-		void Write(bytecs const* buffer, size_t bufferLength) {
+		void Write(bytecs const* buffer, size_t bufferLength, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_stream->Write(buffer, bufferLength, 0, bufferLength);
 		}
 
-		void Write(std::vector<bytecs> const& buffer) {
+		void Write(std::vector<bytecs> const& buffer, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_stream->Write(buffer, 0, buffer.size());
 		}
 
-		void Write(bytecs const* buffer, size_t bufferLength, intcs index, intcs count) {
+		void Write(bytecs const* buffer, size_t bufferLength, intcs index, intcs count, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_stream->Write(buffer, bufferLength, index, count);
 		}
 
-		void Write(std::vector<bytecs> const& buffer, intcs index, intcs count) {
+		void Write(std::vector<bytecs> const& buffer, intcs index, intcs count, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_stream->Write(buffer, index, count);
 		}
 
-		void Write(charcs ch) {
+		void Write(charcs ch, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = static_cast<bytecs>(ch);
 			_stream->Write(_buffer, 0, 1);
 		}
 
-		void Write(double value) {
+		void Write(double value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			ulongcs num = (ulongcs) * (longcs*)&value;
 			_buffer[0] = static_cast<bytecs>(num);
 			_buffer[1] = static_cast<bytecs>(num >> 8);
@@ -506,19 +556,34 @@ namespace cs {
 			_stream->Write(_buffer, 0, 8);
 		}
 
-		void Write(shortcs value) {
+		void Write(shortcs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = static_cast<bytecs>(value);
 			_buffer[1] = static_cast<bytecs>((uintcs)value >> 8);
 			_stream->Write(_buffer, 0, 2);
 		}
 
-		void Write(ushortcs value) {
+		void Write(ushortcs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = static_cast<bytecs>(value);
 			_buffer[1] = static_cast<bytecs>((uintcs)value >> 8);
 			_stream->Write(_buffer, 0, 2);
 		}
 
-		void Write(intcs value) {
+		void Write(intcs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = static_cast<bytecs>(value);
 			_buffer[1] = static_cast<bytecs>(value >> 8);
 			_buffer[2] = static_cast<bytecs>(value >> 16);
@@ -526,7 +591,12 @@ namespace cs {
 			_stream->Write(_buffer, 0, 4);
 		}
 
-		void Write(uintcs value) {
+		void Write(uintcs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = static_cast<bytecs>(value);
 			_buffer[1] = static_cast<bytecs>(value >> 8);
 			_buffer[2] = static_cast<bytecs>(value >> 16);
@@ -534,8 +604,12 @@ namespace cs {
 			_stream->Write(_buffer, 0, 4);
 		}
 
-		void Write(longcs value)
-		{
+		void Write(longcs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = static_cast<bytecs>(value);
 			_buffer[1] = static_cast<bytecs>(value >> 8);
 			_buffer[2] = static_cast<bytecs>(value >> 16);
@@ -547,8 +621,12 @@ namespace cs {
 			_stream->Write(_buffer, 0, 8);
 		}
 
-		void Write(ulongcs value)
-		{
+		void Write(ulongcs value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			_buffer[0] = static_cast<bytecs>(value);
 			_buffer[1] = static_cast<bytecs>(value >> 8);
 			_buffer[2] = static_cast<bytecs>(value >> 16);
@@ -560,8 +638,12 @@ namespace cs {
 			_stream->Write(_buffer, 0, 8);
 		}
 
-		void Write(float value)
-		{
+		void Write(float value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			uintcs num = *(uintcs*)&value;
 			_buffer[0] = static_cast<bytecs>(num);
 			_buffer[1] = static_cast<bytecs>(num >> 8);
@@ -570,18 +652,30 @@ namespace cs {
 			_stream->Write(_buffer, 0, 4);
 		}
 
-		void Write(std::string const& value) {
+		void Write(std::string const& value, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			Write(value.c_str(), value.size());
 		}
 
-		void Write(const char* _string, size_t stringLength) {			
+		void Write(const char* _string, size_t stringLength, dxna::Error err = dxna::NoError) {
+			if (_stream == nullptr) {
+				err = { dxna::ErrorCode::CS_STREAM_IS_NULL };
+				return;
+			}
+
 			Write7BitEncodedInt(stringLength);
-			const auto b = reinterpret_cast<const bytecs*>(_string);			
+			const auto b = reinterpret_cast<const bytecs*>(_string);
 			_stream->Write(b, stringLength, 0, stringLength);
 		}
 
-	private:
+	public:
 		Stream* _stream;
+
+	private:
 		std::vector<bytecs> _buffer;
 
 		void Write7BitEncodedInt(intcs value)
