@@ -95,7 +95,7 @@ namespace dxna::graphics {
 		EffectAnnotationCollectionPtr Annotations;
 		//Representa um object
 		anyptr Data;
-		ulongcs StateKey{ 0 };
+		ulongcs StateKey{ 0 };	
 	};
 	
 	class EffectParameterCollection {

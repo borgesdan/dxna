@@ -8,3 +8,4 @@
 #include "effect.hpp"
 #include "constbuffer.hpp"
 #include "defprocessors.hpp"
+#include "light.hpp"

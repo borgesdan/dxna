@@ -6,20 +6,16 @@
 
 namespace dxna::graphics {
 	class GraphicsResource;
-	class GraphicsDevice;
-	
+	class GraphicsDevice;	
 	struct SamplerInfo;
 	struct VertexAttribute;
 	class Shader;
-
 	struct SamplerState;
 	struct TargetBlendState;
 	struct BlendState;
 	struct DepthStencilState;
 	struct RasterizerState;
-
 	class SamplerStateCollection;
-
 	class Effect;
 	class EffectAnnotation;
 	class EffectParameter;
@@ -31,8 +27,8 @@ namespace dxna::graphics {
 	class EffectPassCollection;
 	class EffectTechniqueCollection;
 	class ConstantBufferCollection;
-
 	class TextureCollection;
+	class DirectionalLight;
 
 	using GraphicsResourcePtr				= std::shared_ptr<GraphicsResource>;
 	using GraphicsDevicePtr					= std::shared_ptr<GraphicsDevice>;
@@ -57,6 +53,7 @@ namespace dxna::graphics {
 	using EffectTechniqueCollectionPtr		= std::shared_ptr<EffectTechniqueCollection>;
 	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;	
 	using TextureCollectionPtr				= std::shared_ptr<TextureCollection>;	
+	using DirectionalLightPtr				= std::shared_ptr<DirectionalLight>;
 }
 
 #endif

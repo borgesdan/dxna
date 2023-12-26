@@ -2,6 +2,21 @@
 #define DXNA_GRAPHICS_ENUMERATIONS_HPP
 
 namespace dxna::graphics {
+    enum class ClearOptions {
+        Target = 1,
+        DepthBuffer = 2,
+        Stencil = 4
+    };
+
+    enum class CubeMapFace {
+        PositiveX,
+        NegativeX,
+        PositiveY,
+        NegativeY,
+        PositiveZ,
+        NegativeZ
+    };
+
 	enum class Blend {
         One,
         Zero,

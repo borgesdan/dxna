@@ -5,6 +5,7 @@
 
 namespace dxna::graphics {
 	class DefaultColorProcessors {
+    public:
 		static void ZeroTransparentPixels(bytecs* data, size_t dataLength) {
             for (size_t i = 0; i < dataLength; i += 4, data += 4) {
                 if (data[3] == 0) {
@@ -21,6 +22,11 @@ namespace dxna::graphics {
                 data[2] = static_cast<bytecs>(data[2] * falpha);
             }
         }
+
+    private:
+        constexpr DefaultColorProcessors() = default;
+        constexpr DefaultColorProcessors(DefaultColorProcessors&&) = default;
+        constexpr DefaultColorProcessors(const DefaultColorProcessors&) = default;
 	};
 }
 
