@@ -18,7 +18,7 @@ namespace dxna::graphics {
 	}
 
 	EffectParameterCollectionPtr Effect::ReadParameters(cs::BinaryReader& reader) {
-		const auto count = reader.ReadInt32().Value();
+		const auto count = reader.ReadInt32();
 
 		if (count == 0)
 			return New<EffectParameterCollection>();
@@ -26,8 +26,8 @@ namespace dxna::graphics {
 		auto parameters = NewVector<EffectParameterPtr>(count);
 
 		for (size_t i = 0; i < count; ++i) {
-			const auto class_ = (EffectParameterClass)reader.ReadByte().Value();
-			const auto type = (EffectParameterType)reader.ReadByte().Value();
+			const auto class_ = (EffectParameterClass)reader.ReadByte();
+			const auto type = (EffectParameterType)reader.ReadByte();
 			const auto name = reader.ReadString();
 			const auto semantic = reader.ReadString();
 			const auto annotations = ReadAnnotations(reader);
@@ -45,7 +45,7 @@ namespace dxna::graphics {
 					auto buffer = NewVector<intcs>(rowCount * columnCount);
 
 					for (size_t j = 0; j < buffer->size(); ++j)
-						buffer->at(j) = reader.ReadInt32().Value();
+						buffer->at(j) = reader.ReadInt32();
 
 					*data = buffer;
 
@@ -54,7 +54,7 @@ namespace dxna::graphics {
 				case EffectParameterType::Single: {
 					auto buffer = NewVector<intcs>(rowCount * columnCount);
 					for (size_t j = 0; j < buffer->size(); ++j)
-						buffer->at(j) = reader.ReadSingle().Value();
+						buffer->at(j) = reader.ReadSingle();
 
 					*data = buffer;
 					break;
@@ -73,64 +73,64 @@ namespace dxna::graphics {
 	}
 
 	EffectPassCollectionPtr Effect::ReadPasses(BinaryReader& reader, EffectPtr const& effect, vectorptr<ShaderPtr> const& shaders) {
-		auto passes = NewVector<EffectPassPtr>(reader.ReadInt32().Value());
+		auto passes = NewVector<EffectPassPtr>(reader.ReadInt32());
 
 		for (size_t i = 0; i < passes->size(); i++) {
 			auto name = reader.ReadString();
 			auto annotations = ReadAnnotations(reader);
 			
-			auto shaderIndex = reader.ReadInt32().Value();
+			auto shaderIndex = reader.ReadInt32();
 			ShaderPtr vertexShader = shaderIndex < 0 ? nullptr : shaders->at(shaderIndex);
 			
-			shaderIndex = reader.ReadInt32().Value();
+			shaderIndex = reader.ReadInt32();
 			ShaderPtr pixelShader = shaderIndex < 0 ? nullptr : shaders->at(shaderIndex);
 
 			BlendStatePtr blend = nullptr;
 			DepthStencilStatePtr depth = nullptr;
 			RasterizerStatePtr raster = nullptr;
 
-			if (reader.ReadBoolean().Value()) {
+			if (reader.ReadBoolean()) {
 				blend = New<BlendState>();
-				blend->AlphaBlendFunction((BlendFunction)reader.ReadByte().Value());
-				blend->AlphaDestinationBlend((Blend)reader.ReadByte().Value());
-				blend->AlphaSourceBlend((Blend)reader.ReadByte().Value());
+				blend->AlphaBlendFunction((BlendFunction)reader.ReadByte());
+				blend->AlphaDestinationBlend((Blend)reader.ReadByte());
+				blend->AlphaSourceBlend((Blend)reader.ReadByte());
 				blend->BlendFactor = Color(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-				blend->ColorBlendFunction((BlendFunction)reader.ReadByte().Value());
-				blend->ColorDestinationBlend((Blend)reader.ReadByte().Value());
-				blend->ColorSourceBlend((Blend)reader.ReadByte().Value());
-				blend->ColorWriteChannels((ColorWriteChannels)reader.ReadByte().Value());
-				blend->ColorWriteChannels1((ColorWriteChannels)reader.ReadByte().Value());
-				blend->ColorWriteChannels2((ColorWriteChannels)reader.ReadByte().Value());
-				blend->ColorWriteChannels3((ColorWriteChannels)reader.ReadByte().Value());
-				blend->MultiSampleMask = reader.ReadInt32().Value();
+				blend->ColorBlendFunction((BlendFunction)reader.ReadByte());
+				blend->ColorDestinationBlend((Blend)reader.ReadByte());
+				blend->ColorSourceBlend((Blend)reader.ReadByte());
+				blend->ColorWriteChannels((ColorWriteChannels)reader.ReadByte());
+				blend->ColorWriteChannels1((ColorWriteChannels)reader.ReadByte());
+				blend->ColorWriteChannels2((ColorWriteChannels)reader.ReadByte());
+				blend->ColorWriteChannels3((ColorWriteChannels)reader.ReadByte());
+				blend->MultiSampleMask = reader.ReadInt32();
 			}
-			if (reader.ReadBoolean().Value()) {
+			if (reader.ReadBoolean()) {
 				depth = New<DepthStencilState>();
-				depth->CounterClockwiseStencilDepthBufferFail = (StencilOperation)reader.ReadByte().Value();
-				depth->CounterClockwiseStencilFail = (StencilOperation)reader.ReadByte().Value();
-				depth->CounterClockwiseStencilFunction = (CompareFunction)reader.ReadByte().Value();
-				depth->CounterClockwiseStencilPass = (StencilOperation)reader.ReadByte().Value();
-				depth->DepthBufferEnable = reader.ReadBoolean().Value();
-				depth->DepthBufferFunction = (CompareFunction)reader.ReadByte().Value();
-				depth->DepthBufferWriteEnable = reader.ReadBoolean().Value();
-				depth->ReferenceStencil = reader.ReadInt32().Value();
-				depth->StencilDepthBufferFail = (StencilOperation)reader.ReadByte().Value();
-				depth->StencilEnable = reader.ReadBoolean().Value();
-				depth->StencilFail = (StencilOperation)reader.ReadByte().Value();
-				depth->StencilFunction = (CompareFunction)reader.ReadByte().Value();
-				depth->StencilMask = reader.ReadInt32().Value();
-				depth->StencilPass = (StencilOperation)reader.ReadByte().Value();
-				depth->StencilWriteMask = reader.ReadInt32().Value();
-				depth->TwoSidedStencilMode = reader.ReadBoolean().Value();
+				depth->CounterClockwiseStencilDepthBufferFail = (StencilOperation)reader.ReadByte();
+				depth->CounterClockwiseStencilFail = (StencilOperation)reader.ReadByte();
+				depth->CounterClockwiseStencilFunction = (CompareFunction)reader.ReadByte();
+				depth->CounterClockwiseStencilPass = (StencilOperation)reader.ReadByte();
+				depth->DepthBufferEnable = reader.ReadBoolean();
+				depth->DepthBufferFunction = (CompareFunction)reader.ReadByte();
+				depth->DepthBufferWriteEnable = reader.ReadBoolean();
+				depth->ReferenceStencil = reader.ReadInt32();
+				depth->StencilDepthBufferFail = (StencilOperation)reader.ReadByte();
+				depth->StencilEnable = reader.ReadBoolean();
+				depth->StencilFail = (StencilOperation)reader.ReadByte();
+				depth->StencilFunction = (CompareFunction)reader.ReadByte();
+				depth->StencilMask = reader.ReadInt32();
+				depth->StencilPass = (StencilOperation)reader.ReadByte();
+				depth->StencilWriteMask = reader.ReadInt32();
+				depth->TwoSidedStencilMode = reader.ReadBoolean();
 			}
-			if (reader.ReadBoolean().Value()) {
+			if (reader.ReadBoolean()) {
 				raster = New<RasterizerState>();
-				raster->CullMode = (CullMode)reader.ReadByte().Value();
-				raster->DepthBias = reader.ReadSingle().Value();
-				raster->FillMode = (FillMode)reader.ReadByte().Value();
-				raster->MultiSampleAntiAlias = reader.ReadBoolean().Value();
-				raster->ScissorTestEnable = reader.ReadBoolean().Value();
-				raster->SlopeScaleDepthBias = reader.ReadSingle().Value();
+				raster->CullMode = (CullMode)reader.ReadByte();
+				raster->DepthBias = reader.ReadSingle();
+				raster->FillMode = (FillMode)reader.ReadByte();
+				raster->MultiSampleAntiAlias = reader.ReadBoolean();
+				raster->ScissorTestEnable = reader.ReadBoolean();
+				raster->SlopeScaleDepthBias = reader.ReadSingle();
 			}
 
 			passes->at(i) = New<EffectPass>(
@@ -159,16 +159,16 @@ namespace dxna::graphics {
 	}
 
 	void Effect::ReadEffect(cs::BinaryReader& reader) {
-		ConstantBuffers = NewVector<ConstantBufferPtr>(reader.ReadInt32().Value());
+		ConstantBuffers = NewVector<ConstantBufferPtr>(reader.ReadInt32());
 
 		for (size_t c = 0; c < ConstantBuffers->size(); c++) {
 			const auto name = reader.ReadString();
 			const auto sizeInBytes = (intcs)reader.ReadInt16();
-			auto parameters = NewVector<intcs>(reader.ReadInt32().Value());
+			auto parameters = NewVector<intcs>(reader.ReadInt32());
 			auto offsets = NewVector<intcs>(parameters->size());
 
 			for (size_t i = 0; i < parameters->size(); i++)	{
-				parameters->at(i) = reader.ReadInt32().Value();
+				parameters->at(i) = reader.ReadInt32();
 				offsets->at(i) = (intcs)reader.ReadUInt16();
 			}
 
@@ -179,11 +179,11 @@ namespace dxna::graphics {
 				name);
 		}
 
-		_shaders = NewVector<ShaderPtr>(reader.ReadInt32().Value());
+		_shaders = NewVector<ShaderPtr>(reader.ReadInt32());
 
 		Parameters = ReadParameters(reader);
 
-		auto techniques = NewVector<EffectTechniquePtr>(reader.ReadInt32().Value());
+		auto techniques = NewVector<EffectTechniquePtr>(reader.ReadInt32());
 
 		for (size_t t = 0; t < techniques->size(); ++t) {
 			const auto name = reader.ReadString();

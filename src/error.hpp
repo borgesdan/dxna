@@ -8,6 +8,8 @@ namespace dxna {
 	//Representa uma estrutura de dados que armazena uma flag de erro
 	//e um valor de index do argumento de função ou outro valor convencionado.
 	struct Error {	
+		constexpr Error() = default;
+
 		constexpr Error(ErrorCode const& error) noexcept : Flag(error) {}
 
 		constexpr Error(ErrorCode const& error, int argIndex) noexcept : 
@@ -30,6 +32,8 @@ namespace dxna {
 		int Index { -1 };
 		ErrorCode Flag{ ErrorCode::NONE };
 	};	
+
+	inline constexpr Error NoError = Error::NoError();
 }
 
 #endif

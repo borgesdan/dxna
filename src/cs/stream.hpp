@@ -5,6 +5,9 @@
 #include "enumerations.hpp"
 #include <vector>
 #include <memory>
+#include <fstream>
+#include <string>
+#include <filesystem>
 
 namespace cs {
 	class Stream {
@@ -23,54 +26,232 @@ namespace cs {
 		virtual void WriteTimeout(intcs value) { }
 		virtual void Close() {}
 		virtual void Flush() {}
-		virtual longcs Seek(longcs offset, SeekOrigin const& origin) { return 0; }
+		virtual longcs Seek(longcs offset, SeekOrigin const& origin) { return -1; }
 		virtual void SetLength(longcs value) {};
-		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) { return 0; }
+		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) { return -1; }
+		virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) { return -1; }
 		virtual intcs ReadByte() { return 0; }
 		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) {}
+		virtual void Write(std::vector<bytecs> const& buffer, intcs offset, intcs count) {}
 		virtual void WriteByte(bytecs value) {}
+	};
+
+	enum class FileMode {
+		CreateNew = 1,
+		Create = 2,
+		Open = 3,
+		OpenOrCreate = 4,
+		Truncate = 5,
+		Append = 6,
+	};
+
+	class FileStream : public Stream {
+	public:
+		FileStream(std::string const& path) {
+
+			const auto exists = std::filesystem::exists(path);
+			int flags = std::fstream::in
+				| std::fstream::out
+				| std::fstream::binary
+				| std::fstream::ate;
+
+			if (!exists)
+				flags |= std::fstream::trunc;
+
+			_fstream.open(path.c_str(), flags);
+
+			fileSize = _fstream.tellg();
+			currentpos = fileSize;
+			_fstream.seekg(0);
+		}
+
+		~FileStream() {
+			if (_fstream.is_open())
+				_fstream.close();
+		}
+
+		virtual bool CanRead() const noexcept override {
+			return _fstream.is_open();
+		}
+
+		virtual bool CanWrite() const noexcept override {
+			return _fstream.is_open();
+		}
+
+		virtual bool CanSeek() const noexcept override {
+			return _fstream.is_open();
+		}
+
+		virtual intcs Length() const {
+			if (!_fstream.is_open())
+				return -1;
+
+			return fileSize + additionalSize;
+		}
+
+		virtual longcs Position() const override {
+			return currentpos;
+		}
+
+		virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) override {
+			if (!CanRead())
+				return -1;
+
+			if (buffer == nullptr)
+				return -1;
+
+			if (offset < 0)
+				offset = 0;
+
+			if (count < 0)
+				count = 0;
+
+			if (bufferLength - offset < count)
+				return -1;
+
+			auto str = reinterpret_cast<char*>(buffer);
+
+			auto& i = _fstream.read(str + offset, count);
+
+			setCurrentPos();
+
+			return _fstream.gcount();
+		}
+
+		virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) override {
+			return Read(buffer.data(), buffer.size(), offset, count);
+		}
+
+		virtual longcs Seek(longcs offset, SeekOrigin const& origin) override {
+			if (!CanSeek())
+				return -1;
+
+			int seek;
+
+			switch (origin)
+			{
+			case SeekOrigin::Begin:
+				seek = std::ios_base::beg;
+				break;
+			case SeekOrigin::Current:
+				seek = std::ios_base::cur;
+				break;
+			case SeekOrigin::End:
+				seek = std::ios_base::end;
+				break;
+			default:
+				seek = std::ios_base::cur;
+				break;
+			}
+
+			const auto& i = _fstream.seekg(offset, seek);
+
+			setCurrentPos();
+
+			return Position();
+		}
+
+		virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) override {
+			if (!CanWrite())
+				return;
+
+			auto str = reinterpret_cast<const char*>(buffer);
+
+			_fstream.write(str + offset, count);
+
+			setCurrentPos();
+			addSize(count);
+		}
+
+		virtual void Write(std::vector<bytecs> const& buffer, intcs offset, intcs count) override {
+			Write(buffer.data(), buffer.size(), offset, count);
+			addSize(count);
+		}
+
+		virtual intcs ReadByte() override {
+			if (!CanRead())
+				return -1;
+
+			char c = 0;
+
+			_fstream.read(&c, 1);
+
+			const auto result = static_cast<int>(c);
+
+			setCurrentPos();
+
+			return result;
+		}
+
+		virtual void WriteByte(bytecs value) override {
+			if (!CanWrite())
+				return;
+
+			const char c = static_cast<char>(value);
+
+			_fstream.write(&c, 1);
+
+			setCurrentPos();
+			addSize(1);
+		}
+
+		virtual void Close() override {
+			if (_fstream.is_open())
+				_fstream.close();
+		}
+
+	public:
+		std::fstream _fstream;
+
+	private:
+		std::streampos currentpos;
+		size_t fileSize{ 0 };
+		size_t additionalSize{ 0 };
+
+		void setCurrentPos() {
+			currentpos = _fstream.tellg();
+		}
+
+		void addSize(size_t size) {
+			additionalSize += size;
+		}		
 	};
 
 	class MemoryStream : public Stream {
 	public:
-		constexpr MemoryStream(intcs capacity) {
-			if (capacity <= 0)
-				capacity = 1;
+		constexpr MemoryStream(size_t capacity) :
+			_capacity(capacity),
+			_buffer(std::vector<bytecs>(capacity)),
+			_expandable(true),
+			_writable(true),
+			_exposable(true),
+			_origin(0),
+			_isOpen(true) {}
 
-			_buffer = std::vector<bytecs>(capacity);
-			_capacity = capacity;
-			_expandable = true;
-			_writable = true;
-			_exposable = true;
-			_origin = 0;
-			_isOpen = true;
-		}
-
-		constexpr MemoryStream(std::vector<bytecs> const& buffer, intcs index, intcs count, bool writable = true, bool publiclyVisible = false) {			
-			if (index < 0)
-				index = 0;
-
-			if (count < 0)
-				count = 0;
-			
-			_buffer = buffer;
-
+		constexpr MemoryStream(
+			std::vector<bytecs> const& buffer,
+			size_t index,
+			size_t count,
+			bool writable = true,
+			bool publiclyVisible = false) :
+			_buffer(buffer),
+			_origin(index),
+			_position(_origin),
+			_length(_position + count),
+			_capacity(_length),
+			_writable(writable),
+			_exposable(publiclyVisible),
+			_expandable(false),
+			_isOpen(true) {
 			if (_buffer.size() - index < count)
 				_buffer.resize(count);
-
-			_origin = _position = index;
-			_length = _capacity = index + count;
-			_writable = writable;
-			_exposable = publiclyVisible;
-			_expandable = false;
-			_isOpen = true;
 		}
 
-		constexpr virtual bool CanRead() const override { return _isOpen; }
-		constexpr virtual bool CanSeek() const { return _isOpen; }
-		constexpr virtual bool CanWrite() const { return _writable; }
+		constexpr virtual bool CanRead() const noexcept override { return _isOpen; }
+		constexpr virtual bool CanSeek() const noexcept { return _isOpen; }
+		constexpr virtual bool CanWrite() const noexcept { return _writable; }
 
-		constexpr virtual intcs Capacity() const {
+		constexpr virtual intcs Capacity() const noexcept {
 			if (!_isOpen)
 				return 0;
 
@@ -85,14 +266,14 @@ namespace cs {
 			_capacity = value;
 		}
 
-		constexpr virtual longcs Position() const override {
+		constexpr virtual longcs Position() const noexcept override {
 			if (!_isOpen)
 				return 0;
 
 			return _position - _origin;
 		}
 
-		constexpr virtual void Position(longcs value) override {
+		constexpr virtual void Position(longcs value) noexcept override {
 			if (value < 0)
 				return;
 
@@ -101,7 +282,7 @@ namespace cs {
 
 		constexpr virtual intcs Read(bytecs* buffer, intcs bufferLength, intcs offset, intcs count) override {
 			if (buffer == nullptr || bufferLength - offset < count || offset < 0 || count < 0 || !_isOpen)
-				return -1;												
+				return -1;
 
 			auto byteCount = _length - _position;
 
@@ -124,6 +305,10 @@ namespace cs {
 
 			_position += byteCount;
 			return static_cast<intcs>(byteCount);
+		}
+
+		constexpr virtual intcs Read(std::vector<bytecs>& buffer, intcs offset, intcs count) override {
+			return Read(buffer.data(), static_cast<intcs>(buffer.size()), offset, count);
 		}
 
 		constexpr virtual intcs ReadByte() override {
@@ -188,7 +373,7 @@ namespace cs {
 			_position = num;
 		};
 
-		constexpr virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) {
+		constexpr virtual void Write(bytecs const* buffer, intcs bufferLength, intcs offset, intcs count) override {
 			if (buffer == nullptr || offset < 0 || count < 0 || bufferLength - offset < count || !_isOpen || !_writable)
 				return;
 
@@ -229,6 +414,10 @@ namespace cs {
 			_position = num1;
 		}
 
+		virtual void Write(std::vector<bytecs> const& buffer, intcs offset, intcs count) override {
+			Write(buffer.data(), buffer.size(), offset, count);
+		}
+
 		constexpr virtual void WriteByte(bytecs value) override {
 			if (!_isOpen || !_writable)
 				return;
@@ -253,18 +442,7 @@ namespace cs {
 			_buffer[_position++] = value;
 		}
 
-		virtual void WriteTo(Stream* stream) const {
-			if (stream == nullptr)
-				return;
-
-			if (!_isOpen)
-				return;
-
-			stream->Write(_buffer.data(),
-				static_cast<intcs>(_buffer.size()),
-				static_cast<intcs>(_origin),
-				static_cast<intcs>(_length - _origin));
-		}
+		virtual void WriteTo(Stream* stream) const;
 
 	private:
 		constexpr bool EnsureCapacity(intcs value) {
@@ -300,9 +478,6 @@ namespace cs {
 		bool _exposable{ true };
 		bool _isOpen{ false };
 	};
-
-	using StreamPtr = std::shared_ptr<Stream>;
-	using MemoryStreamPtr = std::shared_ptr<MemoryStream>;
 }
 
 #endif

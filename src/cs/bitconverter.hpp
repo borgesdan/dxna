@@ -170,7 +170,7 @@ namespace cs {
 		}
 
 		
-		static constexpr char GetHexValue(intcs i) {
+		static constexpr charcs GetHexValue(intcs i) {
 			return i < 10 ? (charcs)(i + 48) : (charcs)(i - 10 + 65);
 		}
 
@@ -181,7 +181,7 @@ namespace cs {
 				return std::string();
 
 			auto length1 = length * 3;
-			auto chArray = new char[length1];
+			auto chArray = new charcs[length1];
 			auto num1 = startIndex;
 
 			for (size_t index = 0; index < length1; index += 3)
@@ -192,7 +192,9 @@ namespace cs {
 				chArray[index + 2] = '-';
 			}
 
-			return std::string(chArray, length1 - 1);
+			auto r = reinterpret_cast<char*>(chArray);
+
+			return std::string(r, length1 - 1);
 		}
 
 		//Returns a Boolean value converted from the byte at a specified position in a byte array.
