@@ -7,3 +7,4 @@
 #include "shader.hpp"
 #include "effect.hpp"
 #include "constbuffer.hpp"
+#include "defprocessors.hpp"
