@@ -33,12 +33,56 @@ namespace dxna::graphics {
 		constexpr Vector3 DiffuseColor() const noexcept { return diffuseColor; }
 		constexpr Vector3 Direction() const noexcept { return direction; }
 		constexpr Vector3 SpecularColor() const noexcept { return specularColor; }
+		constexpr bool Enabled() const noexcept { return enabled; }
 
 		void DiffuseColor(Vector3 const& value) {
 			diffuseColor = value;
 
 			if (enabled && diffuseColorParameter != nullptr) {
 				//diffuseColorParameter->SetValue(diffuseColor);
+			}
+		}
+
+		void Direction(Vector3 const& value) {
+			direction = value;
+
+			if (enabled && directionParameter != nullptr) {
+				//diffuseColorParameter->SetValue(diffuseColor);
+			}
+		}
+
+		void SpecularColor(Vector3 const& value) {
+			specularColor = value;
+
+			if (enabled && specularColorParameter != nullptr) {
+				//diffuseColorParameter->SetValue(diffuseColor);
+			}
+		}
+
+		void Enabled(bool value) {
+			if (enabled != value) {
+				enabled = value;
+
+				if (enabled) {
+					if (diffuseColorParameter != nullptr)
+					{
+						//diffuseColorParameter.SetValue(diffuseColor);
+					}
+					if (specularColorParameter != nullptr)
+					{
+						//specularColorParameter.SetValue(specularColor);
+					}
+				}
+				else {
+					if (diffuseColorParameter != nullptr)
+					{
+						//diffuseColorParameter.SetValue(Vector3.Zero);
+					}
+					if (specularColorParameter != nullptr)
+					{
+						//specularColorParameter.SetValue(Vector3.Zero);
+					}
+				}
 			}
 		}
 
