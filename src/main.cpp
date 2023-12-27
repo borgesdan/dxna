@@ -16,7 +16,6 @@ using namespace dxna;
 using namespace std;
 using namespace cs;
 
-
 void Read(Stream* fs) {
 	BinaryReader reader(fs);
 
@@ -54,19 +53,63 @@ void Write(Stream* fs)
 	writer.Write(s);
 }
 
+template <typename T>
+class EFT;
+
+class EF {
+public:	
+	virtual ~EF() {
+	}
+
+	template <typename T>
+	void GetData(T& data, dxna::Error* err = nullptr) {
+		auto r = dynamic_cast<const EFT<T>*>(this);
+
+		if (r == nullptr) {			
+			apply_error(err, dxna::ErrorCode::ARGUMENT_IS_NULL);						
+			return;
+		}
+
+		data = r->_Data;
+	}
+};
+
+template <typename T>
+class EFT : public EF {
+public:
+	EFT(T value) : _Data(value){}
+
+	virtual ~EFT() override {
+	}
+
+	T _Data;
+};
+
+template <typename T>
+void GetEFData(EF const* ef, T& data) {
+	auto r = dynamic_cast<const EFT<T>*>(ef);
+	data = r->_Data;
+}
+
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
-	setvbuf(stdout, nullptr, _IONBF, 0);
+	setvbuf(stdout, nullptr, _IONBF, 0);	
 
-	FileStream fs("D:/file4.bin");
-	cout << "length: " << fs.Length() << endl;
+	EF* ef = new EFT<int>(5);	
+	int value = 0;
+	string v2;
+	Error err;
+	//GetEFData<int>(ef, value);
+	ef->GetData<string>(v2, &err);
+	cout << value << endl;
+	cout << (int)err.Flag << endl;
+	delete ef;
 
-	auto a = dynamic_cast<Stream*>(&fs);
-	Read(a);
-	//Write(a);
-
-	cout << "length: " << fs.Length() << endl;
-	fs.Close();
+	auto ef2 = EFT<int>(10);
+	auto* ef3 = &ef2;	
+	//GetEFData<int>(ef3, value);
+	ef3->GetData<int>(value);
+	cout << value << endl;	
 
 	return 0;
 }
