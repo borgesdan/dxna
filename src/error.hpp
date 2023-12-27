@@ -33,7 +33,7 @@ namespace dxna {
 		ErrorCode Flag{ ErrorCode::NONE };
 	};	
 
-	inline constexpr Error NoError = Error::NoError();	
+	inline constexpr Error no_error = Error::NoError();	
 
 	inline void apply_error(Error* source, Error const& value) {
 		if (source != nullptr) {
