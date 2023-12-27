@@ -35,7 +35,7 @@ namespace dxna {
 
 	inline constexpr Error NoError = Error::NoError();	
 
-	inline void apply_error(Error* source, Error& value) {
+	inline void apply_error(Error* source, Error const& value) {
 		if (source != nullptr) {
 			source->Flag = value.Flag;
 			source->Index = value.Index;
