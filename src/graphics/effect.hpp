@@ -164,6 +164,9 @@ namespace dxna::graphics {
 			if (v_cast != nullptr) {
 				r->Data = *v_cast;
 			}
+			else {
+				apply_error(err, dxna::ErrorCode::NULL_CAST, 0);
+			}
 		}
 	};
 
@@ -197,6 +200,9 @@ namespace dxna::graphics {
 			if (v_cast != nullptr) {
 				r->Data = *v_cast;
 			}
+			else {
+				apply_error(err, dxna::ErrorCode::NULL_CAST, 0);
+			}
 		}
 	};
 
@@ -228,6 +234,9 @@ namespace dxna::graphics {
 
 			if (v_cast != nullptr) {
 				r->Data = *v_cast;
+			}
+			else {
+				apply_error(err, dxna::ErrorCode::NULL_CAST, 0);
 			}
 		}
 
