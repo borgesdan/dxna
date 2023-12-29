@@ -11,6 +11,7 @@
 #include <locale>
 #include <algorithm>
 #include <cwchar>
+#include <type_traits>
 
 using namespace dxna;
 using namespace std;
@@ -56,6 +57,11 @@ void Write(Stream* fs)
 template <typename T>
 class EFT;
 
+enum class EFType {
+	Int,
+	Float
+};
+
 class EF {
 public:	
 	virtual ~EF() {
@@ -63,15 +69,40 @@ public:
 
 	template <typename T>
 	void GetData(T& data, dxna::Error* err = nullptr) {
-		auto r = dynamic_cast<const EFT<T>*>(this);
 
-		if (r == nullptr) {			
-			apply_error(err, dxna::ErrorCode::ARGUMENT_IS_NULL);						
+		switch (_type)
+		{
+		case EFType::Int:
+		{
+			auto r = dynamic_cast<const EFT<int>*>(this);
+
+			if (r == nullptr) {
+				apply_error(err, dxna::ErrorCode::ARGUMENT_IS_NULL);
+				return;
+			}
+
+			data = r->_Data;
+		}
+		case EFType::Float:
+			break;
+		default:
+			break;
+		}
+	}
+
+	template <typename T>
+	void SetData(T& data, dxna::Error* err = nullptr) {
+		auto r = dynamic_cast<EFT<T>*>(this);
+
+		if (r == nullptr) {
+			apply_error(err, dxna::ErrorCode::ARGUMENT_IS_NULL);
 			return;
 		}
 
-		data = r->_Data;
+		r->_Data = data;
 	}
+
+	EFType _type;
 };
 
 template <typename T>
@@ -85,31 +116,27 @@ public:
 	T _Data;
 };
 
-template <typename T>
-void GetEFData(EF const* ef, T& data) {
-	auto r = dynamic_cast<const EFT<T>*>(ef);
-	data = r->_Data;
-}
+class IntEFT : public EFT<int> {
+public:
+	IntEFT(int value) : EFT(value) {
+		_type = EFType::Int;
+	}
+};
+
+
 
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	setvbuf(stdout, nullptr, _IONBF, 0);	
 
-	EF* ef = new EFT<int>(5);	
-	int value = 0;
-	string v2;
-	Error err;
-	//GetEFData<int>(ef, value);
-	ef->GetData<string>(v2, &err);
-	cout << value << endl;
+	EF* ef = new IntEFT(5);	
+	int value = 65;	
+	Error err;		
+	float v2 = 0.0F;
+	ef->SetData(value, &err);
+	ef->GetData(v2, &err);
 	cout << (int)err.Flag << endl;
 	delete ef;
-
-	auto ef2 = EFT<int>(10);
-	auto* ef3 = &ef2;	
-	//GetEFData<int>(ef3, value);
-	ef3->GetData<int>(value);
-	cout << value << endl;	
 
 	return 0;
 }
