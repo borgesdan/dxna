@@ -29,6 +29,7 @@ namespace dxna::graphics {
 	class ConstantBufferCollection;
 	class TextureCollection;
 	class DirectionalLight;
+	class DisplayMode;
 
 	using GraphicsResourcePtr				= std::shared_ptr<GraphicsResource>;
 	using GraphicsDevicePtr					= std::shared_ptr<GraphicsDevice>;
@@ -54,6 +55,7 @@ namespace dxna::graphics {
 	using ConstantBufferCollectionPtr		= std::shared_ptr<ConstantBufferCollection>;	
 	using TextureCollectionPtr				= std::shared_ptr<TextureCollection>;	
 	using DirectionalLightPtr				= std::shared_ptr<DirectionalLight>;
+	using DisplayModePtr					= std::shared_ptr<DisplayMode>;
 }
 
 #endif

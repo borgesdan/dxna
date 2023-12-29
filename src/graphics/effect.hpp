@@ -60,19 +60,7 @@ namespace dxna::graphics {
 
 	//--------------------------------------------------------------------------------//
 	//								EffectParameter									  //
-	//--------------------------------------------------------------------------------//
-
-	enum class EffectParameterDesc {
-		Int,
-		Matrix,
-		Quaternion,
-		Float,
-		Texture,
-		Vector2,
-		Vector3,
-		Vector4,
-		Pointer
-	};
+	//--------------------------------------------------------------------------------//	
 
 	template <typename T>
 	class EffectParameter_T;

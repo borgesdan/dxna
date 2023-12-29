@@ -82,13 +82,11 @@ namespace dxna::graphics {
 					if (diffuseColorParameter != nullptr)
 					{						
 						auto data = diffuseColorParameter.get();
-						//auto vec3 = Vector3();
 						EffectParameterSetData(Vector3::Zero(), data);
 					}
 					if (specularColorParameter != nullptr)
 					{
 						auto data = specularColorParameter.get();
-						//auto vec3 = Vector3();
 						EffectParameterSetData(Vector3::Zero(), data);
 					}
 				}
