@@ -62,7 +62,7 @@ namespace dxna::graphics {
 	//								EffectParameter									  //
 	//--------------------------------------------------------------------------------//
 
-	enum class EffectParameterType2 {
+	enum class EffectParameterDesc {
 		Int,
 		Matrix,
 		Quaternion,
@@ -105,97 +105,7 @@ namespace dxna::graphics {
 		EffectParameterCollectionPtr StructureMembers;
 		EffectAnnotationCollectionPtr Annotations;
 		ulongcs StateKey{ 0 };
-		EffectParameterType2 Type;
-
-		template <typename T>
-		void GetData(T& data, dxna::Error* err = nullptr) {
-		}
-
-		template <typename T>
-		void SetData(T& data, dxna::Error* err = nullptr) {			
-			switch (Type)
-			{
-			case dxna::graphics::EffectParameterType2::Int: {
-				auto r = dynamic_cast<EffectParameter_T<intcs>*>(this);
-
-				if (r == nullptr) {
-					apply_error(err, dxna::ErrorCode::NULL_CAST);
-					break;
-				}
-
-				r->Data = data;
-				break;
-			}				
-			case dxna::graphics::EffectParameterType2::Matrix:
-			{
-				auto r = dynamic_cast<EffectParameter_T<Matrix>*>(this);
-
-				if (r == nullptr) {
-					apply_error(err, dxna::ErrorCode::NULL_CAST);
-					break;
-				}
-
-				if (std::is_same<Matrix, T>::value) {
-					if (RowCount == 4 && ColumnCount == 4) {
-						r->Data = data;
-					}
-					else if (RowCount == 4 && ColumnCount == 3) {
-
-					}
-					else if (RowCount == 3 && ColumnCount == 4) {
-
-					}
-					else if (RowCount == 3 && ColumnCount == 3) {
-
-					}
-					else if (RowCount == 3 && ColumnCount == 2) {
-
-					}
-				}					
-				else {
-					apply_error(err, dxna::ErrorCode::BAD_CAST);
-					break;
-				}
-				
-				break;
-			}
-			case dxna::graphics::EffectParameterType2::Quaternion:
-				break;
-			case dxna::graphics::EffectParameterType2::Float: {
-				auto r = dynamic_cast<EffectParameter_T<float>*>(this);
-
-				if (r == nullptr) {
-					apply_error(err, dxna::ErrorCode::NULL_CAST);
-					break;
-				}
-
-				r->Data = data;
-				break;
-			}				
-			case dxna::graphics::EffectParameterType2::Texture:
-				break;
-			case dxna::graphics::EffectParameterType2::Vector2:
-				break;
-			case dxna::graphics::EffectParameterType2::Vector3: {
-				auto r = dynamic_cast<EffectParameter_T<Vector3>*>(this);
-
-				if (r == nullptr) {
-					apply_error(err, dxna::ErrorCode::NULL_CAST);
-					break;
-				}
-
-				r->Data = data;
-				break;
-				break;
-			}
-			case dxna::graphics::EffectParameterType2::Vector4:
-				break;
-			case dxna::graphics::EffectParameterType2::Pointer:
-				break;
-			default:
-				break;
-			}	
-		}
+		EffectParameterDesc Type;
 	};
 
 	template <typename T>
@@ -203,7 +113,7 @@ namespace dxna::graphics {
 	public:
 		EffectParameter_T(
 			T& data,
-			EffectParameterType2 const& type,
+			EffectParameterDesc const& type,
 			std::string name,
 			intcs rowCount,
 			intcs columnCount,
@@ -232,9 +142,22 @@ namespace dxna::graphics {
 			EffectParameterCollectionPtr const& elements,
 			EffectParameterCollectionPtr const& structMembers) :
 			EffectParameter_T(
-				value, EffectParameterType2::Int, name, rowCount, columnCount, semantic,
+				value, EffectParameterDesc::Int, name, rowCount, columnCount, semantic,
 				annotations, elements, structMembers) {
 
+		}
+
+		template <typename T>
+		static void SetData(T& data, EffectParameter* base, dxna::Error* err = nullptr) {
+			auto r = dynamic_cast<EffectParameter_T<intcs>*>(base);
+
+			if (r == nullptr) {
+				apply_error(err, dxna::ErrorCode::NULL_CAST);
+				break;
+			}
+
+			r->Data = data;
+			break;
 		}
 	};
 
@@ -249,13 +172,13 @@ namespace dxna::graphics {
 			EffectParameterCollectionPtr const& elements,
 			EffectParameterCollectionPtr const& structMembers) :
 			EffectParameter_T(
-				value, EffectParameterType2::Float, name, rowCount, columnCount, semantic,
+				value, EffectParameterDesc::Float, name, rowCount, columnCount, semantic,
 				annotations, elements, structMembers) {
 		}
 
 		template <typename T>
-		static void set_data(T& data, EffectParameter* base, dxna::Error * err = nullptr) {
-			auto r = dynamic_cast<EffectParameter_T<intcs>*>(base);
+		static void SetData(T& data, EffectParameter* base, dxna::Error * err = nullptr) {
+			auto r = dynamic_cast<EffectParameterInt*>(base);
 
 			if (r == nullptr) {
 				apply_error(err, dxna::ErrorCode::NULL_CAST);
@@ -278,13 +201,45 @@ namespace dxna::graphics {
 			EffectParameterCollectionPtr const& elements,
 			EffectParameterCollectionPtr const& structMembers) :
 			EffectParameter_T(
-				value, EffectParameterType2::Vector3, name, rowCount, columnCount, semantic,
+				value, EffectParameterDesc::Vector3, name, rowCount, columnCount, semantic,
 				annotations, elements, structMembers) {
-
 		}
+		template <typename T>
+		static void SetData(T& data, EffectParameter* base, dxna::Error* err = nullptr) {
+			auto r = dynamic_cast<EffectParameterVector3*>(this);
+
+			if (r == nullptr) {
+				apply_error(err, dxna::ErrorCode::NULL_CAST);
+				break;
+			}
+
+			r->Data = data;
+			break;
+		}
+
 	};
 
+	template <typename T>
+	inline void GetData(T& data, EffectParameter* base, dxna::Error* err = nullptr) {
+	}
 
+	template <typename T>
+	inline void EffectParameterSetData(T& data, EffectParameter* base, dxna::Error* err = nullptr) {
+		switch (base->Type)
+		{
+		case EffectParameterDesc::Int:
+			EffectParameterInt::SetData(data, base, err);
+			break;
+		case EffectParameterDesc::Float:
+			EffectParameterFloat::SetData(data, base, err);
+			break;
+		case EffectParameterDesc::Vector3:
+			EffectParameterVector3::SetData(data, base, err);
+			break;
+		default:
+			break;
+		}
+	}
 
 	class EffectParameterCollection {
 	public:
