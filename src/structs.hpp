@@ -356,7 +356,7 @@ namespace dxna {
 		constexpr Vector3() noexcept {}
 		constexpr Vector3(float x, float y, float z) noexcept : X(x), Y(y), Z(z) {}
 		constexpr Vector3(float value) noexcept : X(value), Y(value), Z(value) {}
-		constexpr Vector3(Vector2 const& value, float z) noexcept : X(value.X), Y(value.Y), Z(z) {}
+		constexpr Vector3(Vector2 const& value, float z = 0) noexcept : X(value.X), Y(value.Y), Z(z) {}
 
 		constexpr size_t GetHashCode() const noexcept {
 			size_t seed = 0;

@@ -81,6 +81,8 @@ namespace dxna::graphics {
 	public:
 		EffectParameter() = default;
 
+		virtual ~EffectParameter() = default;
+
 		EffectParameter(
 			std::string name,
 			intcs rowCount,
@@ -132,6 +134,7 @@ namespace dxna::graphics {
 	};
 
 	class EffectParameterInt : public EffectParameter_T<int> {
+	public:
 		EffectParameterInt(
 			intcs& value,
 			std::string name,
@@ -148,20 +151,24 @@ namespace dxna::graphics {
 		}
 
 		template <typename T>
-		static void SetData(T& data, EffectParameter* base, dxna::Error* err = nullptr) {
-			auto r = dynamic_cast<EffectParameter_T<intcs>*>(base);
+		static void SetData(T const& data, EffectParameter* base, dxna::Error* err = nullptr) {
+			auto r = dynamic_cast<EffectParameterInt*>(base);
 
 			if (r == nullptr) {
 				apply_error(err, dxna::ErrorCode::NULL_CAST);
-				break;
+				return;
 			}
 
-			r->Data = data;
-			break;
+			auto v_cast = reinterpret_cast<const intcs*>(&data);
+
+			if (v_cast != nullptr) {
+				r->Data = *v_cast;
+			}
 		}
 	};
 
 	class EffectParameterFloat : public EffectParameter_T<float> {
+	public:
 		EffectParameterFloat(
 			float& value,
 			std::string name,
@@ -177,20 +184,24 @@ namespace dxna::graphics {
 		}
 
 		template <typename T>
-		static void SetData(T& data, EffectParameter* base, dxna::Error * err = nullptr) {
-			auto r = dynamic_cast<EffectParameterInt*>(base);
+		static void SetData(T const& data, EffectParameter* base, dxna::Error * err = nullptr) {
+			auto r = dynamic_cast<EffectParameterFloat*>(base);
 
 			if (r == nullptr) {
 				apply_error(err, dxna::ErrorCode::NULL_CAST);
-				break;
+				return;
 			}
+			
+			auto v_cast = reinterpret_cast<const float*>(&data);
 
-			r->Data = data;
-			break;
+			if (v_cast != nullptr) {
+				r->Data = *v_cast;
+			}
 		}
 	};
 
 	class EffectParameterVector3 : public EffectParameter_T<Vector3> {
+	public:
 		EffectParameterVector3(
 			Vector3& value,
 			std::string name,
@@ -205,16 +216,19 @@ namespace dxna::graphics {
 				annotations, elements, structMembers) {
 		}
 		template <typename T>
-		static void SetData(T& data, EffectParameter* base, dxna::Error* err = nullptr) {
-			auto r = dynamic_cast<EffectParameterVector3*>(this);
+		static void SetData(T const& data, EffectParameter* base, dxna::Error* err = nullptr) {
+			auto r = dynamic_cast<EffectParameterVector3*>(base);
 
 			if (r == nullptr) {
 				apply_error(err, dxna::ErrorCode::NULL_CAST);
-				break;
-			}
+				return;
+			}			
 
-			r->Data = data;
-			break;
+			auto v_cast = reinterpret_cast<const Vector3*>(&data);
+
+			if (v_cast != nullptr) {
+				r->Data = *v_cast;
+			}
 		}
 
 	};
@@ -224,7 +238,7 @@ namespace dxna::graphics {
 	}
 
 	template <typename T>
-	inline void EffectParameterSetData(T& data, EffectParameter* base, dxna::Error* err = nullptr) {
+	inline void EffectParameterSetData(T const& data, EffectParameter* base, dxna::Error* err = nullptr) {
 		switch (base->Type)
 		{
 		case EffectParameterDesc::Int:

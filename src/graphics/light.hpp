@@ -39,7 +39,8 @@ namespace dxna::graphics {
 			diffuseColor = value;
 
 			if (enabled && diffuseColorParameter != nullptr) {
-				//diffuseColorParameter->SetValue(diffuseColor);
+				auto data = diffuseColorParameter.get();
+				EffectParameterSetData(diffuseColor, data);
 			}
 		}
 
@@ -47,15 +48,17 @@ namespace dxna::graphics {
 			direction = value;
 
 			if (enabled && directionParameter != nullptr) {
-				//diffuseColorParameter->SetValue(diffuseColor);
+				auto data = directionParameter.get();
+				EffectParameterSetData(diffuseColor, data);
 			}
 		}
 
 		void SpecularColor(Vector3 const& value) {
 			specularColor = value;
 
-			if (enabled && specularColorParameter != nullptr) {
-				//diffuseColorParameter->SetValue(diffuseColor);
+			if (enabled && specularColorParameter != nullptr) {				
+				auto data = specularColorParameter.get();
+				EffectParameterSetData(specularColor, data);
 			}
 		}
 
@@ -66,21 +69,27 @@ namespace dxna::graphics {
 				if (enabled) {
 					if (diffuseColorParameter != nullptr)
 					{
-						//diffuseColorParameter.SetValue(diffuseColor);
+						auto data = diffuseColorParameter.get();
+						EffectParameterSetData(diffuseColor, data);
 					}
 					if (specularColorParameter != nullptr)
 					{
-						//specularColorParameter.SetValue(specularColor);
+						auto data = specularColorParameter.get();
+						EffectParameterSetData(diffuseColor, data);
 					}
 				}
 				else {
 					if (diffuseColorParameter != nullptr)
-					{
-						//diffuseColorParameter.SetValue(Vector3.Zero);
+					{						
+						auto data = diffuseColorParameter.get();
+						//auto vec3 = Vector3();
+						EffectParameterSetData(Vector3::Zero(), data);
 					}
 					if (specularColorParameter != nullptr)
 					{
-						//specularColorParameter.SetValue(Vector3.Zero);
+						auto data = specularColorParameter.get();
+						//auto vec3 = Vector3();
+						EffectParameterSetData(Vector3::Zero(), data);
 					}
 				}
 			}
