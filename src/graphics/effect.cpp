@@ -64,9 +64,9 @@ namespace dxna::graphics {
 				}
 			}
 
-			parameters->at(i) = New<EffectParameter>(
+			/*parameters->at(i) = New<EffectParameter>(
 				class_, type, name, rowCount, columnCount, semantic,
-				annotations, elements, structMembers, data);
+				annotations, elements, structMembers, data);*/
 		}
 
 		return New<EffectParameterCollection>(parameters);

@@ -133,8 +133,9 @@ int main() {
 	int value = 65;	
 	Error err;		
 	float v2 = 0.0F;
+	string s;
 	ef->SetData(value, &err);
-	ef->GetData(v2, &err);
+	ef->GetData(s, &err);
 	cout << (int)err.Flag << endl;
 	delete ef;
 

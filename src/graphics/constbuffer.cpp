@@ -49,7 +49,7 @@ namespace dxna::graphics {
 				rowsUsed += rowsUsedSubParam;
 			}
 		}
-		else if (param.Data != nullptr) {
+		/*else if (param.Data != nullptr) {
 			switch (param.ParameterType)
 			{
 			case EffectParameterType::Single:
@@ -68,7 +68,7 @@ namespace dxna::graphics {
 			default:
 				return -1;
 			}
-		}
+		}*/
 
 		return rowsUsed;
 	}

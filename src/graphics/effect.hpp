@@ -3,6 +3,7 @@
 
 #include "graphicsresource.hpp"
 #include "constbuffer.hpp"
+#include <type_traits>
 
 namespace dxna::graphics {
 
@@ -61,43 +62,230 @@ namespace dxna::graphics {
 	//								EffectParameter									  //
 	//--------------------------------------------------------------------------------//
 
+	enum class EffectParameterType2 {
+		Int,
+		Matrix,
+		Quaternion,
+		Float,
+		Texture,
+		Vector2,
+		Vector3,
+		Vector4,
+		Pointer
+	};
+
+	template <typename T>
+	class EffectParameter_T;
+
 	class EffectParameter {
 	public:
 		EffectParameter() = default;
 
 		EffectParameter(
-			EffectParameterClass class_,
-			EffectParameterType type,
 			std::string name,
 			intcs rowCount,
 			intcs columnCount,
 			std::string semantic,
 			EffectAnnotationCollectionPtr const& annotations,
 			EffectParameterCollectionPtr const& elements,
-			EffectParameterCollectionPtr const& structMembers,
-			anyptr const& data) :
-			ParameterClass(class_), ParameterType(type), Name(name),
+			EffectParameterCollectionPtr const& structMembers) :
+			Name(name),
 			RowCount(rowCount), ColumnCount(columnCount), Semantic(semantic),
 			Annotations(annotations), Elements(elements), StructureMembers(structMembers),
-			Data(data), StateKey(NextStateKey++) {
+			StateKey(NextStateKey++) {
 		}
 
 		static ulongcs NextStateKey;
 
 		std::string Name;
 		std::string Semantic;
-		EffectParameterClass ParameterClass{ EffectParameterClass::Scalar };
-		EffectParameterType ParameterType{ EffectParameterType::Void };
 		intcs RowCount{ 0 };
 		intcs ColumnCount{ 0 };
 		EffectParameterCollectionPtr Elements;
 		EffectParameterCollectionPtr StructureMembers;
 		EffectAnnotationCollectionPtr Annotations;
-		//Representa um object
-		anyptr Data;
-		ulongcs StateKey{ 0 };	
+		ulongcs StateKey{ 0 };
+		EffectParameterType2 Type;
+
+		template <typename T>
+		void GetData(T& data, dxna::Error* err = nullptr) {
+		}
+
+		template <typename T>
+		void SetData(T& data, dxna::Error* err = nullptr) {			
+			switch (Type)
+			{
+			case dxna::graphics::EffectParameterType2::Int: {
+				auto r = dynamic_cast<EffectParameter_T<intcs>*>(this);
+
+				if (r == nullptr) {
+					apply_error(err, dxna::ErrorCode::NULL_CAST);
+					break;
+				}
+
+				r->Data = data;
+				break;
+			}				
+			case dxna::graphics::EffectParameterType2::Matrix:
+			{
+				auto r = dynamic_cast<EffectParameter_T<Matrix>*>(this);
+
+				if (r == nullptr) {
+					apply_error(err, dxna::ErrorCode::NULL_CAST);
+					break;
+				}
+
+				if (std::is_same<Matrix, T>::value) {
+					if (RowCount == 4 && ColumnCount == 4) {
+						r->Data = data;
+					}
+					else if (RowCount == 4 && ColumnCount == 3) {
+
+					}
+					else if (RowCount == 3 && ColumnCount == 4) {
+
+					}
+					else if (RowCount == 3 && ColumnCount == 3) {
+
+					}
+					else if (RowCount == 3 && ColumnCount == 2) {
+
+					}
+				}					
+				else {
+					apply_error(err, dxna::ErrorCode::BAD_CAST);
+					break;
+				}
+				
+				break;
+			}
+			case dxna::graphics::EffectParameterType2::Quaternion:
+				break;
+			case dxna::graphics::EffectParameterType2::Float: {
+				auto r = dynamic_cast<EffectParameter_T<float>*>(this);
+
+				if (r == nullptr) {
+					apply_error(err, dxna::ErrorCode::NULL_CAST);
+					break;
+				}
+
+				r->Data = data;
+				break;
+			}				
+			case dxna::graphics::EffectParameterType2::Texture:
+				break;
+			case dxna::graphics::EffectParameterType2::Vector2:
+				break;
+			case dxna::graphics::EffectParameterType2::Vector3: {
+				auto r = dynamic_cast<EffectParameter_T<Vector3>*>(this);
+
+				if (r == nullptr) {
+					apply_error(err, dxna::ErrorCode::NULL_CAST);
+					break;
+				}
+
+				r->Data = data;
+				break;
+				break;
+			}
+			case dxna::graphics::EffectParameterType2::Vector4:
+				break;
+			case dxna::graphics::EffectParameterType2::Pointer:
+				break;
+			default:
+				break;
+			}	
+		}
 	};
-	
+
+	template <typename T>
+	class EffectParameter_T : public EffectParameter {
+	public:
+		EffectParameter_T(
+			T& data,
+			EffectParameterType2 const& type,
+			std::string name,
+			intcs rowCount,
+			intcs columnCount,
+			std::string semantic,
+			EffectAnnotationCollectionPtr const& annotations,
+			EffectParameterCollectionPtr const& elements,
+			EffectParameterCollectionPtr const& structMembers) :
+			Data(data),
+			EffectParameter(
+				name, rowCount, columnCount, semantic,
+				annotations, elements, structMembers) {
+			Type = type;
+		}
+
+		T Data;
+	};
+
+	class EffectParameterInt : public EffectParameter_T<int> {
+		EffectParameterInt(
+			intcs& value,
+			std::string name,
+			intcs rowCount,
+			intcs columnCount,
+			std::string semantic,
+			EffectAnnotationCollectionPtr const& annotations,
+			EffectParameterCollectionPtr const& elements,
+			EffectParameterCollectionPtr const& structMembers) :
+			EffectParameter_T(
+				value, EffectParameterType2::Int, name, rowCount, columnCount, semantic,
+				annotations, elements, structMembers) {
+
+		}
+	};
+
+	class EffectParameterFloat : public EffectParameter_T<float> {
+		EffectParameterFloat(
+			float& value,
+			std::string name,
+			intcs rowCount,
+			intcs columnCount,
+			std::string semantic,
+			EffectAnnotationCollectionPtr const& annotations,
+			EffectParameterCollectionPtr const& elements,
+			EffectParameterCollectionPtr const& structMembers) :
+			EffectParameter_T(
+				value, EffectParameterType2::Float, name, rowCount, columnCount, semantic,
+				annotations, elements, structMembers) {
+		}
+
+		template <typename T>
+		static void set_data(T& data, EffectParameter* base, dxna::Error * err = nullptr) {
+			auto r = dynamic_cast<EffectParameter_T<intcs>*>(base);
+
+			if (r == nullptr) {
+				apply_error(err, dxna::ErrorCode::NULL_CAST);
+				break;
+			}
+
+			r->Data = data;
+			break;
+		}
+	};
+
+	class EffectParameterVector3 : public EffectParameter_T<Vector3> {
+		EffectParameterVector3(
+			Vector3& value,
+			std::string name,
+			intcs rowCount,
+			intcs columnCount,
+			std::string semantic,
+			EffectAnnotationCollectionPtr const& annotations,
+			EffectParameterCollectionPtr const& elements,
+			EffectParameterCollectionPtr const& structMembers) :
+			EffectParameter_T(
+				value, EffectParameterType2::Vector3, name, rowCount, columnCount, semantic,
+				annotations, elements, structMembers) {
+
+		}
+	};
+
+
+
 	class EffectParameterCollection {
 	public:
 		EffectParameterCollection() = default;
@@ -215,7 +403,7 @@ namespace dxna::graphics {
 			std::string const& name,
 			EffectPassCollectionPtr const& passes,
 			EffectAnnotationCollectionPtr const& annotations) :
-		Passes(passes), Annotations(annotations), Name(name){
+			Passes(passes), Annotations(annotations), Name(name) {
 		}
 
 		EffectPassCollectionPtr Passes;
@@ -278,7 +466,7 @@ namespace dxna::graphics {
 		}
 
 	protected:
-		virtual void OnApply(){}
+		virtual void OnApply() {}
 
 	private:
 		MGFXHeader ReadHeader(vectorptr<bytecs> const& effectCode, intcs index) {
@@ -298,7 +486,7 @@ namespace dxna::graphics {
 		EffectParameterCollectionPtr Parameters = nullptr;
 		EffectTechniqueCollectionPtr Techniques = nullptr;
 		EffectTechniquePtr CurrentTechnique = nullptr;
-		vectorptr<ConstantBufferPtr> ConstantBuffers = nullptr;		
+		vectorptr<ConstantBufferPtr> ConstantBuffers = nullptr;
 
 	private:
 		vectorptr<ShaderPtr> _shaders;
