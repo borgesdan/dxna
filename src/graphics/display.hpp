@@ -1,6 +1,7 @@
 #ifndef DXNA_GRAPHICS_DISPLAY_HPP
 #define DXNA_GRAPHICS_DISPLAY_HPP
 
+#include <algorithm>
 #include "enumerations.hpp"
 #include "../cs/cs.hpp"
 #include "../structs.hpp"
@@ -33,10 +34,51 @@ namespace dxna::graphics {
 			return Rectangle::Empty();
 		}
 
+		constexpr bool operator==(const DisplayMode& other) const noexcept {
+			return format == other.format
+				&& height == other.height
+				&& width == other.width;
+		}
+
+		constexpr bool operator<(const DisplayMode& other) const noexcept {
+			return format < other.format
+				&& width < other.width
+				&& height < other.height;
+		}
+
 	private:
 		SurfaceFormat format;
 		intcs height;
 		intcs width;
+	};
+
+	class DisplayModeCollection {
+	public:
+		DisplayModeCollection(vectorptr<DisplayModePtr> const& modes) : _modes(modes) {
+			std::sort(_modes->begin(), _modes->end());
+		}
+
+		vectorptr<DisplayModePtr> operator[](SurfaceFormat const& format) {
+			const auto size = _modes->size();
+			vectorptr<DisplayModePtr> list = NewVector<DisplayModePtr>(size);
+			auto count = 0;
+
+			for (size_t i = 0; i < _modes->size(); ++i) {
+				auto& mode = _modes->at(i);
+
+				if (mode->Format() == format) {
+					list->at(i) = mode;
+					++count;
+				}				
+			}
+			
+			list->resize(count);
+
+			return list;
+		}
+
+	public:
+		vectorptr<DisplayModePtr> _modes;
 	};
 }
 

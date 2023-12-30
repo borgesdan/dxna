@@ -54,90 +54,34 @@ void Write(Stream* fs)
 	writer.Write(s);
 }
 
-template <typename T>
-class EFT;
-
-enum class EFType {
-	Int,
-	Float
-};
-
-class EF {
-public:	
-	virtual ~EF() {
-	}
-
-	template <typename T>
-	void GetData(T& data, dxna::Error* err = nullptr) {
-
-		switch (_type)
-		{
-		case EFType::Int:
-		{
-			auto r = dynamic_cast<const EFT<int>*>(this);
-
-			if (r == nullptr) {
-				apply_error(err, dxna::ErrorCode::ARGUMENT_IS_NULL);
-				return;
-			}
-
-			data = r->_Data;
-		}
-		case EFType::Float:
-			break;
-		default:
-			break;
-		}
-	}
-
-	template <typename T>
-	void SetData(T& data, dxna::Error* err = nullptr) {
-		auto r = dynamic_cast<EFT<T>*>(this);
-
-		if (r == nullptr) {
-			apply_error(err, dxna::ErrorCode::ARGUMENT_IS_NULL);
-			return;
-		}
-
-		r->_Data = data;
-	}
-
-	EFType _type;
-};
-
-template <typename T>
-class EFT : public EF {
+class Sorted {
 public:
-	EFT(T value) : _Data(value){}
+	Sorted() = default;
+	Sorted(int i) : i(i){}
 
-	virtual ~EFT() override {
-	}
+	int i{ 0 };
 
-	T _Data;
-};
-
-class IntEFT : public EFT<int> {
-public:
-	IntEFT(int value) : EFT(value) {
-		_type = EFType::Int;
+	constexpr bool operator<(const Sorted& other) const noexcept {
+		return i <= other.i;
 	}
 };
-
-
 
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
-	setvbuf(stdout, nullptr, _IONBF, 0);	
+	setvbuf(stdout, nullptr, _IONBF, 0);		
 
-	EF* ef = new IntEFT(5);	
-	int value = 65;	
-	Error err;		
-	float v2 = 0.0F;
-	string s;
-	ef->SetData(value, &err);
-	ef->GetData(s, &err);
-	cout << (int)err.Flag << endl;
-	delete ef;
+	vector<Sorted> s{
+		Sorted(35),
+		Sorted(-10),
+		Sorted(10),
+		Sorted(-5),
+		Sorted(5),
+	};
+
+	sort(s.begin(), s.end());
+
+	for (auto& st : s)
+		cout << st.i << endl;
 
 	return 0;
 }
