@@ -32,6 +32,7 @@ namespace dxna::graphics {
 	class DisplayMode;
 	class DisplayModeCollection;
 	class GraphicsAdapter;
+	class GraphicsCapabilities;
 
 	using GraphicsResourcePtr				= std::shared_ptr<GraphicsResource>;
 	using GraphicsDevicePtr					= std::shared_ptr<GraphicsDevice>;
@@ -60,6 +61,7 @@ namespace dxna::graphics {
 	using DisplayModePtr					= std::shared_ptr<DisplayMode>;
 	using DisplayModeCollectionPtr			= std::shared_ptr<DisplayModeCollection>;
 	using GraphicsAdapterPtr				= std::shared_ptr<GraphicsAdapter>;
+	using GraphicsCapabilitiesPtr			= std::shared_ptr<GraphicsCapabilities>;
 }
 
 #endif

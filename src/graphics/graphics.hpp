@@ -11,3 +11,4 @@
 #include "light.hpp"
 #include "display.hpp"
 #include "adapter.hpp"
+#include "capabilities.hpp"
