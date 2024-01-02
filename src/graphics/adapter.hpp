@@ -17,7 +17,14 @@ namespace dxna::graphics {
             FastSoftware
         };
 
-        static void PlatformInitializeAdapters(vectorptr<GraphicsAdapterPtr>& adapters);
+        static void GraphicsAdapter_ctor() {
+            PlatformInitializeAdapters(_adapters);
+            _adapters->at(0)->_isDefaultAdapter = true;
+        }
+
+        static void PlatformInitializeAdapters(vectorptr<GraphicsAdapterPtr>& adapters) {
+            //TODO: PlatformInitializeAdapters
+        }
        
         static GraphicsAdapterPtr DefaultAdapter() {
             return _adapters->at(0);
@@ -59,22 +66,21 @@ namespace dxna::graphics {
             return _subSystemId;
         }
 
-        DisplayModeCollectionPtr SupportedDisplayModes() const {
+        DisplayModeCollectionPtr SupportedDisplayModes() const noexcept {
             return _supportedDisplayModes;
         }
 
-        DisplayModePtr CurrentDisplayMode() const {
+        DisplayModePtr CurrentDisplayMode() const noexcept {
             return _currentDisplayMode;
         }
 
-        bool IsWideScreen() const {
+        bool IsWideScreen() const noexcept {
             const auto minWideScreenAspect = 16.0f / 10.0f;
             return _currentDisplayMode->AspectRatio() >= minWideScreenAspect;
         }
 
-        bool QueryRenderTargetFormat(
-            SurfaceFormat const& format,            
-            SurfaceFormat& selectedFormat) {
+        bool QueryRenderTargetFormat(SurfaceFormat const& format,            
+            SurfaceFormat& selectedFormat) const noexcept {
 
             selectedFormat = format;
 

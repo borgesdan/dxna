@@ -3,6 +3,7 @@
 
 #pragma once
 #include "curve.hpp"
-
+#include "static.hpp"
+#include "dxna.hpp"
 
 // TODO: Reference additional headers your program requires here.
