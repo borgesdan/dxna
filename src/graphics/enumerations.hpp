@@ -218,6 +218,10 @@ namespace dxna::graphics {
         SRgb8A8Etc2 = 95,
     };
 
+    enum class GraphicsProfile {
+        Reach,
+        HiDef
+    };
 }
 
 #endif

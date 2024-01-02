@@ -10,3 +10,4 @@
 #include "defprocessors.hpp"
 #include "light.hpp"
 #include "display.hpp"
+#include "adapter.hpp"

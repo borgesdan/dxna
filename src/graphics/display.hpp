@@ -77,6 +77,25 @@ namespace dxna::graphics {
 			return list;
 		}
 
+		vectorptr<DisplayModePtr> At(SurfaceFormat const& format) {
+			const auto size = _modes->size();
+			vectorptr<DisplayModePtr> list = NewVector<DisplayModePtr>(size);
+			auto count = 0;
+
+			for (size_t i = 0; i < _modes->size(); ++i) {
+				auto& mode = _modes->at(i);
+
+				if (mode->Format() == format) {
+					list->at(i) = mode;
+					++count;
+				}
+			}
+
+			list->resize(count);
+
+			return list;
+		}
+
 	public:
 		vectorptr<DisplayModePtr> _modes;
 	};

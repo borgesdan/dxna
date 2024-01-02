@@ -30,6 +30,8 @@ namespace dxna::graphics {
 	class TextureCollection;
 	class DirectionalLight;
 	class DisplayMode;
+	class DisplayModeCollection;
+	class GraphicsAdapter;
 
 	using GraphicsResourcePtr				= std::shared_ptr<GraphicsResource>;
 	using GraphicsDevicePtr					= std::shared_ptr<GraphicsDevice>;
@@ -56,6 +58,8 @@ namespace dxna::graphics {
 	using TextureCollectionPtr				= std::shared_ptr<TextureCollection>;	
 	using DirectionalLightPtr				= std::shared_ptr<DirectionalLight>;
 	using DisplayModePtr					= std::shared_ptr<DisplayMode>;
+	using DisplayModeCollectionPtr			= std::shared_ptr<DisplayModeCollection>;
+	using GraphicsAdapterPtr				= std::shared_ptr<GraphicsAdapter>;
 }
 
 #endif
